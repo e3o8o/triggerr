@@ -1,0 +1,30 @@
+{
+  "name": "@triggerr/config",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "tsconfig"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf .turbo dist",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "eslint": "^8",
+    "eslint-config-custom": "*",
+    "tsup": "^8.2.3",
+    "typescript": "^5"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

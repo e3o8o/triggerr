@@ -1,0 +1,721 @@
+-- =========================================================================
+-- ROW LEVEL SECURITY (RLS) POLICIES FOR TRIGGERR
+-- =========================================================================
+-- This file contains all RLS policies with correct table and column names
+-- matching the Drizzle schema definitions in packages/core/database/schema.ts
+--
+-- SECURITY MODEL:
+-- - Anonymous users can access their session-specific data
+-- - Authenticated users can access their user-specific data
+-- - Service role has full access for backend operations
+-- - Public read access for reference data (flights, airports, etc.)
+--
+-- ANONYMOUS USER SUPPORT:
+-- - Uses app.anonymous_session_id setting for session identification
+-- - Supports quote cart, policies, wallets, payments, and conversations
+-- - Proper data isolation between anonymous sessions
+--
+-- USAGE:
+-- 1. This script is idempotent and can be run multiple times safely
+-- 2. It will drop and recreate all policies to ensure consistency
+-- 3. Run with: PGPASSWORD="pwd" psql -h host -p port -U user -d db -f RLS_sql.txt
+-- =========================================================================
+
+-- Start transaction for atomic execution
+BEGIN;
+
+\echo 'Starting RLS policy setup for triggerr...'
+
+-- =========================================================================
+-- USER AND AUTHENTICATION TABLES
+-- =========================================================================
+
+-- Table: user
+ALTER TABLE IF EXISTS public.user ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own user record" ON public.user;
+CREATE POLICY "Users can view their own user record"
+  ON public.user FOR SELECT
+  USING (auth.uid()::text = id);
+
+DROP POLICY IF EXISTS "Users can update their own user record" ON public.user;
+CREATE POLICY "Users can update their own user record"
+  ON public.user FOR UPDATE
+  USING (auth.uid()::text = id)
+  WITH CHECK (auth.uid()::text = id);
+
+DROP POLICY IF EXISTS "Service can manage users" ON public.user;
+CREATE POLICY "Service can manage users"
+  ON public.user FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: session
+ALTER TABLE IF EXISTS public.session ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own sessions" ON public.session;
+CREATE POLICY "Users can view their own sessions"
+  ON public.session FOR SELECT
+  USING (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Service can manage sessions" ON public.session;
+CREATE POLICY "Service can manage sessions"
+  ON public.session FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: account
+ALTER TABLE IF EXISTS public.account ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own accounts" ON public.account;
+CREATE POLICY "Users can view their own accounts"
+  ON public.account FOR SELECT
+  USING (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Service can manage accounts" ON public.account;
+CREATE POLICY "Service can manage accounts"
+  ON public.account FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: verification
+ALTER TABLE IF EXISTS public.verification ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage verification" ON public.verification;
+CREATE POLICY "Service can manage verification"
+  ON public.verification FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- REFERENCE DATA TABLES (PUBLIC READ ACCESS)
+-- =========================================================================
+
+-- Table: countries
+ALTER TABLE IF EXISTS public.countries ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view countries" ON public.countries;
+CREATE POLICY "Public can view countries"
+  ON public.countries FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Service can manage countries" ON public.countries;
+CREATE POLICY "Service can manage countries"
+  ON public.countries FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: regions
+ALTER TABLE IF EXISTS public.regions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view regions" ON public.regions;
+CREATE POLICY "Public can view regions"
+  ON public.regions FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Service can manage regions" ON public.regions;
+CREATE POLICY "Service can manage regions"
+  ON public.regions FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: airline
+ALTER TABLE IF EXISTS public.airline ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view airlines" ON public.airline;
+CREATE POLICY "Public can view airlines"
+  ON public.airline FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Service can manage airlines" ON public.airline;
+CREATE POLICY "Service can manage airlines"
+  ON public.airline FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: airport
+ALTER TABLE IF EXISTS public.airport ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view airports" ON public.airport;
+CREATE POLICY "Public can view airports"
+  ON public.airport FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Service can manage airports" ON public.airport;
+CREATE POLICY "Service can manage airports"
+  ON public.airport FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: aircraft_types
+ALTER TABLE IF EXISTS public.aircraft_types ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view aircraft types" ON public.aircraft_types;
+CREATE POLICY "Public can view aircraft types"
+  ON public.aircraft_types FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Service can manage aircraft types" ON public.aircraft_types;
+CREATE POLICY "Service can manage aircraft types"
+  ON public.aircraft_types FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: runways
+ALTER TABLE IF EXISTS public.runways ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view runways" ON public.runways;
+CREATE POLICY "Public can view runways"
+  ON public.runways FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Service can manage runways" ON public.runways;
+CREATE POLICY "Service can manage runways"
+  ON public.runways FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: routes
+ALTER TABLE IF EXISTS public.routes ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view routes" ON public.routes;
+CREATE POLICY "Public can view routes"
+  ON public.routes FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Service can manage routes" ON public.routes;
+CREATE POLICY "Service can manage routes"
+  ON public.routes FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- FLIGHT DATA TABLES
+-- =========================================================================
+
+-- Table: flight
+ALTER TABLE IF EXISTS public.flight ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can search flights" ON public.flight;
+CREATE POLICY "Public can search flights"
+  ON public.flight FOR SELECT
+  USING (true);
+
+DROP POLICY IF EXISTS "Service can manage flights" ON public.flight;
+CREATE POLICY "Service can manage flights"
+  ON public.flight FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: flight_data_source
+ALTER TABLE IF EXISTS public.flight_data_source ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage flight data sources" ON public.flight_data_source;
+CREATE POLICY "Service can manage flight data sources"
+  ON public.flight_data_source FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- PROVIDER AND PRODUCT TABLES
+-- =========================================================================
+
+-- Table: provider
+ALTER TABLE IF EXISTS public.provider ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view active providers" ON public.provider;
+CREATE POLICY "Public can view active providers"
+  ON public.provider FOR SELECT
+  USING (status = 'ACTIVE');
+
+DROP POLICY IF EXISTS "Service can manage providers" ON public.provider;
+CREATE POLICY "Service can manage providers"
+  ON public.provider FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: provider_product
+ALTER TABLE IF EXISTS public.provider_product ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view active provider products" ON public.provider_product;
+CREATE POLICY "Public can view active provider products"
+  ON public.provider_product FOR SELECT
+  USING (status = 'PUBLISHED');
+
+DROP POLICY IF EXISTS "Service can manage provider products" ON public.provider_product;
+CREATE POLICY "Service can manage provider products"
+  ON public.provider_product FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- QUOTE MANAGEMENT TABLES
+-- =========================================================================
+
+-- Table: quote
+ALTER TABLE IF EXISTS public.quote ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own quotes" ON public.quote;
+CREATE POLICY "Users can view their own quotes"
+  ON public.quote FOR SELECT
+  USING (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Service can manage quotes" ON public.quote;
+CREATE POLICY "Service can manage quotes"
+  ON public.quote FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: quote_cart_items (ANONYMOUS + AUTHENTICATED SUPPORT)
+ALTER TABLE IF EXISTS public.quote_cart_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can manage their own quote cart items" ON public.quote_cart_items;
+CREATE POLICY "Users can manage their own quote cart items"
+  ON public.quote_cart_items FOR ALL
+  USING (auth.uid()::text = user_id)
+  WITH CHECK (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Anonymous users can view their quote cart items" ON public.quote_cart_items;
+CREATE POLICY "Anonymous users can view their quote cart items"
+  ON public.quote_cart_items FOR SELECT
+  USING (anonymous_session_id IS NOT NULL AND
+         anonymous_session_id = current_setting('app.anonymous_session_id', true));
+
+DROP POLICY IF EXISTS "Anonymous users can manage their quote cart items" ON public.quote_cart_items;
+CREATE POLICY "Anonymous users can manage their quote cart items"
+  ON public.quote_cart_items FOR ALL
+  USING (anonymous_session_id IS NOT NULL AND
+         anonymous_session_id = current_setting('app.anonymous_session_id', true))
+  WITH CHECK (anonymous_session_id IS NOT NULL AND
+              anonymous_session_id = current_setting('app.anonymous_session_id', true) AND
+              user_id IS NULL);
+
+DROP POLICY IF EXISTS "Service can manage all quote cart items" ON public.quote_cart_items;
+CREATE POLICY "Service can manage all quote cart items"
+  ON public.quote_cart_items FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- POLICY MANAGEMENT TABLES (ANONYMOUS + AUTHENTICATED SUPPORT)
+-- =========================================================================
+
+-- Table: policy
+ALTER TABLE IF EXISTS public.policy ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can manage their own policies" ON public.policy;
+CREATE POLICY "Users can manage their own policies"
+  ON public.policy FOR ALL
+  USING (auth.uid()::text = user_id)
+  WITH CHECK (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Anonymous users can access policies by session ID" ON public.policy;
+CREATE POLICY "Anonymous users can access policies by session ID"
+  ON public.policy FOR SELECT
+  USING (anonymous_session_id IS NOT NULL AND
+         anonymous_session_id = current_setting('app.anonymous_session_id', true));
+
+DROP POLICY IF EXISTS "Service can manage all policies" ON public.policy;
+CREATE POLICY "Service can manage all policies"
+  ON public.policy FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: policy_verification_code
+ALTER TABLE IF EXISTS public.policy_verification_code ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can access verification codes for their policies" ON public.policy_verification_code;
+CREATE POLICY "Users can access verification codes for their policies"
+  ON public.policy_verification_code FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM policy p
+    WHERE p.id = policy_verification_code.policy_id AND p.user_id = auth.uid()::text
+  ));
+
+DROP POLICY IF EXISTS "Anonymous users can access verification codes for their policies" ON public.policy_verification_code;
+CREATE POLICY "Anonymous users can access verification codes for their policies"
+  ON public.policy_verification_code FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM policy p
+    WHERE p.id = policy_verification_code.policy_id
+    AND p.anonymous_session_id IS NOT NULL
+    AND p.anonymous_session_id = current_setting('app.anonymous_session_id', true)
+  ));
+
+DROP POLICY IF EXISTS "Service can manage policy verification codes" ON public.policy_verification_code;
+CREATE POLICY "Service can manage policy verification codes"
+  ON public.policy_verification_code FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: policy_event
+ALTER TABLE IF EXISTS public.policy_event ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view events for their policies" ON public.policy_event;
+CREATE POLICY "Users can view events for their policies"
+  ON public.policy_event FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM policy p
+    WHERE p.id = policy_event.policy_id AND p.user_id = auth.uid()::text
+  ));
+
+DROP POLICY IF EXISTS "Anonymous users can view events for their policies" ON public.policy_event;
+CREATE POLICY "Anonymous users can view events for their policies"
+  ON public.policy_event FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM policy p
+    WHERE p.id = policy_event.policy_id
+    AND p.anonymous_session_id IS NOT NULL
+    AND p.anonymous_session_id = current_setting('app.anonymous_session_id', true)
+  ));
+
+DROP POLICY IF EXISTS "Service can manage policy events" ON public.policy_event;
+CREATE POLICY "Service can manage policy events"
+  ON public.policy_event FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- FINANCIAL MANAGEMENT TABLES (ANONYMOUS + AUTHENTICATED SUPPORT)
+-- =========================================================================
+
+-- Table: user_wallets
+ALTER TABLE IF EXISTS public.user_wallets ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own wallet" ON public.user_wallets;
+CREATE POLICY "Users can view their own wallet"
+  ON public.user_wallets FOR SELECT
+  USING (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Users can update their own wallet" ON public.user_wallets;
+CREATE POLICY "Users can update their own wallet"
+  ON public.user_wallets FOR UPDATE
+  USING (auth.uid()::text = user_id)
+  WITH CHECK (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Anonymous users can access their paygo wallets" ON public.user_wallets;
+CREATE POLICY "Anonymous users can access their paygo wallets"
+  ON public.user_wallets FOR ALL
+  USING (anonymous_session_id IS NOT NULL AND
+         anonymous_session_id = current_setting('app.anonymous_session_id', true))
+  WITH CHECK (anonymous_session_id IS NOT NULL AND
+              anonymous_session_id = current_setting('app.anonymous_session_id', true) AND
+              user_id IS NULL);
+
+DROP POLICY IF EXISTS "Service can manage all user wallets" ON public.user_wallets;
+CREATE POLICY "Service can manage all user wallets"
+  ON public.user_wallets FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: user_payment_methods
+ALTER TABLE IF EXISTS public.user_payment_methods ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own payment methods" ON public.user_payment_methods;
+CREATE POLICY "Users can view their own payment methods"
+  ON public.user_payment_methods FOR SELECT
+  USING (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Users can update their own payment methods" ON public.user_payment_methods;
+CREATE POLICY "Users can update their own payment methods"
+  ON public.user_payment_methods FOR UPDATE
+  USING (auth.uid()::text = user_id)
+  WITH CHECK (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Anonymous users can access their payment methods" ON public.user_payment_methods;
+CREATE POLICY "Anonymous users can access their payment methods"
+  ON public.user_payment_methods FOR ALL
+  USING (anonymous_session_id IS NOT NULL AND
+         anonymous_session_id = current_setting('app.anonymous_session_id', true))
+  WITH CHECK (anonymous_session_id IS NOT NULL AND
+              anonymous_session_id = current_setting('app.anonymous_session_id', true) AND
+              user_id IS NULL);
+
+DROP POLICY IF EXISTS "Service can manage all payment methods" ON public.user_payment_methods;
+CREATE POLICY "Service can manage all payment methods"
+  ON public.user_payment_methods FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- CONVERSATION MANAGEMENT TABLES (ANONYMOUS + AUTHENTICATED SUPPORT)
+-- =========================================================================
+
+-- Table: conversations
+ALTER TABLE IF EXISTS public.conversations ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own conversations" ON public.conversations;
+CREATE POLICY "Users can view their own conversations"
+  ON public.conversations FOR SELECT
+  USING (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Users can manage their own conversations" ON public.conversations;
+CREATE POLICY "Users can manage their own conversations"
+  ON public.conversations FOR ALL
+  USING (auth.uid()::text = user_id)
+  WITH CHECK (auth.uid()::text = user_id);
+
+DROP POLICY IF EXISTS "Anonymous users can access their conversations" ON public.conversations;
+CREATE POLICY "Anonymous users can access their conversations"
+  ON public.conversations FOR ALL
+  USING (anonymous_session_id IS NOT NULL AND
+         anonymous_session_id = current_setting('app.anonymous_session_id', true))
+  WITH CHECK (anonymous_session_id IS NOT NULL AND
+              anonymous_session_id = current_setting('app.anonymous_session_id', true) AND
+              user_id IS NULL);
+
+DROP POLICY IF EXISTS "Service can manage all conversations" ON public.conversations;
+CREATE POLICY "Service can manage all conversations"
+  ON public.conversations FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: conversation_messages
+ALTER TABLE IF EXISTS public.conversation_messages ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view messages in their conversations" ON public.conversation_messages;
+CREATE POLICY "Users can view messages in their conversations"
+  ON public.conversation_messages FOR SELECT
+  USING (EXISTS (
+    SELECT 1 FROM public.conversations c
+    WHERE c.id = conversation_messages.conversation_id
+    AND (c.user_id = auth.uid()::text OR auth.role() = 'service_role')
+  ));
+
+DROP POLICY IF EXISTS "Users can add messages to their conversations" ON public.conversation_messages;
+CREATE POLICY "Users can add messages to their conversations"
+  ON public.conversation_messages FOR INSERT
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.conversations c
+    WHERE c.id = conversation_messages.conversation_id
+    AND c.user_id = auth.uid()::text
+  ));
+
+DROP POLICY IF EXISTS "Anonymous users can access their conversation messages" ON public.conversation_messages;
+CREATE POLICY "Anonymous users can access their conversation messages"
+  ON public.conversation_messages FOR ALL
+  USING (EXISTS (
+    SELECT 1 FROM public.conversations c
+    WHERE c.id = conversation_messages.conversation_id
+    AND c.anonymous_session_id IS NOT NULL
+    AND c.anonymous_session_id = current_setting('app.anonymous_session_id', true)
+  ))
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.conversations c
+    WHERE c.id = conversation_messages.conversation_id
+    AND c.anonymous_session_id IS NOT NULL
+    AND c.anonymous_session_id = current_setting('app.anonymous_session_id', true)
+  ));
+
+DROP POLICY IF EXISTS "Service can manage all conversation messages" ON public.conversation_messages;
+CREATE POLICY "Service can manage all conversation messages"
+  ON public.conversation_messages FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- FINANCIAL SYSTEM TABLES (SERVICE ROLE ONLY)
+-- =========================================================================
+
+-- Table: escrow
+ALTER TABLE IF EXISTS public.escrow ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage escrows" ON public.escrow;
+CREATE POLICY "Service can manage escrows"
+  ON public.escrow FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: escrow_pool
+ALTER TABLE IF EXISTS public.escrow_pool ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage escrow pools" ON public.escrow_pool;
+CREATE POLICY "Service can manage escrow pools"
+  ON public.escrow_pool FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: escrow_pool_participant
+ALTER TABLE IF EXISTS public.escrow_pool_participant ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage escrow pool participants" ON public.escrow_pool_participant;
+CREATE POLICY "Service can manage escrow pool participants"
+  ON public.escrow_pool_participant FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: payout
+ALTER TABLE IF EXISTS public.payout ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage payouts" ON public.payout;
+CREATE POLICY "Service can manage payouts"
+  ON public.payout FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: revenue
+ALTER TABLE IF EXISTS public.revenue ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage revenue records" ON public.revenue;
+CREATE POLICY "Service can manage revenue records"
+  ON public.revenue FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: revenue_sharing_rule
+ALTER TABLE IF EXISTS public.revenue_sharing_rule ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage revenue sharing rules" ON public.revenue_sharing_rule;
+CREATE POLICY "Service can manage revenue sharing rules"
+  ON public.revenue_sharing_rule FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- SYSTEM MANAGEMENT TABLES (SERVICE ROLE ONLY)
+-- =========================================================================
+
+-- Table: webhook
+ALTER TABLE IF EXISTS public.webhook ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage webhooks" ON public.webhook;
+CREATE POLICY "Service can manage webhooks"
+  ON public.webhook FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: webhook_delivery
+ALTER TABLE IF EXISTS public.webhook_delivery ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage webhook deliveries" ON public.webhook_delivery;
+CREATE POLICY "Service can manage webhook deliveries"
+  ON public.webhook_delivery FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: system_configuration
+ALTER TABLE IF EXISTS public.system_configuration ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Authenticated users can view non-sensitive configurations" ON public.system_configuration;
+CREATE POLICY "Authenticated users can view non-sensitive configurations"
+  ON public.system_configuration FOR SELECT
+  USING (auth.role() = 'authenticated' AND is_secret = false);
+
+DROP POLICY IF EXISTS "Service can manage all system configurations" ON public.system_configuration;
+CREATE POLICY "Service can manage all system configurations"
+  ON public.system_configuration FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: cache_entry
+ALTER TABLE IF EXISTS public.cache_entry ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage cache entries" ON public.cache_entry;
+CREATE POLICY "Service can manage cache entries"
+  ON public.cache_entry FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: scheduled_task
+ALTER TABLE IF EXISTS public.scheduled_task ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage scheduled tasks" ON public.scheduled_task;
+CREATE POLICY "Service can manage scheduled tasks"
+  ON public.scheduled_task FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: task_execution
+ALTER TABLE IF EXISTS public.task_execution ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage task executions" ON public.task_execution;
+CREATE POLICY "Service can manage task executions"
+  ON public.task_execution FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- AUDIT AND LOGGING TABLES (SERVICE ROLE ONLY)
+-- =========================================================================
+
+-- Table: audit_log
+ALTER TABLE IF EXISTS public.audit_log ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage audit logs" ON public.audit_log;
+CREATE POLICY "Service can manage audit logs"
+  ON public.audit_log FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: api_logs
+ALTER TABLE IF EXISTS public.api_logs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view their own API logs" ON public.api_logs;
+CREATE POLICY "Users can view their own API logs"
+  ON public.api_logs FOR SELECT
+  USING (auth.uid()::text = user_id OR
+         (anonymous_session_id IS NOT NULL AND
+          anonymous_session_id = current_setting('app.anonymous_session_id', true)));
+
+DROP POLICY IF EXISTS "Service can manage all API logs" ON public.api_logs;
+CREATE POLICY "Service can manage all API logs"
+  ON public.api_logs FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: raw_api_call_logs
+ALTER TABLE IF EXISTS public.raw_api_call_logs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage raw API call logs" ON public.raw_api_call_logs;
+CREATE POLICY "Service can manage raw API call logs"
+  ON public.raw_api_call_logs FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- HISTORICAL DATA TABLES (SERVICE ROLE ONLY)
+-- =========================================================================
+
+-- Table: historical_flight_segments
+ALTER TABLE IF EXISTS public.historical_flight_segments ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage historical flight segments" ON public.historical_flight_segments;
+CREATE POLICY "Service can manage historical flight segments"
+  ON public.historical_flight_segments FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Table: historical_weather_observations
+ALTER TABLE IF EXISTS public.historical_weather_observations ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage historical weather observations" ON public.historical_weather_observations;
+CREATE POLICY "Service can manage historical weather observations"
+  ON public.historical_weather_observations FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- =========================================================================
+-- API KEY MANAGEMENT (SERVICE ROLE ONLY)
+-- =========================================================================
+
+-- Table: api_key
+ALTER TABLE IF EXISTS public.api_key ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Service can manage API keys" ON public.api_key;
+CREATE POLICY "Service can manage API keys"
+  ON public.api_key FOR ALL
+  USING (auth.role() = 'service_role')
+  WITH CHECK (auth.role() = 'service_role');
+
+-- Commit the transaction
+COMMIT;
+
+\echo 'RLS policy setup completed successfully!'
+\echo ''
+\echo 'Summary of RLS policies created:'
+\echo '• User authentication and session management'
+\echo '• Public read access for reference data'
+\echo '• Anonymous user support for core business flows'
+\echo '• Authenticated user data isolation'
+\echo '• Service role administrative access'
+\

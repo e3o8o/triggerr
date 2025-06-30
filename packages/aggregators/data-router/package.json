@@ -1,0 +1,20 @@
+{
+  "name": "@triggerr/data-router",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A high-level service for managing and optimizing data aggregator sources.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf .turbo dist"
+  },
+  "dependencies": {
+    "@triggerr/core": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  }
+}

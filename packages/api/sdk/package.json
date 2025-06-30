@@ -1,0 +1,63 @@
+{
+  "name": "@triggerr/api-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Framework-agnostic TypeScript SDK for triggerr parametric insurance platform API",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./client": "./dist/src/client/index.js",
+    "./services": "./dist/src/services/index.js",
+    "./auth": "./dist/src/auth/index.js",
+    "./types": "./dist/src/types/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist .turbo",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "triggerr",
+    "api",
+    "sdk",
+    "typescript",
+    "parametric-insurance",
+    "paygo",
+    "blockchain",
+    "framework-agnostic"
+  ],
+  "dependencies": {
+    "@triggerr/api-contracts": "workspace:*"
+  },
+  "peerDependencies": {
+    "zod": "^3.22.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/e3o8o/triggerr.git",
+    "directory": "packages/api/sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/e3o8o/triggerr/issues"
+  },
+  "homepage": "https://docs.triggerr.com/sdk",
+  "author": {
+    "name": "Elem Oghenekaro",
+    "email": "elemoghenekaro@gmail.com",
+    "url": "https://github.com/e3o8o"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

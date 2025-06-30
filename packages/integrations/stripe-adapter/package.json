@@ -1,0 +1,28 @@
+{
+  "name": "@triggerr/stripe",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup",
+    "clean": "rm -rf .turbo dist",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "@triggerr/api-contracts": "workspace:*",
+    "@triggerr/core": "workspace:*",
+    "stripe": "^16.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.12",
+    "eslint": "^8.57.0",
+    "tsup": "^8.2.3",
+    "typescript": "^5.5.4"
+  }
+}

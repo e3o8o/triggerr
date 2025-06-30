@@ -1,0 +1,8 @@
+# Bun configuration file
+# See https://bun.sh/docs/runtime/bunfig for more information
+
+[test]
+# This prevents Bun's test runner from executing tests found in build output directories.
+# By default, bun test discovers test files in the entire project. We only want
+# to run tests from the source files.
+exclude = ["**/dist/**", "**/node_modules/**"]

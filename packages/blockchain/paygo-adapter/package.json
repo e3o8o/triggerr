@@ -1,0 +1,55 @@
+{
+  "name": "@triggerr/paygo-adapter",
+  "version": "0.1.0",
+  "description": "PayGo client adapter for InsureInnie - Provides a clean interface for interacting with the PayGo blockchain network.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "bun test",
+    "lint": "eslint 'src/**/*.ts' --fix",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "paygo",
+    "blockchain",
+    "adapter",
+    "triggerr"
+  ],
+  "author": "InsureInnie Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/triggerr/triggerr/tree/main/packages/blockchain/paygo-adapter"
+  },
+  "bugs": {
+    "url": "https://github.com/triggerr/triggerr/issues"
+  },
+  "homepage": "https://github.com/triggerr/triggerr#readme",
+  "dependencies": {
+    "@triggerr/blockchain-interface": "*",
+    "@witnessco/paygo-ts-client": "^0.1.1",
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

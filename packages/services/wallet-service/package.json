@@ -1,0 +1,33 @@
+{
+  "name": "@triggerr/wallet-service",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "bun test --config ./tsconfig.test.json",
+    "lint": "eslint . --ext .ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@triggerr/paygo-adapter": "workspace:*",
+    "@triggerr/service-registry": "*",
+    "@triggerr/core": "workspace:*",
+    "viem": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "~5.0.0"
+  }
+}

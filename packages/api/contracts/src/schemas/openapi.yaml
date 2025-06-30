@@ -1,0 +1,3516 @@
+openapi: 3.1.0
+info:
+  title: triggerr API
+  description: |
+    Parametric Insurance Platform API - "The Parametric Insurance Experts"
+
+    This API provides comprehensive access to triggerr's parametric insurance platform,
+    supporting anonymous and authenticated users across multiple interfaces (Web, CLI, Terminal, API).
+
+    Key Features:
+    - Parametric Insurance: Automated, blockchain-based insurance products.
+    - Multi-Interface Support: Web UI, REST API, CLI, and Terminal access.
+    - Anonymous Sessions: Quote and interact without registration.
+    - PayGo Integration: Blockchain escrow and automated payouts.
+    - Conversational AI: LLM-powered chat for quotes and support.
+
+    Authentication Methods:
+    - Anonymous Access: Via `x-anonymous-session-id` header.
+    - User Authentication: OAuth2 JWT (Bearer Token) for full platform access.
+    - API Keys: Via `x-api-key` header for B2B integration partners.
+  version: '1.0.0' # API version, not package version
+  contact:
+    name: triggerr API Support
+    email: api@triggerr.com
+    url: https://docs.triggerr.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.triggerr.com/v1
+    description: Production server
+  - url: https://staging-api.triggerr.com/v1
+    description: Staging server
+  - url: http://localhost:3000/api/v1
+    description: Local development server
+
+security:
+  - BearerAuth: []
+  - AnonymousSession: []
+  - ApiKeyAuth: []
+
+tags:
+  - name: System
+    description: System health and status endpoints
+  - name: Chat
+    description: Conversational AI endpoints
+  - name: Insurance
+    description: Insurance products, quotes, and policy purchase
+  - name: Policy
+    description: Parametric policy lifecycle and automated payout management
+  - name: User
+    description: User management, profile, and dashboard endpoints
+  - name: Wallet
+    description: User wallet and transaction management
+  - name: Admin
+    description: Administrative endpoints for user and system management
+
+paths:
+  # ============================================================================
+  # HEALTH & STATUS
+  # ============================================================================
+  /health:
+    get:
+      summary: Health Check
+      description: Checks the operational status of the API and its core dependencies.
+      tags: [System]
+      security: [] # No authentication needed for health check
+      responses:
+        '200':
+          description: API is healthy and operational.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse'
+        '503':
+          description: API is unhealthy or one of its critical dependencies is down.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthCheckResponse' # Still returns a HealthCheckResponse structure
+
+  # ============================================================================
+  # CHAT ENDPOINTS
+  # ============================================================================
+  /chat/message:
+    post:
+      summary: Send Chat Message
+      description: |
+        Sends a message to the conversational AI system.
+        Can be used by anonymous or authenticated users.
+        If `conversationId` is omitted, a new conversation is started.
+      tags: [Chat]
+      security:
+        - BearerAuth: []
+        - AnonymousSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatMessageRequest'
+      responses:
+        '200':
+          description: Message processed successfully and response generated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatMessageResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /chat/conversations:
+    get:
+      summary: List User Conversations
+      description: Retrieves a paginated list of conversations for the authenticated user.
+      tags: [Chat]
+      security:
+        - BearerAuth: [] # Requires user authentication
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: status
+          in: query
+          description: Filter conversations by status.
+          required: false
+          schema:
+            type: string # Using type directly as ConversationStatusEnum might be Zod specific
+            enum: [active, completed, archived]
+        - name: interface
+          in: query
+          description: Filter conversations by the interface they originated from.
+          required: false
+          schema:
+            type: string # Using type directly as ChatInterfaceEnum might be Zod specific
+            enum: [web, api, cli, terminal]
+      responses:
+        '200':
+          description: A list of conversations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ============================================================================
+  # INSURANCE (QUOTING & PRODUCT CATALOG) ENDPOINTS
+  # ============================================================================
+  /insurance/products:
+    get:
+      summary: List Insurance Products
+      description: Retrieves a list of available insurance products and their configurations.
+      tags: [Insurance]
+      security: [] # Open endpoint
+      parameters:
+        - name: productType
+          in: query
+          description: Filter by a specific product type.
+          required: false
+          schema:
+            $ref: '#/components/schemas/InsuranceProductTypeEnum'
+        - name: tier
+          in: query
+          description: Filter by a specific coverage tier.
+          required: false
+          schema:
+            $ref: '#/components/schemas/CoverageTierEnum'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: A list of available insurance products.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InsuranceProductsResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /insurance/quote:
+    post:
+      summary: Get Insurance Quote
+      description: |
+        Requests a parametric insurance quote based on provided flight and coverage details.
+        Can be used by anonymous or authenticated users.
+      tags: [Insurance]
+      security:
+        - BearerAuth: []
+        - AnonymousSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InsuranceQuoteRequest'
+      responses:
+        '200':
+          description: Quote generated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InsuranceQuoteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # For validation errors
+        '422':
+          description: Unprocessable entity, e.g., flight data unavailable for quoting.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /insurance/cart/add: # For anonymous users to save quotes
+    post:
+      summary: Add Quote to Anonymous Cart
+      description: Adds a generated quote to an anonymous user's temporary cart using their session ID.
+      tags: [Insurance]
+      security:
+        - AnonymousSession: [] # Requires anonymous session ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToCartRequest'
+      responses:
+        '200':
+          description: Quote successfully added to the anonymous cart.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddToCartResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          description: Quote ID not found or expired.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /insurance/purchase: # Authenticated users purchase policies
+    post:
+      summary: Purchase Insurance Policy
+      description: Purchases an insurance policy based on a previously generated quote. Requires user authentication.
+      tags: [Insurance]
+      security:
+        - BearerAuth: [] # Requires authenticated user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyPurchaseRequest'
+      responses:
+        '200': # Or 201 Created
+          description: Policy purchased successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyPurchaseResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # e.g., quote expired, terms not accepted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired' # If payment step fails
+        '404':
+          description: Quote ID not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ============================================================================
+  # POLICY (PARAMETRIC) ENDPOINTS
+  # ============================================================================
+  /policies/{policyIdentifier}: # Changed from policyId to policyIdentifier
+    get:
+      summary: Get Policy Details
+      description: Retrieves detailed information for a specific parametric insurance policy using its UUID, policy number, or tracking number.
+      tags: [Policy]
+      security:
+        - BearerAuth: [] # User must be authenticated and own the policy, or be an admin
+        - AnonymousSession: [] # If trackingNumber is used via query param by an anonymous user
+      parameters:
+        - name: policyIdentifier
+          in: path
+          required: true
+          description: The unique identifier (UUID, policy number, or tracking number) of the policy.
+          schema:
+            type: string
+        # Example of how to use a query parameter if trackingNumber is not part of path
+        # - name: trackingNumber
+        #   in: query
+        #   required: false
+        #   description: Optional anonymous tracking number for the policy (if policyIdentifier in path is UUID/policyNumber).
+        #   schema:
+        #     type: string
+      responses:
+        '200':
+          description: Detailed information about the policy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden' # If user does not own the policy
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /policies/{policyId}/timeline:
+    get:
+      summary: Get Policy Event Timeline
+      description: Retrieves the event history for a specific policy.
+      tags: [Policy]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: policyId
+          in: path
+          required: true
+          description: The UUID of the policy.
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: eventTypes
+          in: query
+          description: Filter by specific event types (comma-separated).
+          required: false
+          style: form
+          explode: false # For comma-separated array
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/PolicyEventTypeEnum'
+      responses:
+        '200':
+          description: A list of policy events.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPolicyTimelineResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /policies/{policyId}/payouts:
+    get:
+      summary: List Policy Automated Payout Records
+      description: Retrieves automated payout records associated with a policy.
+      tags: [Policy]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: policyId
+          in: path
+          required: true
+          description: The UUID of the policy.
+          schema:
+            type: string
+            format: uuid
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: status
+          in: query
+          description: Filter payout records by status.
+          required: false
+          schema:
+            $ref: '#/components/schemas/AutomatedPayoutStatusEnum'
+      responses:
+        '200':
+          description: A list of automated payout records.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListPolicyAutomatedPayoutsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ============================================================================
+  # USER ENDPOINTS
+  # ============================================================================
+  /user/auth/complete-signup:
+    post:
+      summary: Complete User Signup
+      description: |
+        Finalizes the user registration process after OAuth authentication.
+        Typically involves creating a custodial wallet and migrating any anonymous session data.
+      tags: [User]
+      security:
+        - BearerAuth: [] # User is authenticated at this point but signup isn't "complete"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignupCompletionRequest'
+      responses:
+        '200':
+          description: Signup completed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSignupCompletionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # e.g., terms not accepted
+        '401':
+          $ref: '#/components/responses/Unauthorized' # Should not happen if BearerAuth is enforced by middleware
+        '409':
+          description: User signup already completed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/profile:
+    get:
+      summary: Get User Profile
+      description: Retrieves the profile information for the currently authenticated user.
+      tags: [User]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User profile data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Update User Profile
+      description: Updates mutable profile information for the currently authenticated user.
+      tags: [User]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdateRequest'
+      responses:
+        '200':
+          description: User profile updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileUpdateResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/policies:
+    get:
+      summary: List User Policies
+      description: Retrieves a paginated list of insurance policies for the authenticated user.
+      tags: [User, Policy] # Also tagged Policy as it returns policy summaries
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: status
+          in: query
+          description: Filter policies by status.
+          required: false
+          schema:
+            $ref: '#/components/schemas/PolicyStatusEnum'
+        - name: productType
+          in: query
+          description: Filter policies by product type.
+          required: false
+          schema:
+            $ref: '#/components/schemas/InsuranceProductTypeEnum'
+      responses:
+        '200':
+          description: A list of the user\'s policies.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListUserPoliciesResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/dashboard:
+    get:
+      summary: Get User Dashboard Data
+      description: Retrieves a consolidated set of data for the user's dashboard.
+      tags: [User]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: includeRecentActivity
+          in: query
+          description: Whether to include recent activity items.
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: includePolicySummary
+          in: query
+          description: Whether to include a summary of policies.
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: includeWalletSummary
+          in: query
+          description: Whether to include a summary of the wallet.
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: activityLimit
+          in: query
+          description: Maximum number of recent activity items to return.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+      responses:
+        '200':
+          description: Dashboard data retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDashboardResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ============================================================================
+  # WALLET ENDPOINTS
+  # ============================================================================
+  /user/wallet/info:
+    get:
+      summary: Get Wallet Information
+      description: Retrieves details for the authenticated user\'s primary PayGo custodial wallet, including balance and recent activity.
+      tags: [Wallet]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Wallet information retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserWalletInfoResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: User wallet not found or not yet created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/wallet/send:
+    post:
+      summary: Send Funds from Wallet
+      description: Initiates a transfer of funds from the authenticated user\'s PayGo custodial wallet to a specified recipient address.
+      tags: [Wallet]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WalletSendRequest'
+      responses:
+        '200': # Or 202 Accepted if processing is asynchronous
+          description: Fund transfer initiated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletSendResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # e.g., invalid address, insufficient funds
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '402':
+          $ref: '#/components/responses/PaymentRequired' # For insufficient funds specifically
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/wallet/transactions:
+    get:
+      summary: Get Wallet Transaction History
+      description: Retrieves a paginated list of transactions for the authenticated user\'s PayGo custodial wallet.
+      tags: [Wallet]
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: type
+          in: query
+          description: Filter transactions by type.
+          required: false
+          schema:
+            $ref: '#/components/schemas/TransactionTypeEnum'
+        - name: status
+          in: query
+          description: Filter transactions by status.
+          required: false
+          schema:
+            $ref: '#/components/schemas/TransactionStatusEnum'
+        - name: dateFrom
+          in: query
+          description: Filter transactions from this date (ISO 8601).
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: dateTo
+          in: query
+          description: Filter transactions up to this date (ISO 8601).
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Transaction history retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionHistoryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /user/wallet/faucet:
+    post:
+      summary: Request Faucet Funds (Testnet/Alpha)
+      description: Allows authenticated users to request test funds for their PayGo custodial wallet on testnet or alpha environments. This endpoint will be disabled in production.
+      tags: [Wallet, System]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: false # Amount and reason can be optional
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FaucetRequest'
+      responses:
+        '200':
+          description: Faucet request processed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFaucetResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Faucet not available or disabled in this environment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests' # If user requests too frequently
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ============================================================================
+  # ADMIN ENDPOINTS (Example - to be expanded based on dtos/user.ts)
+  # ============================================================================
+  /admin/users:
+    get:
+      summary: List Users (Admin)
+      description: Retrieves a paginated list of all users. Requires admin privileges.
+      tags: [Admin, User]
+      security:
+        - BearerAuth: [] # Requires admin role, enforced by application logic
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+        - name: email
+          in: query
+          required: false
+          description: Filter by user email.
+          schema:
+            type: string
+            format: email
+        - name: status
+          in: query
+          required: false
+          description: Filter by user status.
+          schema:
+            $ref: '#/components/schemas/UserStatusEnum'
+        - name: role
+          in: query
+          required: false
+          description: Filter by user role.
+          schema:
+            $ref: '#/components/schemas/UserRoleEnum'
+      responses:
+        '200':
+          description: A list of users.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminListUsersResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/users/{userId}/action:
+    post:
+      summary: Perform Admin Action on User
+      description: Allows an administrator to perform specific actions on a user account (e.g., suspend, verify KYC). Requires admin privileges.
+      tags: [Admin, User]
+      security:
+        - BearerAuth: [] # Requires admin role
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The UUID of the user to perform an action on.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminPerformUserActionRequest'
+      responses:
+        '200':
+          description: Admin action performed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminPerformUserActionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest' # e.g., invalid action or payload
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth2 JWT token obtained from the authentication flow (e.g., Better-Auth).
+    AnonymousSession:
+      type: apiKey
+      in: header
+      name: x-anonymous-session-id
+      description: Identifier for an anonymous user session, used for tracking unauthenticated interactions like cart or chat history.
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: API key for B2B partners or external service integrations.
+
+  parameters:
+    Limit:
+      name: limit
+      in: query
+      description: Maximum number of items to return in a paginated response.
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100 # Max limit to prevent abuse
+        default: 10
+    Offset:
+      name: offset
+      in: query
+      description: Number of items to skip for pagination.
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    Cursor: # Example for cursor-based pagination, if used
+      name: cursor
+      in: query
+      description: Opaque cursor for cursor-based pagination.
+      required: false
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: |
+        The request was malformed or contained invalid parameters.
+        The response body will contain an `ApiError` object with details.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            success: false
+            error:
+              code: "VALIDATION_ERROR"
+              message: "Input validation failed."
+              details: { "field": "email", "issue": "Invalid email format" }
+            timestamp: "2024-01-01T12:00:00Z"
+            requestId: "uuid-request-id"
+            version: "1.0.0"
+    Unauthorized:
+      description: |
+        Authentication failed or is missing.
+        The client needs to provide valid authentication credentials (e.g., Bearer token).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            success: false
+            error:
+              code: "UNAUTHORIZED"
+              message: "Authentication required."
+            timestamp: "2024-01-01T12:00:00Z"
+            requestId: "uuid-request-id"
+            version: "1.0.0"
+    Forbidden:
+      description: |
+        The authenticated user does not have permission to perform the requested action
+        on the specified resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            success: false
+            error:
+              code: "FORBIDDEN"
+              message: "You do not have permission to access this resource."
+            timestamp: "2024-01-01T12:00:00Z"
+            requestId: "uuid-request-id"
+            version: "1.0.0"
+    NotFound:
+      description: The requested resource could not be found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            success: false
+            error:
+              code: "NOT_FOUND"
+              message: "Resource not found."
+            timestamp: "2024-01-01T12:00:00Z"
+            requestId: "uuid-request-id"
+            version: "1.0.0"
+    PaymentRequired:
+      description: |
+        Payment is required to complete the action, or a payment-related issue occurred
+        (e.g., insufficient funds, payment declined).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            success: false
+            error:
+              code: "INSUFFICIENT_FUNDS" # Or PAYMENT_FAILED
+              message: "Insufficient funds in wallet."
+            timestamp: "2024-01-01T12:00:00Z"
+            requestId: "uuid-request-id"
+            version: "1.0.0"
+    TooManyRequests:
+      description: |
+        The client has sent too many requests in a given amount of time (rate limiting).
+        The `Retry-After` header may be included to indicate how long to wait before making a new request.
+      headers:
+        Retry-After:
+          description: The date/time after which the request may be retried.
+          schema:
+            type: string # Or integer for seconds
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            success: false
+            error:
+              code: "RATE_LIMIT_EXCEEDED"
+              message: "Rate limit exceeded. Try again later."
+            timestamp: "2024-01-01T12:00:00Z"
+            requestId: "uuid-request-id"
+            version: "1.0.0"
+    InternalServerError:
+      description: |
+        An unexpected error occurred on the server.
+        This is a generic error for situations where no more specific error code is suitable.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            success: false
+            error:
+              code: "INTERNAL_SERVER_ERROR"
+              message: "An unexpected internal server error occurred."
+            timestamp: "2024-01-01T12:00:00Z"
+            requestId: "uuid-request-id"
+            version: "1.0.0"
+
+  schemas:
+    # ============================================================================
+    # COMMON SCHEMAS (derived from dtos/common.ts)
+    # ============================================================================
+    ApiResponse: # A generic wrapper for all API responses
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the request was successful.
+        data: # Content varies based on the endpoint
+          nullable: true # Data can be null or absent for errors or no-content responses
+          description: The main payload of the response for successful requests.
+        error:
+          $ref: '#/components/schemas/ApiError'
+          nullable: true
+        message:
+          type: string
+          nullable: true
+          description: An optional human-readable message providing additional context.
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of when the response was generated.
+        requestId:
+          type: string
+          format: uuid
+          description: Unique identifier for the request, useful for logging and debugging.
+        version:
+          type: string
+          pattern: '^\d+\.\d+\.\d+$'
+          description: The API version that served the request (e.g., "1.0.0").
+      required:
+        - success
+        - timestamp
+        - requestId
+        - version
+
+    ApiError: # Standard structure for API error responses
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCodeEnum' # Using the enum schema
+        message:
+          type: string
+          maxLength: 500
+          description: A human-readable description of the error.
+        details:
+          type: object
+          additionalProperties: true # Allows for arbitrary structured error details
+          nullable: true
+          description: Optional structured data providing more details about the error.
+        field:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: For validation errors, indicates the specific field that caused the error.
+
+    ErrorCodeEnum:
+      type: string
+      description: Standardized error codes used by the API.
+      enum:
+        # Authentication & Authorization
+        - UNAUTHORIZED
+        - FORBIDDEN
+        - TOKEN_EXPIRED
+        - INVALID_SESSION
+        # Validation
+        - VALIDATION_ERROR
+        - INVALID_INPUT
+        - MISSING_REQUIRED_FIELD
+        - INVALID_FORMAT
+        # Business Logic
+        - INSUFFICIENT_FUNDS
+        - QUOTE_EXPIRED
+        - POLICY_NOT_FOUND
+        - ESCROW_CREATION_FAILED
+        - PAYMENT_FAILED
+        # External Services
+        - FLIGHT_DATA_UNAVAILABLE
+        - PAYGO_SERVICE_ERROR
+        - WEATHER_SERVICE_ERROR
+        # System
+        - INTERNAL_SERVER_ERROR
+        - SERVICE_UNAVAILABLE
+        - RATE_LIMIT_EXCEEDED
+        - MAINTENANCE_MODE
+        # Resource
+        - NOT_FOUND
+        - ALREADY_EXISTS
+        - RESOURCE_LOCKED
+        - RESOURCE_EXPIRED
+
+    HealthCheckResponse:
+      type: object
+      required:
+        - status
+        - version
+        - timestamp
+        - uptime
+        - dependencies
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+          description: Overall health status of the API.
+        version:
+          type: string
+          pattern: '^\d+\.\d+\.\d+$'
+          description: Current version of the running API service.
+        timestamp:
+          type: string
+          format: date-time
+          description: Current server timestamp.
+        uptime:
+          type: integer
+          minimum: 0
+          description: Server uptime in seconds.
+        dependencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/ServiceHealthStatus'
+          description: Status of critical downstream services.
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: Optional additional metadata about the health status.
+
+    ServiceHealthStatus:
+      type: object
+      required:
+        - name
+        - status
+        - lastChecked
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: Name of the dependency.
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy, unknown]
+          description: Health status of the dependency.
+        responseTime:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Response time of the dependency in milliseconds.
+        lastChecked:
+          type: string
+          format: date-time
+          description: Timestamp when the dependency was last checked.
+        error:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: Error message if the dependency is unhealthy.
+
+    PaginationRequest: # Common properties for paginated list requests
+      type: object
+      properties:
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+          nullable: true
+          description: Maximum number of items to return.
+        offset:
+          type: integer
+          minimum: 0
+          default: 0
+          nullable: true
+          description: Number of items to skip.
+        cursor:
+          type: string
+          nullable: true
+          description: Opaque cursor for cursor-based pagination.
+
+    PaginationResponse: # Common metadata for paginated list responses
+      type: object
+      required:
+        - total
+        - limit
+        - offset
+        - hasMore
+      properties:
+        total:
+          type: integer
+          minimum: 0
+          description: Total number of items available.
+        limit:
+          type: integer
+          minimum: 1
+          description: The limit used for this page.
+        offset:
+          type: integer
+          minimum: 0
+          description: The offset used for this page.
+        hasMore:
+          type: boolean
+          description: True if more items are available beyond this page.
+        nextCursor:
+          type: string
+          nullable: true
+          description: Cursor for fetching the next page.
+        prevCursor:
+          type: string
+          nullable: true
+          description: Cursor for fetching the previous page.
+
+    MoneyAmount: # Represents a monetary value, always in cents
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: integer # Using integer for cents to avoid floating point issues
+          description: Monetary amount in the smallest currency unit (e.g., cents for USD).
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: USD
+          description: ISO 4217 currency code.
+        formatted:
+          type: string
+          nullable: true
+          description: Human-readable formatted amount (e.g., "$100.00").
+
+    Address: # Represents a physical address
+      type: object
+      properties:
+        street:
+          type: string
+          maxLength: 200
+          nullable: true
+        city:
+          type: string
+          maxLength: 100
+          nullable: true # Making city nullable if not always required
+        state:
+          type: string
+          maxLength: 100
+          nullable: true
+        country:
+          type: string
+          maxLength: 100
+          nullable: true # Making country nullable
+        postalCode:
+          type: string
+          maxLength: 20
+          nullable: true
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+          nullable: true # Assuming countryCode might not always be present
+          description: ISO 3166-1 alpha-2 country code.
+        formatted:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: A pre-formatted string representation of the address.
+        location:
+          $ref: '#/components/schemas/GeoLocation'
+          nullable: true
+
+    GeoLocation: # Geographic coordinates
+      type: object
+      properties:
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        accuracy:
+          type: number
+          format: float
+          minimum: 0
+          nullable: true
+          description: Accuracy of the location in meters.
+        # Other GeoLocation fields omitted for brevity, can be added from common DTO
+
+    # ============================================================================
+    # CHAT SCHEMAS (derived from dtos/chat.ts)
+    # ============================================================================
+    ChatMessageRoleEnum:
+      type: string
+      enum: [user, assistant, system]
+      description: The role of the sender of a chat message.
+
+    ChatMessageContentTypeEnum:
+      type: string
+      enum: [text, quote_request, quote_response, flight_info, policy_info]
+      description: The type of content in a chat message.
+
+    ChatInterfaceEnum:
+      type: string
+      enum: [web, api, cli, terminal]
+      description: The interface through which the chat interaction occurs.
+
+    ConversationStatusEnum:
+      type: string
+      enum: [active, completed, archived]
+      description: The current status of a chat conversation.
+
+    ChatMessageRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 4000 # Max message length
+          description: The content of the chat message.
+        conversationId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Optional ID of an existing conversation to continue.
+        sessionId:
+          type: string
+          nullable: true
+          description: Anonymous session ID, if the user is not authenticated.
+        context:
+          $ref: '#/components/schemas/ChatContext'
+          nullable: true
+        interface:
+          $ref: '#/components/schemas/ChatInterfaceEnum'
+          default: web
+
+    ChatMessageResponse:
+      type: object
+      required:
+        - id
+        - conversationId
+        - message
+        - role
+        - contentType
+        - timestamp
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique ID of the chat message response.
+        conversationId:
+          type: string
+          format: uuid
+          description: ID of the conversation this message belongs to.
+        message:
+          type: string
+          description: The content of the assistant's response.
+        role:
+          $ref: '#/components/schemas/ChatMessageRoleEnum'
+        contentType:
+          $ref: '#/components/schemas/ChatMessageContentTypeEnum'
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of when the message was generated.
+        context:
+          $ref: '#/components/schemas/ChatContext'
+          nullable: true
+          description: Updated chat context after this message.
+        suggestions:
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          maxItems: 10
+          nullable: true
+          description: Suggested follow-up prompts or questions.
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChatAction'
+          maxItems: 10
+          nullable: true
+          description: Suggested actions the user can take.
+
+    ChatContext: # Contextual information for a chat conversation
+      type: object
+      properties:
+        flightSearch: # Context related to a flight search
+          type: object
+          nullable: true
+          properties:
+            origin:
+              type: string
+              minLength: 3
+              maxLength: 3 # IATA code
+              nullable: true
+            destination:
+              type: string
+              minLength: 3
+              maxLength: 3 # IATA code
+              nullable: true
+            departureDate:
+              type: string
+              format: date-time # Or date if only date is used
+              nullable: true
+            returnDate:
+              type: string
+              format: date-time # Or date
+              nullable: true
+            passengers:
+              type: integer
+              minimum: 1
+              maximum: 20
+              nullable: true
+            cabin:
+              type: string
+              nullable: true
+        quoteRequest: # Context related to an insurance quote request
+          type: object
+          nullable: true
+          properties:
+            productType:
+              type: string # Could be InsuranceProductTypeEnum
+              nullable: true
+            coverageAmount:
+              type: integer # In cents
+              minimum: 1
+              nullable: true
+            delayThreshold:
+              type: integer # In minutes
+              minimum: 30
+              maximum: 720
+              nullable: true
+            # Other quote-specific context fields
+        policyInquiry: # Context related to a policy inquiry
+          type: object
+          nullable: true
+          properties:
+            policyId:
+              type: string # UUID or policy number
+              nullable: true
+            trackingNumber:
+              type: string
+              nullable: true
+            # Other policy inquiry fields
+        userIntent:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: The system's understanding of the user's current intent.
+        previousActions:
+          type: array
+          items:
+            type: string
+          maxLength: 50 # Limit history size
+          nullable: true
+          description: Record of previous significant actions or states in the conversation.
+
+    ChatAction: # A suggested action within a chat response
+      type: object
+      required:
+        - id
+        - label
+        - type
+      properties:
+        id:
+          type: string
+          description: A unique identifier for this action suggestion.
+        label:
+          type: string
+          maxLength: 100
+          description: User-friendly label for the action button/link.
+        type:
+          type: string
+          enum: [quote, search, track, purchase, info, navigate]
+          description: The type of action.
+        endpoint: # Optional API endpoint to call if this action is taken
+          type: string
+          format: uri # Or relative path
+          nullable: true
+        params: # Optional parameters for the action or endpoint
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    Conversation: # Represents a chat conversation
+      type: object
+      required:
+        - id
+        - status
+        - interface
+        - createdAt
+        - updatedAt
+        - messageCount
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+          nullable: true
+        sessionId:
+          type: string
+          nullable: true
+        title:
+          type: string
+          maxLength: 200
+          nullable: true
+          description: A system-generated or user-set title for the conversation.
+        status:
+          $ref: '#/components/schemas/ConversationStatusEnum'
+        interface:
+          $ref: '#/components/schemas/ChatInterfaceEnum'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        messageCount:
+          type: integer
+          minimum: 0
+        lastMessage: # Snippet of the last message for display
+          type: string
+          maxLength: 500 # Truncated
+          nullable: true
+        context:
+          $ref: '#/components/schemas/ChatContext'
+          nullable: true
+
+    ConversationListResponse:
+      type: object
+      required:
+        - conversations
+        - total # Added total to required
+        - hasMore # Added hasMore to required
+        - pagination
+      properties:
+        conversations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Conversation'
+        total:
+          type: integer
+          minimum: 0
+        hasMore:
+          type: boolean
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+
+    # ============================================================================
+    # INSURANCE (QUOTING & PRODUCT) SCHEMAS (derived from dtos/insurance.ts)
+    # ============================================================================
+    InsuranceProductTypeEnum:
+      type: string
+      enum: [flight_delay, flight_cancellation, baggage_delay, weather_disruption, travel_comprehensive]
+      description: Type of parametric insurance product.
+
+    CoverageTierEnum:
+      type: string
+      enum: [economy, business, premium, custom]
+      description: Available coverage tiers for insurance products.
+
+    PaymentMethodEnum: # From dtos/insurance.ts (PaymentMethod)
+      type: string
+      enum: [stripe, paygo_wallet, paygo_escrow]
+      description: Methods available for purchasing a policy.
+
+    PayoutTypeEnum: # From dtos/insurance.ts (PayoutStructure type)
+      type: string
+      enum: [fixed, tiered, proportional]
+      description: Structure of the payout for the insurance product.
+
+    InsuranceQuoteRequest:
+      type: object
+      required:
+        - productType
+        - flightDetails
+        - coverageDetails
+      properties:
+        productType:
+          $ref: '#/components/schemas/InsuranceProductTypeEnum'
+        flightDetails:
+          $ref: '#/components/schemas/FlightDetailsForQuote'
+        coverageDetails:
+          $ref: '#/components/schemas/CoverageRequest'
+        passengerDetails:
+          $ref: '#/components/schemas/PassengerDetails'
+          nullable: true
+        sessionId:
+          type: string
+          nullable: true
+          description: For anonymous users, their session ID.
+
+    FlightDetailsForQuote:
+      type: object
+      required:
+        - flightNumber
+        - airline
+        - origin
+        - destination
+        - departureDate
+        # departureTime might be redundant if departureDate is date-time
+      properties:
+        flightNumber:
+          type: string
+          minLength: 1 # Adjusted to minLength instead of specific length
+          maxLength: 10
+        airline: # Typically 2-3 char IATA/ICAO code
+          type: string
+          minLength: 2
+          maxLength: 3 # Adjusted common airline code length
+        origin:
+          type: string
+          minLength: 3
+          maxLength: 3 # IATA airport code
+          description: IATA airport code of the origin.
+        destination:
+          type: string
+          minLength: 3
+          maxLength: 3 # IATA airport code
+          description: IATA airport code of the destination.
+        departureDate:
+          type: string
+          format: date-time # Should include date and time with timezone
+          description: Scheduled departure date and time (ISO 8601).
+        departureTime: # This might be redundant if departureDate includes time.
+                      # Keeping for now if specific DTO has it separately.
+          type: string
+          format: date-time
+          description: Scheduled departure time (ISO 8601), potentially redundant if covered by departureDate.
+          nullable: true # Made nullable if departureDate is primary
+        arrivalTime:
+          type: string
+          format: date-time
+          nullable: true
+          description: Scheduled arrival date and time (ISO 8601).
+        aircraft:
+          type: string
+          maxLength: 50
+          nullable: true
+        route:
+          type: string
+          maxLength: 200
+          nullable: true
+
+    CoverageRequest:
+      type: object
+      required:
+        - tier
+        - coverageAmount
+        - delayThreshold # Assuming this is specific to flight_delay
+      properties:
+        tier:
+          $ref: '#/components/schemas/CoverageTierEnum'
+        coverageAmount:
+          type: integer
+          minimum: 1000 # e.g., $10 in cents
+          maximum: 10000000 # e.g., $100,000 in cents
+          description: Desired coverage amount in cents.
+        delayThreshold: # Specific to flight_delay, might be in a more generic "triggerParams" for other products
+          type: integer
+          minimum: 30 # minutes
+          maximum: 720 # 12 hours
+          description: Delay threshold in minutes (for flight delay products).
+        customOptions:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: Product-specific custom options.
+
+    PassengerDetails:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          minimum: 1
+          maximum: 20 # Arbitrary max
+        ages:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            maximum: 120
+          nullable: true
+        cabinClass:
+          type: string
+          maxLength: 20
+          nullable: true
+        specialRequirements:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          maxItems: 10
+          nullable: true
+
+    InsuranceQuoteResponse:
+      type: object
+      required:
+        - quoteId
+        - productType
+        - product
+        - coverage
+        - premium
+        # flightRisk can be nullable
+        - validUntil
+        - terms # URL or text
+        - provider
+      properties:
+        quoteId:
+          type: string
+          format: uuid
+        productType:
+          $ref: '#/components/schemas/InsuranceProductTypeEnum'
+        product:
+          $ref: '#/components/schemas/InsuranceProduct'
+        coverage:
+          $ref: '#/components/schemas/QuoteCoverage'
+        premium:
+          $ref: '#/components/schemas/PremiumBreakdown'
+        flightRisk: # This is specific to flight delay insurance
+          $ref: '#/components/schemas/FlightRiskAssessment'
+          nullable: true # Make nullable if not all products have this
+        validUntil:
+          type: string
+          format: date-time
+          description: Timestamp (ISO 8601) until which this quote is valid.
+        terms: # Could be a URL to terms or the full text
+          type: string
+          description: Reference or full text of applicable terms and conditions.
+        exclusions:
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          maxItems: 50
+          nullable: true
+          description: List of key exclusions for this quote.
+        provider:
+          $ref: '#/components/schemas/ProviderInfo'
+
+    InsuranceProduct: # Definition of an available insurance product
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - description
+        - coverageTiers
+        # delayThresholds removed, should be part of PayoutStructure or specific product config
+        - maxCoverageAmount
+        - minCoverageAmount
+        # basePrice removed, premium calculated dynamically
+        - isActive
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 100
+        type:
+          $ref: '#/components/schemas/InsuranceProductTypeEnum'
+        description:
+          type: string
+          maxLength: 1000
+        coverageTiers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageTierDefinition'
+        # delayThresholds removed, specific triggers are now part of PayoutStructure in QuoteCoverage
+        maxCoverageAmount: # In cents
+          type: integer
+          minimum: 1
+        minCoverageAmount: # In cents
+          type: integer
+          minimum: 1
+        # basePrice removed, pricing is dynamic via quote engine
+        isActive:
+          type: boolean
+        terms: # URL or general terms for the product
+          type: string
+          nullable: true
+        exclusions:
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          maxItems: 50
+          nullable: true
+
+    CoverageTierDefinition: # Defines a specific tier within an insurance product
+      type: object
+      required:
+        - tier
+        - name
+        - minCoverage
+        - maxCoverage
+        # basePremium removed, as it's dynamic
+        - description
+        - features
+      properties:
+        tier:
+          $ref: '#/components/schemas/CoverageTierEnum'
+        name:
+          type: string
+          maxLength: 50
+        minCoverage: # In cents
+          type: integer
+          minimum: 0
+        maxCoverage: # In cents
+          type: integer
+          minimum: 1
+        # basePremium removed
+        description:
+          type: string
+          maxLength: 500
+        features:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          maxItems: 20
+
+    QuoteCoverage: # Detailed coverage information for a specific quote
+      type: object
+      required:
+        - tier
+        - amount # This is the chosen coverageAmount
+        - payoutStructure
+      # delayThreshold removed, it's part of PayoutStructure now
+      properties:
+        tier:
+          $ref: '#/components/schemas/CoverageTierEnum'
+        amount: # Chosen coverage amount in cents (as MoneyAmount object)
+          $ref: '#/components/schemas/MoneyAmount'
+        # delayThreshold removed, defined within payoutStructure
+        payoutStructure:
+          $ref: '#/components/schemas/PayoutStructure'
+        conditions: # Key conditions for this specific quoted coverage
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          maxItems: 20
+          nullable: true
+
+    PayoutStructure: # Defines how a policy pays out for a parametric event
+      type: object
+      required:
+        - type
+        - amounts # For fixed/tiered, or rules for proportional
+      properties:
+        type:
+          $ref: '#/components/schemas/PayoutTypeEnum'
+        amounts: # Represents PayoutTier for fixed/tiered. For proportional, it might be a single entry defining percentage.
+          type: array
+          items:
+            $ref: '#/components/schemas/PayoutTier'
+          minItems: 1
+          maxItems: 10 # Max tiers
+        # For proportional, could add:
+        # payoutPercentage:
+        #   type: number
+        #   minimum: 0
+        #   maximum: 100
+        #   description: "Percentage of coverageAmount to be paid."
+
+    PayoutTier: # Defines a specific tier or condition for payout (e.g., delay duration)
+      type: object
+      required:
+        # minDelay removed, now using a more generic triggerCondition
+        # payoutAmount or payoutPercentage is required
+      properties:
+        # minDelay and maxDelay are specific to flight delay.
+        # For a generic parametric system, use a more abstract trigger definition.
+        # Example for flight delay:
+        triggerCondition:
+          type: string # e.g., "delay_gt_120_min", "cancellation_confirmed"
+          description: A machine-readable or human-readable condition that triggers this payout tier.
+          example: "delay_duration_minutes >= 120"
+        payoutAmount: # Absolute amount in cents for this tier
+          type: integer
+          minimum: 0 # Could be 0 if it's just a trigger for another action
+          nullable: true # Make nullable if payoutPercentage is used
+        payoutPercentage: # Percentage of the total coverageAmount for this tier
+          type: number
+          minimum: 0
+          maximum: 100 # e.g., 50 for 50%
+          nullable: true
+          description: |
+            Percentage of the policy's main `coverageAmount` to be paid out for this tier.
+            Use either `payoutAmount` (absolute) or `payoutPercentage` (relative).
+        description:
+          type: string
+          nullable: true
+          description: Human-readable description of this payout tier/condition.
+      # oneOf: [ {required: [payoutAmount]}, {required: [payoutPercentage]} ] # Ensure one is present
+
+    PremiumBreakdown:
+      type: object
+      required:
+        - total # This should be MoneyAmount
+        # currency is part of MoneyAmount
+        # Other fields like basePremium, riskAdjustment etc. can be useful but might be internal
+      properties:
+        basePremium:
+          $ref: '#/components/schemas/MoneyAmount'
+          nullable: true # May not always be exposed
+        riskAdjustment:
+          $ref: '#/components/schemas/MoneyAmount' # Can be negative
+          nullable: true # May not always be exposed
+        platformFee:
+          $ref: '#/components/schemas/MoneyAmount'
+          nullable: true # May not always be exposed
+        taxes:
+          $ref: '#/components/schemas/MoneyAmount'
+          nullable: true # May not always be exposed
+        total: # Total premium as MoneyAmount
+          $ref: '#/components/schemas/MoneyAmount'
+        breakdown: # Detailed components of the premium
+          type: array
+          items:
+            $ref: '#/components/schemas/PremiumComponent'
+          nullable: true
+
+    PremiumComponent:
+      type: object
+      required:
+        - name
+        - amount # This is MoneyAmount
+        - type
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        amount: # In cents, as MoneyAmount object
+          $ref: '#/components/schemas/MoneyAmount'
+        description:
+          type: string
+          maxLength: 200
+          nullable: true
+        type:
+          type: string
+          enum: [base, risk_adjustment, platform_fee, tax, discount, surcharge]
+
+    FlightRiskAssessment: # Specific to flight insurance products
+      type: object
+      required:
+        - overallRisk
+        - delayProbability # Or a more generic eventProbability
+      properties:
+        overallRisk:
+          type: string
+          enum: [low, medium, high, unknown]
+        delayProbability: # Probability of the specific insured event (e.g., delay > X minutes)
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+        # Historical data might be too detailed for quote response, but good for internal use
+        historicalDelayRate:
+          type: number
+          minimum: 0
+          maximum: 1
+          nullable: true
+        # Other risk factors can be included if simple and explainable
+        riskFactors:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          maxItems: 20
+          nullable: true
+          description: Key factors contributing to the risk assessment.
+
+    ProviderInfo: # Information about the insurance provider
+      type: object
+      required:
+        - id
+        - name
+        - displayName # User-facing name
+        # tier, rating, isFirstParty are useful but might be internal context for display
+      properties:
+        id:
+          type: string
+          format: uuid # Or other unique identifier
+        name:
+          type: string
+          maxLength: 100 # Internal or legal name
+        displayName:
+          type: string
+          maxLength: 100 # Name shown to users
+        tier:
+          type: string
+          enum: [startup, standard, premium, enterprise, first_party]
+          nullable: true
+        rating: # Aggregate rating if applicable
+          type: number
+          minimum: 0
+          maximum: 5
+          nullable: true
+        isFirstParty:
+          type: boolean
+          nullable: true # To distinguish triggerr Direct
+        logo:
+          type: string
+          format: uri
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+
+    InsuranceProductsResponse:
+      type: object
+      required:
+        - products
+        # total, categories, providers are good additions
+      properties:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/InsuranceProduct'
+        total:
+          type: integer
+          minimum: 0
+          nullable: true
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductCategory'
+          nullable: true
+        providers: # List of providers offering products in this list
+          type: array
+          items:
+            $ref: '#/components/schemas/ProviderInfo'
+          nullable: true
+
+    ProductCategory: # Defines a category for grouping insurance products
+      type: object
+      required:
+        - id
+        - name
+        # description and productTypes are useful
+      properties:
+        id:
+          type: string # Could be slug or UUID
+        name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+        productTypes: # List of InsuranceProductTypeEnum that fall into this category
+          type: array
+          items:
+            $ref: '#/components/schemas/InsuranceProductTypeEnum'
+          nullable: true
+        icon: # URL to an icon for the category
+          type: string
+          format: uri
+          nullable: true
+
+    AddToCartRequest: # Request to add an insurance quote to an anonymous user's cart
+      type: object
+      required:
+        - quoteId
+        - sessionId
+      properties:
+        quoteId:
+          type: string
+          format: uuid
+          description: The ID of the quote to add to the cart.
+        sessionId:
+          type: string
+          maxLength: 255
+          description: Anonymous session ID for the user.
+        expiresAt: # Optional: if cart item should expire differently than quote
+          type: string
+          format: date-time
+          nullable: true
+
+    AddToCartResponse:
+      type: object
+      required:
+        - cartItemId
+        - quote
+        - addedAt
+        - expiresAt
+        - message
+      properties:
+        cartItemId:
+          type: string
+          format: uuid # ID of the item in the cart
+        quote:
+          $ref: '#/components/schemas/InsuranceQuoteResponse' # The quote that was added
+        addedAt:
+          type: string
+          format: date-time
+          description: Timestamp (ISO 8601) when the item was added to the cart.
+        expiresAt:
+          type: string
+          format: date-time
+          description: Timestamp (ISO 8601) when the cart item (quote) expires.
+        message:
+          type: string
+          maxLength: 200
+          description: Confirmation message.
+
+    PolicyPurchaseRequest: # Request to purchase an insurance policy from a quote
+      type: object
+      required:
+        - quoteId
+        - paymentMethod
+        - confirmTerms
+      properties:
+        quoteId:
+          type: string
+          format: uuid
+        paymentMethod:
+          $ref: '#/components/schemas/PaymentMethodEnum'
+        paymentDetails: # Specific details depending on paymentMethod
+          type: object
+          nullable: true
+          properties:
+            stripePaymentIntentId:
+              type: string
+              nullable: true
+            paygoWalletId: # User's PayGo wallet if paying with it
+              type: string
+              format: uuid
+              nullable: true
+            # escrowId might be system-managed based on policy, not user input
+        confirmTerms:
+          type: boolean
+          # Use `const: true` in OpenAPI 3.1 to require true
+          description: Must be true to confirm acceptance of terms and conditions.
+          # For OpenAPI 3.0, a pattern or enum: [true] might be used if const isn't supported by toolchain
+          # Or rely on server-side validation.
+        customerInfo: # Information about the customer purchasing the policy
+          $ref: '#/components/schemas/CustomerInfo'
+          nullable: true # Might be pre-filled for authenticated users
+
+    CustomerInfo: # Information about the customer
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true # Assuming email might be optional if user is authenticated
+        phone:
+          type: string
+          maxLength: 20 # International phone number considerations
+          nullable: true
+        emergencyContact:
+          $ref: '#/components/schemas/EmergencyContact'
+          nullable: true
+        travelPreferences: # May not be relevant for all policy purchases
+          $ref: '#/components/schemas/TravelPreferences'
+          nullable: true
+
+    EmergencyContact: # Emergency contact information for the policyholder
+      type: object
+      # Making all optional if not always collected at purchase
+      # required:
+      #   - name
+      #   - relationship
+      #   - phone
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          nullable: true
+        relationship:
+          type: string
+          maxLength: 50
+          nullable: true
+        phone:
+          type: string
+          maxLength: 20
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+
+    TravelPreferences: # User's travel-related preferences
+      type: object
+      # Not making these required at policy purchase
+      properties:
+        notifications:
+          $ref: '#/components/schemas/NotificationPreferences'
+          nullable: true
+        communications:
+          $ref: '#/components/schemas/CommunicationPreferences'
+          nullable: true
+
+    NotificationPreferences: # User's notification settings
+      type: object
+      properties:
+        email:
+          type: boolean
+          default: true
+          nullable: true
+        sms:
+          type: boolean
+          default: false
+          nullable: true
+        push:
+          type: boolean
+          default: true
+          nullable: true
+        inApp: # Added based on dtos/wallet.ts
+          type: boolean
+          default: true
+          nullable: true
+        flightUpdates:
+          type: boolean
+          default: true
+          nullable: true
+        policyUpdates:
+          type: boolean
+          default: true
+          nullable: true
+        claimUpdates: # For parametric, this would be "payoutUpdates"
+          type: boolean
+          default: true
+          nullable: true
+        walletTransactions: # Added based on dtos/wallet.ts
+          type: boolean
+          default: true
+          nullable: true
+        marketingEmails: # Added based on dtos/wallet.ts
+          type: boolean
+          default: false
+          nullable: true
+
+    CommunicationPreferences: # User's communication preferences
+      type: object
+      properties:
+        language: # ISO 639-1 language code
+          type: string
+          minLength: 2
+          maxLength: 5 # For regional variations like en-US
+          default: en
+          nullable: true
+        timezone: # IANA timezone
+          type: string
+          maxLength: 50
+          default: UTC
+          nullable: true
+        preferredMethod:
+          type: string
+          enum: [email, sms, push, in_app] # Added in_app
+          default: email
+          nullable: true
+        frequency: # How often to receive summary communications
+          type: string
+          enum: [immediate, daily, weekly, monthly]
+          default: immediate
+          nullable: true # If not all comms have frequency
+
+    PolicyPurchaseResponse: # Response after successfully purchasing a policy
+      type: object
+      required:
+        - policyId
+        - policyNumber
+        - status
+        - coverage
+        - payment
+        - documents
+        # nextSteps might be optional
+      properties:
+        policyId:
+          type: string
+          format: uuid
+        policyNumber:
+          type: string
+          maxLength: 50
+        status: # Current status of the newly created policy
+          $ref: '#/components/schemas/PolicyStatusEnum'
+        coverage:
+          $ref: '#/components/schemas/PolicyCoverage' # Details of the purchased coverage
+        payment:
+          $ref: '#/components/schemas/PaymentConfirmation' # Confirmation of the payment
+        escrow: # Information about the PayGo escrow, if applicable
+          $ref: '#/components/schemas/EscrowInfo'
+          nullable: true
+        documents: # Links to policy documents
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyDocumentObject'
+          nullable: true
+        nextSteps: # Suggested next actions for the user
+          type: array
+          items:
+            type: string
+            maxLength: 200
+          maxItems: 10
+          nullable: true
+
+    PolicyCoverage: # Detailed coverage terms of an active policy (PARAMETRIC FOCUS)
+      type: object
+      required:
+        - productType
+        - tier
+        - amount # Effective coverage amount
+        - effectiveDate
+        - expirationDate
+        - payoutStructure
+        # flightDetails is specific to flight products, make nullable or conditional
+      properties:
+        productType:
+          $ref: '#/components/schemas/InsuranceProductTypeEnum'
+        tier:
+          $ref: '#/components/schemas/CoverageTierEnum'
+        amount: # The coverage amount in cents that will be used for payout calculation
+          $ref: '#/components/schemas/MoneyAmount'
+        # delayThreshold is now part of payoutStructure
+        effectiveDate:
+          type: string
+          format: date-time
+        expirationDate:
+          type: string
+          format: date-time
+        flightDetails: # Only for flight-related policies
+          $ref: '#/components/schemas/FlightDetailsForQuote'
+          nullable: true
+        payoutStructure:
+          $ref: '#/components/schemas/PayoutStructure' # Defines how the amount is paid based on triggers
+
+    PaymentConfirmation:
+      type: object
+      required:
+        - paymentId
+        - method
+        - amount # This is MoneyAmount object
+        - status
+      properties:
+        paymentId:
+          type: string # Internal ID for the payment attempt
+        method:
+          $ref: '#/components/schemas/PaymentMethodEnum'
+        amount: # Amount that was charged/paid
+          $ref: '#/components/schemas/MoneyAmount'
+        status:
+          type: string
+          enum: [pending, confirmed, failed, refunded, partially_refunded]
+        transactionId: # External transaction ID (e.g., Stripe charge ID, PayGo TX hash)
+          type: string
+          nullable: true
+        receipt: # URL to a receipt if available
+          type: string
+          format: uri
+          nullable: true
+        processedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    EscrowInfo: # Information about a PayGo escrow
+      type: object
+      required:
+        - escrowId # Our internal system's ID for the escrow
+        - blockchainId # The ID on the PayGo blockchain
+        - status # Current status on PayGo
+        - amount # Amount in escrow
+        - expiresAt # Expiration on PayGo
+      properties:
+        escrowId:
+          type: string # Corresponds to `escrow.id` in our DB
+        blockchainId:
+          type: string # The actual PayGo escrow ID
+        status: # Status of the escrow on the blockchain
+          type: string
+          # These should align with PayGo's actual escrow states or our mapping of them
+          enum: [created, funded, active, fulfilled, released, expired, cancelled]
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        expiresAt:
+          type: string
+          format: date-time
+        txHash: # Optional: tx hash related to last state change
+          type: string
+          nullable: true
+        # Other relevant PayGo escrow details
+
+    PolicyDocumentObject: # Represents a document related to a policy (renamed to avoid OpenAPI path conflicts)
+      type: object
+      required:
+        - id
+        - documentName
+        - type
+        - url
+        - mimeType
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        documentName:
+          type: string
+          maxLength: 255
+        type:
+          $ref: '#/components/schemas/DocumentTypeEnum'
+        url:
+          type: string
+          format: uri
+          description: Secure URL to access the document.
+        mimeType:
+          type: string
+          maxLength: 100
+        fileSize:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: File size in bytes.
+        createdAt:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    # "PolicyTrackingRequest" is now covered by GET /policies/{policyIdentifier}
+    # "PolicyTrackingResponse" is now the "Policy" object itself
+
+    # ============================================================================
+    # POLICY & AUTOMATED PAYOUT SCHEMAS (Parametric Model - from dtos/policy.ts)
+    # These are already defined above using the parametric model.
+    # PolicyStatusEnum, AutomatedPayoutStatusEnum, PolicyEventTypeEnum, DocumentTypeEnum
+    # PolicyCoverageDetails, FlightPolicyDetails, AutomatedPayoutRecord, Policy, PolicySummary, PolicyEventObject
+    # ============================================================================
+
+
+    # ============================================================================
+    # USER & ADMIN SCHEMAS (derived from dtos/user.ts & dtos/wallet.ts)
+    # ============================================================================
+    UserRoleEnum: # From dtos/wallet.ts (UserRole)
+      type: string
+      enum: [customer, provider, admin, support]
+      description: Role of the user within the system.
+
+    UserStatusEnum: # From dtos/wallet.ts (UserStatus)
+      type: string
+      enum: [active, inactive, suspended, pending_verification]
+      description: Status of the user account.
+
+    KYCStatusEnum: # From dtos/wallet.ts (KYCStatus)
+      type: string
+      enum: [not_required, pending, approved, rejected, expired]
+      description: KYC (Know Your Customer) verification status.
+
+    AdminUserActionTypeEnum: # From dtos/user.ts (AdminUserActionType)
+      type: string
+      enum:
+        - SUSPEND_USER
+        - UNSUSPEND_USER
+        - VERIFY_KYC
+        - REJECT_KYC
+        - RESET_PASSWORD_ADMIN
+        - UPDATE_USER_ROLE
+        - DELETE_USER_DATA
+        - GRANT_ADMIN_PRIVILEGE
+        - REVOKE_ADMIN_PRIVILEGE
+      description: Actions an administrator can perform on a user account.
+
+    UserSignupCompletionRequest:
+      type: object
+      required:
+        - acceptTerms
+      properties:
+        completeProfile:
+          type: boolean
+          default: false
+          nullable: true
+        acceptTerms:
+          type: boolean
+          description: Indicates user acceptance of terms and conditions. Must be true.
+          # const: true # OpenAPI 3.1 feature
+          enum: [true] # For OpenAPI 3.0 compatibility with some tools
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+          nullable: true
+
+    UserPreferences:
+      type: object
+      properties:
+        notifications:
+          $ref: '#/components/schemas/NotificationPreferences'
+          nullable: true
+        communications:
+          $ref: '#/components/schemas/CommunicationPreferences'
+          nullable: true
+        privacy:
+          $ref: '#/components/schemas/PrivacyPreferences'
+          nullable: true
+        trading:
+          $ref: '#/components/schemas/TradingPreferences'
+          nullable: true
+
+    PrivacyPreferences:
+      type: object
+      properties:
+        profileVisibility:
+          type: string
+          enum: [public, private, limited]
+          default: private
+          nullable: true
+        dataSharing:
+          type: boolean
+          default: false
+          nullable: true
+        analyticsOptOut:
+          type: boolean
+          default: false
+          nullable: true
+        marketingOptOut: # Usually handled via notification preferences (marketingEmails)
+          type: boolean
+          default: false
+          nullable: true
+
+    TradingPreferences:
+      type: object
+      properties:
+        autoRenewal:
+          type: boolean
+          default: false
+          nullable: true
+        riskTolerance:
+          type: string
+          enum: [low, medium, high]
+          default: medium
+          nullable: true
+        preferredCurrency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          default: USD
+          nullable: true
+        transactionLimits:
+          $ref: '#/components/schemas/TransactionLimits'
+          nullable: true
+
+    TransactionLimits:
+      type: object
+      properties:
+        dailyLimit:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Daily transaction limit in cents.
+        monthlyLimit:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Monthly transaction limit in cents.
+        singleTransactionLimit:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Limit per single transaction in cents.
+        requireApprovalAbove:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Transactions above this amount (cents) may require additional approval.
+
+    UserSignupCompletionResponse:
+      type: object
+      required:
+        - user
+        - wallet
+        - message
+      properties:
+        user:
+          $ref: '#/components/schemas/UserProfile'
+        wallet:
+          $ref: '#/components/schemas/UserWallet'
+          description: The custodial wallet created for the user.
+        message:
+          type: string
+          maxLength: 200
+        nextSteps:
+          type: array
+          items:
+            type: string
+            maxLength: 100
+          maxItems: 10
+          nullable: true
+          description: Suggested next steps for the newly signed-up user.
+
+    UserProfile: # Detailed user profile information
+      type: object
+      required:
+        - id
+        - email
+        - status
+        - role
+        - kycStatus
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          maxLength: 100
+          nullable: true
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+          description: URL to user's avatar image.
+        phone:
+          type: string
+          maxLength: 20
+          nullable: true
+          description: Phone number, preferably E.164 format.
+        status:
+          $ref: '#/components/schemas/UserStatusEnum'
+        role:
+          $ref: '#/components/schemas/UserRoleEnum'
+        kycStatus:
+          $ref: '#/components/schemas/KYCStatusEnum'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: System-specific user flags or info.
+
+    UserProfileUpdateRequest: # Payload for updating a user's profile
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          nullable: true
+        phone:
+          type: string
+          maxLength: 20
+          nullable: true
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+          nullable: true
+          description: Allows partial update of preferences.
+
+    UserProfileUpdateResponse:
+      type: object
+      required:
+        - user # The full updated user profile
+        - message
+      properties:
+        user:
+          $ref: '#/components/schemas/UserProfile'
+        message:
+          type: string
+          maxLength: 200
+        updatedFields: # List of field names that were actually updated
+          type: array
+          items:
+            type: string
+            maxLength: 50 # e.g., "name", "preferences.notifications.email"
+          maxItems: 20
+          nullable: true
+
+    ListUserPoliciesResponse: # Response for listing a user's policies
+      type: object
+      required:
+        - policies
+        - pagination
+      properties:
+        policies:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicySummary' # Uses the refactored PolicySummary
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+
+    UserDashboardResponse: # Aggregated data for the user dashboard
+      type: object
+      required:
+        - user
+        - walletSummary
+        - policySummary
+        # recentActivity, notifications, quickActions are optional
+      properties:
+        user:
+          $ref: '#/components/schemas/UserProfile'
+        walletSummary:
+          $ref: '#/components/schemas/WalletSummary'
+          nullable: true
+        policySummary:
+          $ref: '#/components/schemas/PolicySummaryStats'
+          nullable: true
+        recentActivity:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityItem'
+          maxItems: 50
+          nullable: true
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserNotification'
+          maxItems: 20
+          nullable: true
+        quickActions:
+          type: array
+          items:
+            $ref: '#/components/schemas/QuickAction'
+          maxItems: 10
+          nullable: true
+
+    WalletSummary: # Summary of wallet status for dashboard
+      type: object
+      required:
+        - totalBalance # Should be MoneyAmount
+        - availableBalance # Should be MoneyAmount
+        # lockedBalance, recentTransactionCount, activeEscrowCount optional
+      properties:
+        totalBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+        availableBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+        lockedBalance:
+          $ref: '#/components/schemas/MoneyAmount'
+          nullable: true
+        recentTransactionCount:
+          type: integer
+          minimum: 0
+          nullable: true
+        activeEscrowCount:
+          type: integer
+          minimum: 0
+          nullable: true
+
+    PolicySummaryStats: # Summary of policy statistics for dashboard
+      type: object
+      required:
+        - activePolicies
+        - totalCoverage # Should be MoneyAmount
+        - totalPremiumsPaid # Should be MoneyAmount
+        # upcomingExpirations, totalAutomatedPayoutsReceived optional
+      properties:
+        activePolicies:
+          type: integer
+          minimum: 0
+        totalCoverage:
+          $ref: '#/components/schemas/MoneyAmount'
+        upcomingExpirations:
+          type: integer
+          minimum: 0
+          nullable: true
+        totalAutomatedPayoutsReceived: # Renamed from recentClaims
+          $ref: '#/components/schemas/MoneyAmount'
+          nullable: true
+          description: Total amount of completed automated payouts received by the user.
+        totalPremiumsPaid:
+          $ref: '#/components/schemas/MoneyAmount'
+
+    ActivityItem: # An item for the user's recent activity feed
+      type: object
+      required:
+        - id
+        - type
+        - title
+        - description
+        - timestamp
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [policy_purchased, automated_payout_processed, payment_received, wallet_transaction, flight_event_notification, profile_updated, security_alert]
+        title:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 500
+        timestamp:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+        actionUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: URL for user to take action or view details.
+
+    UserNotification: # A notification for the user
+      type: object
+      required:
+        - id
+        - type
+        - title
+        - message
+        - read
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [info, warning, success, error, action_required]
+        title:
+          type: string
+          maxLength: 100
+        message:
+          type: string
+          maxLength: 500
+        read:
+          type: boolean
+          default: false
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        actionUrl:
+          type: string
+          format: uri
+          nullable: true
+        actionLabel:
+          type: string
+          maxLength: 50
+          nullable: true
+
+    QuickAction: # A suggested quick action for the user dashboard
+      type: object
+      required:
+        - id
+        - label
+        # category can be inferred or optional
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the quick action type.
+        label:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+          maxLength: 200
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+          description: Icon name or URL for display.
+        url:
+          type: string
+          format: uri # Direct URL or internal app path
+          nullable: true # Some actions might trigger client-side flows
+        # actionType: { type: string, enum: [CREATE_QUOTE, VIEW_POLICIES], nullable: true } # Alternative to URL
+        # actionParams: { type: object, additionalProperties: true, nullable: true }
+        category:
+          type: string
+          enum: [policy, wallet, account, support, get_quote]
+          nullable: true
+
+    AdminListUsersRequest:
+      allOf:
+        - $ref: '#/components/schemas/PaginationRequest'
+        - type: object
+          properties:
+            email:
+              type: string
+              format: email
+              nullable: true
+            status:
+              $ref: '#/components/schemas/UserStatusEnum'
+              nullable: true
+            role:
+              $ref: '#/components/schemas/UserRoleEnum'
+              nullable: true
+            kycStatus:
+              $ref: '#/components/schemas/KYCStatusEnum'
+              nullable: true
+            createdAtFrom:
+              type: string
+              format: date-time
+              nullable: true
+            createdAtTo:
+              type: string
+              format: date-time
+              nullable: true
+            lastLoginFrom:
+              type: string
+              format: date-time
+              nullable: true
+            lastLoginTo:
+              type: string
+              format: date-time
+              nullable: true
+            sortBy:
+              type: string
+              enum: [email, createdAt, lastLoginAt, status, role]
+              default: createdAt
+              nullable: true
+            sortOrder:
+              type: string
+              enum: [asc, desc]
+              default: desc
+              nullable: true
+
+    AdminListUsersResponse:
+      type: object
+      required: [users, pagination]
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfile' # UserProfile defined in User section (from dtos/wallet)
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+
+    AdminUpdateUserRequest: # Request for an admin to update a user's details
+      type: object
+      # userId is typically part of the path for such an operation
+      properties:
+        status:
+          $ref: '#/components/schemas/UserStatusEnum'
+          nullable: true
+        role:
+          $ref: '#/components/schemas/UserRoleEnum'
+          nullable: true
+        kycStatus:
+          $ref: '#/components/schemas/KYCStatusEnum'
+          nullable: true
+        name:
+          type: string
+          maxLength: 100
+          nullable: true
+        # Email/phone changes should have specific verified flows, not direct admin update usually
+        metadata: # Admin-specific notes or flags
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    AdminPerformUserActionRequest:
+      type: object
+      required:
+        # userId is typically part of path
+        - action
+      properties:
+        action:
+          $ref: '#/components/schemas/AdminUserActionTypeEnum'
+        reason: # Reason for audit log
+          type: string
+          maxLength: 500
+          nullable: true
+        payload: # Action-specific data
+          type: object
+          additionalProperties: true
+          nullable: true
+          description: |
+            Action-specific payload, e.g., { "newRole": "admin" } for UPDATE_USER_ROLE.
+
+    AdminPerformUserActionResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        updatedUser: # The user profile if it was modified by the action
+          $ref: '#/components/schemas/UserProfile'
+          nullable: true
+        auditLogId: # ID of the audit log entry for this action
+          type: string
+          format: uuid
+          nullable: true
+
+    UserActivityLog: # Log of significant user activities
+      type: object
+      required: [id, timestamp, activityType, description]
+      properties:
+        id:
+          type: string
+          format: uuid
+        timestamp:
+          type: string
+          format: date-time
+        activityType: # e.g., 'LOGIN', 'POLICY_PURCHASE', 'WALLET_TRANSFER_SENT'
+          type: string
+          maxLength: 100
+        description:
+          type: string
+          maxLength: 1000
+        ipAddress:
+          type: string
+          format: ip # General IP format (covers IPv4 and IPv6)
+          nullable: true
+        userAgent:
+          type: string
+          maxLength: 500
+          nullable: true
+        location: # Approximate location based on IP, if available
+          type: string
+          maxLength: 200
+          nullable: true
+        metadata: # Any other relevant data
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    GetUserActivityLogRequest: # Request to get user activity logs
+      allOf:
+        - $ref: '#/components/schemas/PaginationRequest'
+        - type: object
+          # userId is typically part of path or inferred from auth context
+          properties:
+            activityType:
+              type: string
+              maxLength: 100
+              nullable: true
+            dateFrom:
+              type: string
+              format: date-time
+              nullable: true
+            dateTo:
+              type: string
+              format: date-time
+              nullable: true
+
+    GetUserActivityLogResponse: # Response containing user activity logs
+      type: object
+      required:
+        - logs
+        - pagination
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserActivityLog'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+
+    UserConsent: # Represents a specific user consent record
+      type: object
+      required:
+        - id # ID of the consent type itself
+        - granted
+        - updatedAt
+      properties:
+        id:
+          type: string
+          maxLength: 100
+          description: Identifier of the consent type (e.g., 'TERMS_OF_SERVICE_V2', 'MARKETING_OPT_IN').
+        granted:
+          type: boolean
+          description: Whether the consent is granted (true) or revoked (false).
+        version:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: Version of the consent document/policy associated with this grant.
+        grantedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp (ISO 8601) when consent was initially granted or last affirmed.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp (ISO 8601) of the last update to this consent record.
+        source:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: How this consent state was recorded (e.g., 'SIGNUP_FORM', 'PROFILE_SETTINGS_V1.2').
+
+    GetUserConsentsResponse: # Response containing a list of user consents
+      type: object
+      required:
+        - consents
+      properties:
+        consents:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserConsent'
+
+    UpdateUserConsentRequest: # Request to update a user's consent status
+      type: object
+      # userId is typically inferred from auth context
+      required:
+        - consentId
+        - granted
+      properties:
+        consentId:
+          type: string
+          maxLength: 100
+          description: Identifier of the consent type to update (e.g., 'MARKETING_OPT_IN').
+        granted:
+          type: boolean
+        version:
+          type: string
+          maxLength: 50
+          nullable: true
+          description: Version of the consent document/policy being consented to/from.
+        source:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: Source of this consent update.
+
+    # UserProfile and related (UserPreferences, etc.) are defined in the USER section (derived from dtos/wallet.ts)
+    # This avoids duplication if they are identical.
+
+    # Note on GeoLocation, Address, PaginationRequest:
+    # These were defined in the Common Schemas section.
+    # If they are referenced from other sections, ensure $ref paths are correct.
+    # Duplicates within components.schemas should be avoided by referencing the canonical definition.
+
+    # ============================================================================
+    # WALLET SCHEMAS (derived from dtos/wallet.ts)
+    # ============================================================================
+    WalletTypeEnum:
+      type: string
+      enum: [custodial, external, multisig]
+
+    WalletStatusEnum:
+      type: string
+      enum: [active, inactive, frozen, pending_setup]
+
+    TransactionTypeEnum:
+      type: string
+      enum: [deposit, withdrawal, escrow_fund, escrow_release, premium_payment, automated_payout, faucet_request, transfer] # Changed claim_payout to automated_payout
+      description: Type of wallet transaction.
+
+    TransactionStatusEnum:
+      type: string
+      enum: [pending, confirmed, failed, cancelled, processing] # Added processing
+      description: Status of a wallet transaction.
+
+    UserWallet: # User's PayGo custodial wallet information
+      type: object
+      required:
+        - id
+        - userId
+        - paygoAddress
+        - walletName
+        - walletType
+        - status
+        - isPrimary
+        - balance
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        paygoAddress:
+          type: string
+          maxLength: 100 # PayGo address format
+        walletName:
+          type: string
+          maxLength: 100
+        walletType:
+          $ref: '#/components/schemas/WalletTypeEnum'
+        status:
+          $ref: '#/components/schemas/WalletStatusEnum'
+        isPrimary:
+          type: boolean
+        balance:
+          $ref: '#/components/schemas/WalletBalance'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        lastActivity:
+          type: string
+          format: date-time
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    WalletBalance: # Detailed balance of a user's wallet
+      type: object
+      required:
+        - total
+        - available
+        - locked
+        - pending
+        - currency # This should be a string code, MoneyAmount has the object
+        - lastUpdated
+      properties:
+        total: # In cents
+          type: integer
+          minimum: 0
+        available: # In cents
+          type: integer
+          minimum: 0
+        locked: # In cents (e.g., in active escrows or pending bets)
+          type: integer
+          minimum: 0
+        pending: # In cents (e.g., incoming deposits not yet confirmed)
+          type: integer
+          minimum: 0
+        currency: # ISO 4217 currency code
+          type: string
+          default: USD # Assuming USD, though PayGo might be token-specific
+          maxLength: 3 # Ensure it's a code
+        lastUpdated:
+          type: string
+          format: date-time
+
+    UserWalletInfoResponse: # Comprehensive response for user wallet information
+      type: object
+      required:
+        - wallet
+        # recentTransactions, activeEscrows, pendingOperations can be nullable if not always present
+      properties:
+        wallet:
+          $ref: '#/components/schemas/UserWallet'
+        recentTransactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletTransaction'
+          maxItems: 20 # Example limit
+          nullable: true
+        activeEscrows:
+          type: array
+          items:
+            $ref: '#/components/schemas/EscrowSummary' # Defined below
+          maxItems: 50
+          nullable: true
+        pendingOperations:
+          type: array
+          items:
+            $ref: '#/components/schemas/PendingOperation' # Defined below
+          maxItems: 20
+          nullable: true
+
+    WalletTransaction: # A single transaction record for a user's wallet
+      type: object
+      required:
+        - id
+        - walletId
+        - type
+        - amount # This should be MoneyAmount
+        - status
+        - description
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        walletId:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TransactionTypeEnum'
+        amount:
+          $ref: '#/components/schemas/MoneyAmount' # Amount transferred/affected
+        fee:
+          $ref: '#/components/schemas/MoneyAmount'
+          nullable: true
+        status:
+          $ref: '#/components/schemas/TransactionStatusEnum'
+        fromAddress:
+          type: string
+          nullable: true
+        toAddress:
+          type: string
+          nullable: true
+        txHash: # Blockchain transaction hash, if applicable
+          type: string
+          nullable: true
+        blockNumber:
+          type: integer
+          minimum: 1
+          nullable: true
+        confirmations:
+          type: integer
+          minimum: 0
+          nullable: true
+        description:
+          type: string
+          maxLength: 500
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        confirmedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    EscrowSummary: # Summary of an escrow relevant to the user's wallet
+      type: object
+      required:
+        - id # Internal escrow ID from our system
+        # - internalId # Duplicates id?
+        - blockchainId # PayGo escrow ID
+        - type # POLICY or USER initiated
+        - amount
+        - status
+        - expiresAt
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        internalId: # This seems redundant if `id` is already the internal system ID
+          type: string
+          description: Internal system identifier for the escrow (e.g., from escrow-id-generator).
+          nullable: true # If id is primary
+        blockchainId:
+          type: string
+          description: Escrow ID on the PayGo blockchain.
+        type:
+          type: string
+          enum: [POLICY, USER] # POLICY escrow for insurance, USER for user-defined escrows
+        purpose: # For USER escrows
+          type: string
+          maxLength: 50
+          nullable: true
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        status: # This should map to PayGo escrow statuses or our internal mapping
+          type: string
+          enum: [created, funded, active, fulfilled, released, expired, cancelled] # Example statuses
+        expiresAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        relatedPolicyId: # Link to policy if it's a POLICY escrow
+          type: string
+          format: uuid
+          nullable: true
+
+    PendingOperation: # A wallet operation that is in progress
+      type: object
+      required:
+        - id
+        - type
+        - status
+        - description
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [transfer, escrow_create, escrow_fulfill, faucet_request, withdrawal_request]
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+          nullable: true
+        status:
+          type: string
+          enum: [pending, processing, confirming, requires_action]
+        estimatedCompletion:
+          type: string
+          format: date-time
+          nullable: true
+        description:
+          type: string
+          maxLength: 200
+
+    WalletSendRequest:
+      type: object
+      required:
+        - toAddress
+        - amount # This should be just the integer value, currency inferred or set by system
+      properties:
+        toAddress:
+          type: string
+          maxLength: 100 # PayGo address
+        amount: # Amount in cents
+          type: integer
+          minimum: 1
+        description:
+          type: string
+          maxLength: 200
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+
+    WalletSendResponse:
+      type: object
+      required:
+        - transactionId # Our internal transaction ID
+        - status
+        - amount # This should be MoneyAmount
+        - message
+        # txHash is important if it's on-chain
+      properties:
+        transactionId:
+          type: string
+          format: uuid
+        txHash: # PayGo transaction hash
+          type: string
+          nullable: true
+        status:
+          $ref: '#/components/schemas/TransactionStatusEnum'
+        amount: # Amount sent, as MoneyAmount
+          $ref: '#/components/schemas/MoneyAmount'
+        fee:
+          $ref: '#/components/schemas/MoneyAmount'
+          nullable: true
+        estimatedConfirmation: # For on-chain transactions
+          type: string
+          format: date-time
+          nullable: true
+        message:
+          type: string
+          maxLength: 200
+
+    TransactionHistoryResponse:
+      type: object
+      required:
+        - transactions
+        - pagination
+        # summary is a good addition
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletTransaction'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponse'
+        summary:
+          $ref: '#/components/schemas/TransactionSummary' # Defined below
+          nullable: true
+
+    TransactionSummary: # Summary for a list of transactions
+      type: object
+      required:
+        - totalIn
+        - totalOut
+        - totalFees
+        - transactionCount
+        - period
+      properties:
+        totalIn: # MoneyAmount for consistency
+          $ref: '#/components/schemas/MoneyAmount'
+        totalOut: # MoneyAmount
+          $ref: '#/components/schemas/MoneyAmount'
+        totalFees: # MoneyAmount
+          $ref: '#/components/schemas/MoneyAmount'
+        transactionCount:
+          type: integer
+          minimum: 0
+        period: # The period these transactions cover
+          type: object
+          required: [from, to]
+          properties:
+            from:
+              type: string
+              format: date-time
+            to:
+              type: string
+              format: date-time
+
+    FaucetRequest:
+      type: object
+      properties:
+        amount: # Amount in cents
+          type: integer
+          minimum: 1
+          nullable: true # If there's a default faucet amount
+        reason:
+          type: string
+          maxLength: 200
+          nullable: true
+
+    UserFaucetResponse:
+      type: object
+      required:
+        - success
+        - amount # This is MoneyAmount
+        - newBalance # This is MoneyAmount
+        - message
+      properties:
+        success:
+          type: boolean
+        amount: # Amount credited, as MoneyAmount
+          $ref: '#/components/schemas/MoneyAmount'
+        txHash: # PayGo transaction hash
+          type: string
+          nullable: true
+        newBalance: # New total balance, as MoneyAmount
+          $ref: '#/components/schemas/MoneyAmount'
+        message:
+          type: string
+          maxLength: 200
+        nextRequestAt: # When user can request from faucet again
+          type: string
+          format: date-time
+          nullable: true

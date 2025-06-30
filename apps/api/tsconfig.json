@@ -1,0 +1,54 @@
+{
+  "extends": "../../packages/config/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/": ["./src/"],
+      "@triggerr/core": ["../../packages/core/src"],
+      "@triggerr/core/*": ["../../packages/core/src/*"],
+      "@triggerr/api-contracts": ["../../packages/api/contracts/src"],
+      "@triggerr/api-contracts/*": ["../../packages/api/contracts/src/*"],
+      "@triggerr/api-sdk": ["../../packages/api/sdk/src"],
+      "@triggerr/api-sdk/*": ["../../packages/api/sdk/src/*"],
+      "@triggerr/shared": ["../../packages/shared/src"],
+      "@triggerr/shared/*": ["../../packages/shared/src/*"],
+      "@triggerr/ui": ["../../packages/ui/src"],
+      "@triggerr/ui/*": ["../../packages/ui/src/*"],
+      "@triggerr/utils": ["../../packages/utils/src"],
+      "@triggerr/utils/*": ["../../packages/utils/src/*"],
+      "@triggerr/config": ["../../packages/config/src"],
+      "@triggerr/config/*": ["../../packages/config/src/*"],
+      "@triggerr/paygo-adapter": [
+        "../../packages/blockchain/paygo-adapter/src"
+      ],
+      "@triggerr/paygo-adapter/*": [
+        "../../packages/blockchain/paygo-adapter/src/*"
+      ],
+      "@triggerr/stripe": ["../../packages/integrations/stripe/src"],
+      "@triggerr/stripe/*": ["../../packages/integrations/stripe/src/*"],
+      "@triggerr/wallet-service": [
+        "../../packages/services/wallet-service/src"
+      ],
+      "@triggerr/wallet-service/*": [
+        "../../packages/services/wallet-service/src/*"
+      ],
+      "@triggerr/escrow-engine": [
+        "../../packages/services/escrow-engine/src"
+      ],
+      "@triggerr/escrow-engine/*": [
+        "../../packages/services/escrow-engine/src/*"
+      ],
+      "@triggerr/payout-engine": [
+        "../../packages/services/payout-engine/src"
+      ],
+      "@triggerr/payout-engine/*": [
+        "../../packages/services/payout-engine/src/*"
+      ]
+    },
+    "noEmit": true,
+    "module": "ESNext",
+    "lib": ["ES2022"]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

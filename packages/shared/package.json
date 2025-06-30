@@ -1,0 +1,30 @@
+{
+  "name": "@triggerr/shared",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./constants": "./dist/constants/index.js",
+    "./validators": "./dist/validators/index.js",
+    "./notifications": "./dist/notifications/index.js",
+    "./types": "./dist/types/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist .turbo",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@triggerr/core": "workspace:*",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "eslint": "^8",
+    "typescript": "^5",
+    "rimraf": "^5.0.0"
+  }
+}

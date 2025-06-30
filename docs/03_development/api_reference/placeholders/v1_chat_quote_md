@@ -1,0 +1,49 @@
+# API Placeholder: Chat Quote API
+
+## Original Path
+`/apps/web/src/app/api/v1/chat/quote/route.ts`
+
+## Purpose
+This API is designed to handle chat-based insurance quote requests. It processes natural language messages from users, extracts flight details, and returns insurance quote options based on the extracted information.
+
+## Current Status
+- **Status**: Disabled (Placeholder)
+- **Build Status**: Failing in CI
+- **Priority**: Medium
+
+## Issues Encountered
+- Build failure with error: `TypeError: Cannot read properties of undefined (reading 'optional')`
+- Schema validation issues with Zod
+- Complex dependencies between API contracts and validation schemas
+- Incomplete implementation of flight info extraction
+
+## Required Dependencies
+- `@insureinnie/core/auth`
+- `@insureinnie/core/database/edge`
+- `@insureinnie/core/database/schema`
+- `@insureinnie/api-contracts`
+- `@insureinnie/api-contracts/validators/chat`
+- `@insureinnie/api-contracts/validators/insurance`
+- `@insureinnie/api-contracts/dtos/chat`
+- `@insureinnie/api-contracts/dtos/insurance`
+
+## Implementation Plan
+1. Create simplified schema validation that won't break the build
+2. Implement proper flight info extraction from natural language
+3. Connect to actual quote generation service
+4. Add comprehensive error handling
+5. Implement caching for similar quote requests
+
+## Original Code
+The original code has been preserved in this document. Key sections include:
+- Chat message validation using `chatMessageRequestSchema`
+- Flight info extraction from messages
+- Quote request validation using `insuranceQuoteRequestSchema`
+- Risk factor calculation and premium adjustment
+- Quote generation and response formatting
+
+## Notes
+- The API needs to handle both authenticated and anonymous users
+- Flight details extraction needs improvement with NLP techniques
+- Consider adding a rate limiter for this endpoint
+- Need to implement proper logging for debugging

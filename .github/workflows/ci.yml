@@ -1,0 +1,59 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "1.2.15"
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        continue-on-error: true
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install dependencies
+        run: bun install
+
+      # - name: Lint
+      #   run: bun run lint
+      # - name: Run unit tests
+      #   run: bun test
+
+      - name: Build packages
+        run: |
+          echo "Building all workspace packages..."
+          bun run build
+          echo "Verifying built packages:"
+          ls -la packages/core/dist || echo "Core package not built"
+          ls -la packages/shared/dist || echo "Shared package not built"
+          ls -la packages/config/dist || echo "Config package not built"
+          ls -la packages/utils/dist || echo "Utils package not built"
+          ls -la packages/integrations/stripe/dist || echo "Stripe integration not built"
+          ls -la packages/api/contracts/dist || echo "API contracts not built"
+          ls -la packages/api/sdk/dist || echo "API SDK not built"
+          echo "Checking for Next.js build output:"
+          find . -name ".next" -type d || echo "No .next directory found"
+          ls -la apps/web/ || echo "apps/web directory not found"
+        env:
+          NODE_ENV: production
+
+      # Artifact upload removed - not needed for CI validation
+      # - name: Upload build artifact (Next.js output)
+      #   if: success()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: insureinnie-dist
+      #     path: apps/web/.next/

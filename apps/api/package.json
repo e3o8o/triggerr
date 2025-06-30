@@ -1,0 +1,20 @@
+{
+  "name": "@triggerr/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone Bun API service for the triggerr platform.",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch src/index.ts"
+  },
+  "dependencies": {
+    "bun-types": "latest",
+    "@triggerr/api-contracts": "workspace:*",
+    "@triggerr/core": "workspace:*",
+    "@triggerr/paygo-adapter": "workspace:*",
+    "@triggerr/wallet-service": "workspace:*",
+    "@triggerr/escrow-engine": "workspace:*",
+    "@triggerr/payout-engine": "workspace:*"
+  }
+}
