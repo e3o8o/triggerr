@@ -53,27 +53,6 @@ interface PayGoRawTransaction {
 }
 
 /**
- * Convert PayGo amount (BigInt with base-100 system) to decimal string
- */
-function convertPayGoAmount(amount: bigint): string {
-  try {
-    // Use the corrected utility function
-    return convertFromPayGoAmount(amount);
-  } catch (error) {
-    console.warn("[PayGoParser] Error converting amount:", error);
-    return "0";
-  }
-}
-
-/**
- * Format amount for display with currency symbol
- */
-function formatAmountDisplay(amount: string): string {
-  const numericAmount = parseFloat(amount);
-  return `$${numericAmount.toFixed(2)}`;
-}
-
-/**
  * Extract transaction hash from signature
  */
 function extractTransactionHash(signature: string): string {
@@ -110,7 +89,7 @@ function parseTransactionParams(transactionParams: any, signerAddress: string) {
           to = transactionParams.to;
         }
         if (transactionParams.value) {
-          amount = convertPayGoAmount(BigInt(transactionParams.value));
+          amount = convertFromPayGoAmount(BigInt(transactionParams.value));
         }
       } catch (error) {
         console.warn("[PayGoParser] Error parsing Transfer:", error);
@@ -123,7 +102,7 @@ function parseTransactionParams(transactionParams: any, signerAddress: string) {
       to = signerAddress; // Faucet goes to the requester
       try {
         if (transactionParams.value) {
-          amount = convertPayGoAmount(BigInt(transactionParams.value));
+          amount = convertFromPayGoAmount(BigInt(transactionParams.value));
         }
       } catch (error) {
         console.warn("[PayGoParser] Error parsing FaucetRequest:", error);
@@ -134,7 +113,7 @@ function parseTransactionParams(transactionParams: any, signerAddress: string) {
       type = "escrow_create";
       try {
         if (transactionParams.amount !== undefined) {
-          amount = convertPayGoAmount(BigInt(transactionParams.amount));
+          amount = convertFromPayGoAmount(BigInt(transactionParams.amount));
         }
         if (transactionParams.fulfiller) {
           to = transactionParams.fulfiller;
@@ -225,7 +204,7 @@ export function parsePayGoTransaction(
       id: hash,
       type: displayType,
       amount: parsed.amount,
-      formattedAmount: formatAmountDisplay(parsed.amount),
+      formattedAmount: formatBalanceDisplay(parsed.amount),
       from: parsed.from || undefined,
       to: parsed.to || undefined,
       date: new Date(timestamp).toISOString(),

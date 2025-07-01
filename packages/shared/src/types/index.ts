@@ -1,16 +1,16 @@
 // Re-export all shared type definitions
-export * from './canonical-models';
-export * from './chat-types';
-export * from './api-types';
-export * from './business-types';
-export * from './auth-types';
+export * from "../models/canonical-models";
+export * from "./chat-types";
+export * from "./api-types";
+export * from "./business-types";
+export * from "./auth-types";
 
 // Common utility types
 export type UUID = string;
 export type Timestamp = string; // ISO 8601 timestamp
 export type EmailAddress = string;
 export type PhoneNumber = string;
-export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'CAD';
+export type CurrencyCode = "USD" | "EUR" | "GBP" | "CAD";
 export type CountryCode = string; // ISO 3166-1 alpha-2
 export type LanguageCode = string; // ISO 639-1
 
@@ -36,7 +36,12 @@ export interface PaginatedResponse<T> {
 // API Response wrapper types are exported from './api-types'
 
 // Status types used across the platform
-export type Status = 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED' | 'ARCHIVED';
+export type Status =
+  | "ACTIVE"
+  | "INACTIVE"
+  | "PENDING"
+  | "SUSPENDED"
+  | "ARCHIVED";
 
 // Money and pricing types
 export interface MoneyAmount {
@@ -112,14 +117,14 @@ export interface FeatureFlag {
 }
 
 // Environment types
-export type Environment = 'development' | 'staging' | 'production' | 'test';
+export type Environment = "development" | "staging" | "production" | "test";
 
 // Log level types
-export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'FATAL';
+export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR" | "FATAL";
 
 // Notification types
-export type NotificationChannel = 'EMAIL' | 'SMS' | 'PUSH' | 'WEBHOOK';
-export type NotificationPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+export type NotificationChannel = "EMAIL" | "SMS" | "PUSH" | "WEBHOOK";
+export type NotificationPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
 // NotificationTemplate is exported from other modules
 
@@ -129,7 +134,7 @@ export interface SearchQuery {
   filters?: Record<string, any>;
   sort?: {
     field: string;
-    direction: 'ASC' | 'DESC';
+    direction: "ASC" | "DESC";
   };
   pagination?: PaginationParams;
 }
@@ -145,7 +150,7 @@ export interface FilterOption {
 export interface ConfigValue {
   key: string;
   value: string | number | boolean | object;
-  type: 'STRING' | 'NUMBER' | 'BOOLEAN' | 'JSON';
+  type: "STRING" | "NUMBER" | "BOOLEAN" | "JSON";
   description?: string;
   isSecret?: boolean;
 }

@@ -105,11 +105,11 @@ This roadmap outlines the critical phases to achieve the MVP. Progress is tracke
 
 *   **7.1 Implement MVP User Flows**: Quote search, quote display, policy purchase, user dashboard.
 
-### PHASE 8: Provider Foundation (InsureCo) & Testing (Status: ⏳ LATER)
+### PHASE 8: Provider Foundation (Triggerr Direct) & Testing (Status: ⏳ LATER)
 
-**Goal**: Finalize InsureCo setup and conduct thorough testing.
+**Goal**: Finalize Triggerr Direct setup and conduct thorough testing.
 
-*   **8.1 InsureCo Configuration**: Ensure InsureCo provider record is correctly set up.
+*   **8.1 InsureCo Configuration**: Ensure Triggerr Direct provider record is correctly set up.
 *   **8.2 End-to-End Testing**: Comprehensive testing of all MVP flows.
 
 ## IV. Key Development Resources

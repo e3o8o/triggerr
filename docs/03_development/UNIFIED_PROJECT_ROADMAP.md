@@ -31,11 +31,11 @@ The following tasks are ordered by their **strict technical dependencies**. Each
 *   **Task 1.1: Implement Foundational Aggregators**
     *   **Priority**: **BLOCKER**
     *   **Status**: ❌ **NOT IMPLEMENTED**
-    *   **Description**: The `packages/aggregators` directory is currently empty. This is the highest priority task as the `QuoteEngine` cannot function without it.
+    *   **Description**: The `packages/aggregators` directory contains the shells for our data aggregation layer. This task involves implementing the logic within them as defined in `docs/02_architecture/06_DATA_AGGREGATION_DESIGN.md`.
     *   **Deliverables**:
-        1.  Create and implement a basic `FlightAggregator` class within `packages/aggregators/flight-aggregator/`. For MVP, this can use a mock data source but must have the correct interface.
-        2.  Create and implement a basic `WeatherAggregator` class within `packages/aggregators/weather-aggregator/`.
-        3.  Create and implement a `DataRouter` class within `packages/aggregators/data-router/` to select the correct aggregator based on product type.
+        1.  Implement the `CacheManager`, `ConflictResolver`, `SourceRouter`, and main `FlightAggregator` class.
+        2.  Implement the `WeatherDataCollector` and `WeatherRiskAnalyzer` classes for the `WeatherAggregator`.
+        3.  Implement a basic `DataRouter` class that can route requests to the correct aggregator based on product type.
 
 *   **Task 1.2: Migrate to Transaction Parser Utilities**
     *   **Priority**: **HIGH**
@@ -57,7 +57,7 @@ The following tasks are ordered by their **strict technical dependencies**. Each
     *   **Dependencies**: Task 1.1 (Aggregators).
     *   **Deliverables**:
         1.  Flesh out the `QuoteService` class in `packages/services/quote-engine/`.
-        2.  Implement a `generateQuote` method that uses the `FlightAggregator`.
+        2.  Implement a `generateQuote` method that uses the `FlightAggregator` and `WeatherAggregator`.
         3.  Define a `quote` table in the database schema (`packages/core/src/database/schema.ts`) to store generated quotes with an expiration time.
         4.  Implement the `POST /api/v1/insurance/quote` endpoint, connecting it to the `QuoteService`.
 
@@ -96,7 +96,11 @@ These tasks are not on the critical path to the core MVP but should be addressed
 
 *   **Task 4: Implement Full Chat Service Logic**
     *   **Priority**: **MEDIUM**
-    *   **Description**: The chat endpoints are currently mocks. This task involves integrating a real LLM client and building out the conversation management and chat-driven quote generation logic.
+    *   **Description**: The chat endpoints are currently mocks. This task involves implementing the full `ChatService` architecture as defined in `docs/03_development/03_CHAT_IMPLEMENTATION_PLAN.md`.
+    *   **Deliverables**:
+        1.  Build the `llm-interface` and `deepseek-adapter` packages.
+        2.  Implement the `ChatService` to orchestrate entity extraction and quote generation.
+        3.  Implement the resilient frontend UI with both chat and structured form inputs.
 
 *   **Task 5: Implement Delegation Features**
     *   **Priority**: **MEDIUM**
@@ -116,6 +120,28 @@ These tasks are not on the critical path to the core MVP but should be addressed
 
 *   **`getEscrowStatus` Implementation**: 🔵 **BLOCKED**. This remains blocked pending the availability of a network query API from the PayGo client.
 *   **Secure Key Management**: 🔵 **POST-MVP**. A full integration with a KMS for secure private key handling is a critical security enhancement planned for after the initial MVP launch.
+
+---
+
+## V. Future Vision: Multi-Chain & DeFi Integration
+
+This section summarizes the long-term architectural strategy for ensuring Triggerr remains a flexible and capital-efficient platform.
+
+*   **Multi-Chain Smart Contract Strategy**:
+    *   Our `IBlockchainService` interface allows us to support new chains like Ethereum, Base, and Solana.
+    *   Supporting a new chain requires us to build and deploy our own suite of smart contracts (`Escrow`, `Delegation`, etc.) to replicate the functionality PayGo provides natively. This is detailed in `docs/02_architecture/04_MULTI_CHAIN_EXPANSION_STRATEGY.md`.
+
+*   **Capital Provisioning via DeFi**:
+    *   To solve the capital requirements for underwriting policies, we will leverage established DeFi protocols.
+    *   This creates a two-sided market, allowing DeFi users to provide liquidity to our reserve funds and earn yield from premiums.
+    *   **For EVM Chains**: We will use **Morpho**.
+    *   **For Solana**: We will use **Perena** or **Kamino**.
+    *   This strategy is detailed in `docs/02_architecture/04_MULTI_CHAIN_EXPANSION_STRATEGY.md`.
+
+*   **Hybrid Escrow Architecture**:
+    *   Our core strategy is to keep complex, dynamic business logic on our flexible **application layer**.
+    *   The on-chain smart contracts are used as simple, secure **settlement layers** or "vaults."
+    *   This hybrid model gives us the flexibility to innovate quickly while leveraging the security of the blockchain for financial transactions. This is detailed in `docs/02_architecture/05_ESCROW_ARCHITECTURE_STRATEGY.md`.
 
 ---
 

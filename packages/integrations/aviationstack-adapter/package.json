@@ -1,0 +1,48 @@
+{
+  "name": "@triggerr/aviationstack-adapter",
+  "version": "1.0.0",
+  "description": "AviationStack API client adapter for flight data aggregation",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./client": {
+      "import": "./dist/client.js",
+      "types": "./dist/client.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "bun test",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "aviation",
+    "flight-data",
+    "api-adapter",
+    "aviationstack"
+  ],
+  "author": "Triggerr Team",
+  "license": "MIT",
+  "dependencies": {
+    "@triggerr/shared": "workspace:*",
+    "axios": "^1.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

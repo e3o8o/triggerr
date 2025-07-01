@@ -27,7 +27,33 @@ export class CacheManager<T> {
   constructor(ttl: number = 5 * 60 * 1000) {
     this.cache = new Map<string, CacheEntry<T>>();
     this.ttl = ttl;
-    console.log(`CacheManager instantiated with a TTL of ${ttl / 1000} seconds.`);
+    console.log(
+      `CacheManager instantiated with a TTL of ${ttl / 1000} seconds.`,
+    );
+  }
+
+  /**
+   * Generates a standardized cache key for flight data.
+   * @param {string} flightNumber - The flight number (e.g., "BT318").
+   * @param {string} date - Optional date in ISO format. Defaults to today's date.
+   * @returns {string} A standardized cache key.
+   */
+  public generateCacheKey(flightNumber: string, date?: string): string {
+    const dateStr = date || new Date().toISOString().split("T")[0];
+    const normalizedFlightNumber = flightNumber.toUpperCase().trim();
+    return `flight:${normalizedFlightNumber}:${dateStr}`;
+  }
+
+  /**
+   * Generates a cache key for weather data.
+   * @param {string} airportCode - The airport IATA code (e.g., "JFK").
+   * @param {string} date - Optional date in ISO format. Defaults to today's date.
+   * @returns {string} A standardized cache key for weather data.
+   */
+  public generateWeatherCacheKey(airportCode: string, date?: string): string {
+    const dateStr = date || new Date().toISOString().split("T")[0];
+    const normalizedAirportCode = airportCode.toUpperCase().trim();
+    return `weather:${normalizedAirportCode}:${dateStr}`;
   }
 
   /**
@@ -44,7 +70,7 @@ export class CacheManager<T> {
       return null;
     }
 
-    const isExpired = (Date.now() - entry.timestamp) > this.ttl;
+    const isExpired = Date.now() - entry.timestamp > this.ttl;
 
     if (isExpired) {
       console.log(`[CacheManager] Cache STALE for key: ${key}`);

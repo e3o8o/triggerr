@@ -60,10 +60,11 @@ export function convertToPayGoAmount(decimalAmount: string): bigint {
  */
 export function convertFromPayGoAmount(bigIntAmount: bigint): string {
   try {
-    // Convert the bigint to a number and divide by 100 to get the decimal value (100 units = $1.00)
-    const decimalValue = Number(bigIntAmount) / 100;
-    // Format to 2 decimal places to ensure consistent currency representation
-    return decimalValue.toFixed(2);
+    const dollars = bigIntAmount / 100n;
+    const cents = bigIntAmount % 100n;
+    // Pad the cents with a leading zero if it's a single digit
+    const centsPadded = cents.toString().padStart(2, "0");
+    return `${dollars}.${centsPadded}`;
   } catch (error) {
     console.error(
       `[PayGo Adapter Error] Failed to convert bigint amount "${bigIntAmount}" to decimal string:`,
