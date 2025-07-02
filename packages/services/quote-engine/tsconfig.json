@@ -12,7 +12,10 @@
     "../../core/src/**/*.ts",
     "../../aggregators/data-router/src/**/*.ts",
     "../../aggregators/flight-aggregator/src/**/*.ts",
-    "../../aggregators/weather-aggregator/src/**/*.ts"
+    "../../aggregators/weather-aggregator/src/**/*.ts",
+    "../../integrations/**/*.ts",
+    "../../api/**/*.ts",
+    "../../config/src/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

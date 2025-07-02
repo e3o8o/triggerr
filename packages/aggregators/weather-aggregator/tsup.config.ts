@@ -4,8 +4,9 @@ export default defineConfig({
   entry: ["src/index.ts"],
   format: ["cjs", "esm"],
   dts: true,
-  splitting: true,
+  splitting: false,
   sourcemap: true,
   clean: true,
   target: "es2020",
+  tsconfig: "./tsconfig.build.json",
 });

@@ -12,7 +12,9 @@
     "../../core/src/**/*.ts",
     "../escrow-engine/src/**/*.ts",
     "../../blockchain/blockchain-interface/src/**/*.ts",
-    "../../blockchain/service-registry/src/**/*.ts"
+    "../../blockchain/service-registry/src/**/*.ts",
+    "../../blockchain/paygo-adapter/src/**/*.ts",
+    "../wallet-service/src/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }
