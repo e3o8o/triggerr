@@ -9,7 +9,7 @@
 export { FlightAwareClient } from "./client";
 
 // Re-export flight API client interface for convenience
-export type { IFlightApiClient } from "../../../aggregators/flight-aggregator/src/source-router";
+export type { IFlightApiClient } from "@triggerr/shared/types/integrations";
 
 // Re-export canonical types for convenience
 export type {

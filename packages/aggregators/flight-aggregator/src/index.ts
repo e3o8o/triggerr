@@ -15,13 +15,13 @@ export type {
 
 // Source routing
 export { SourceRouter } from "./source-router";
-export type { IFlightApiClient } from "./source-router";
+export type { IFlightApiClient } from "@triggerr/shared/types/integrations";
 
 // Conflict resolution
 export { ConflictResolver } from "./conflict-resolver";
 
 // Cache management
-export { CacheManager } from "../../../core/src/utils/cache-manager";
+export { CacheManager } from "@triggerr/core/utils/cache-manager";
 
 // Re-export canonical types for convenience
 export type {

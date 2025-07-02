@@ -47,7 +47,10 @@ export class WeatherSourceRouter {
    * @param {object} coordinates - The latitude and longitude for the weather query.
    * @returns {Promise<IWeatherApiClient[]>} An array of data source clients in the order they should be queried.
    */
-  public async getSources(coordinates: { latitude: number; longitude: number }): Promise<IWeatherApiClient[]> {
+  public async getSources(coordinates: {
+    latitude: number;
+    longitude: number;
+  }): Promise<IWeatherApiClient[]> {
     console.log(
       `[WeatherSourceRouter] Determining source priority for coordinates: ${coordinates.latitude}, ${coordinates.longitude}`,
     );
@@ -59,7 +62,9 @@ export class WeatherSourceRouter {
     const availableSources = this.sources.filter((source) => {
       const isHealthy = this.healthStatus.get(source.name) !== false;
       if (!isHealthy) {
-        console.log(`[WeatherSourceRouter] Skipping unhealthy source: ${source.name}`);
+        console.log(
+          `[WeatherSourceRouter] Skipping unhealthy source: ${source.name}`,
+        );
       }
       return isHealthy;
     });
@@ -120,7 +125,9 @@ export class WeatherSourceRouter {
    * Manually mark a source as unhealthy (for error handling).
    */
   public markSourceUnhealthy(sourceName: string): void {
-    console.warn(`[WeatherSourceRouter] Marking source as unhealthy: ${sourceName}`);
+    console.warn(
+      `[WeatherSourceRouter] Marking source as unhealthy: ${sourceName}`,
+    );
     this.healthStatus.set(sourceName, false);
     this.lastHealthCheck.set(sourceName, Date.now());
   }

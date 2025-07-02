@@ -109,7 +109,7 @@ async function testCheckoutSessionCreation() {
       flightDetails: TEST_CONFIG.flightDetails,
     });
 
-    if (sessionResult.success) {
+    if (sessionResult.success && sessionResult.data) {
       logSuccess("Checkout session created successfully");
       logInfo(`Session ID: ${sessionResult.data.sessionId}`);
       logInfo(`Checkout URL: ${sessionResult.data.checkoutUrl}`);
@@ -122,7 +122,11 @@ async function testCheckoutSessionCreation() {
 
       return sessionResult.data;
     } else {
-      logError(`Checkout session creation failed: ${sessionResult.error}`);
+      if ("error" in sessionResult) {
+        logError(`Checkout session creation failed: ${sessionResult.error}`);
+      } else {
+        logError(`Checkout session creation failed with an unknown error.`);
+      }
       return null;
     }
   } catch (error) {
@@ -176,8 +180,12 @@ async function testWebhookEventHandling() {
     if (result.success) {
       logSuccess("Webhook event handled successfully");
       logInfo(`Message: ${result.message}`);
-      logInfo(`Policy ID: ${result.policyId}`);
-      logInfo(`Event type: ${result.eventType}`);
+      if ("policyId" in result) {
+        logInfo(`Policy ID: ${result.policyId}`);
+      }
+      if ("eventType" in result) {
+        logInfo(`Event type: ${result.eventType}`);
+      }
     } else {
       logWarning(
         `Webhook event handling completed with warning: ${result.message}`,

@@ -1,0 +1,42 @@
+{
+  "name": "@triggerr/policy-engine",
+  "version": "0.1.0",
+  "description": "Service for creating and managing insurance policies from quotes and interacting with the escrow system.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "bun test",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@triggerr/core": "workspace:*",
+    "@triggerr/shared": "workspace:*",
+    "@triggerr/escrow-engine": "workspace:*",
+    "drizzle-orm": "^0.31.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "bun-types": "latest"
+  },
+  "keywords": [
+    "insurance",
+    "policy",
+    "escrow",
+    "purchase"
+  ],
+  "author": "Triggerr Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/triggerr/triggerr.git",
+    "directory": "packages/services/policy-engine"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

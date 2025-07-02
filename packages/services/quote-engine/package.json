@@ -1,0 +1,42 @@
+{
+  "name": "@triggerr/quote-engine",
+  "version": "0.1.0",
+  "description": "Insurance quote generation engine with risk assessment and premium calculation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "bun test",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@triggerr/core": "workspace:*",
+    "@triggerr/shared": "workspace:*",
+    "@triggerr/data-router": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "bun-types": "latest"
+  },
+  "keywords": [
+    "insurance",
+    "quotes",
+    "risk-assessment",
+    "premium-calculation",
+    "flight-insurance"
+  ],
+  "author": "Triggerr Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/triggerr/triggerr.git",
+    "directory": "packages/services/quote-engine"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

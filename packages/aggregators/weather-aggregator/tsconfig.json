@@ -10,8 +10,7 @@
     "tsup.config.ts",
     "../../shared/src/**/*.ts",
     "../../core/src/**/*.ts",
-    "../../blockchain/blockchain-interface/src/**/*.ts",
-    "../../blockchain/service-registry/src/**/*.ts"
+    "../../integrations/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

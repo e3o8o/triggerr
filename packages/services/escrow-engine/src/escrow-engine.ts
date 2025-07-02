@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import {
   IBlockchainService,
   GenericEscrowParams,
+  BlockchainProviderName,
 } from "@triggerr/blockchain-interface";
 import { BlockchainServiceRegistry } from "@triggerr/service-registry";
 import PayGoClientService, {
@@ -555,7 +556,7 @@ export class EscrowEngineFactory {
 
   createEngine(
     modelType: EscrowModelType,
-    chain: "PAYGO", // TODO: Make this dynamic
+    chain: BlockchainProviderName, // Multichain support: "PAYGO" | "ETHEREUM" | "BASE" | "SOLANA"
   ): IEscrowEngine {
     const EngineClass = EscrowEngineFactory.engines.get(modelType);
     if (!EngineClass) {
@@ -578,10 +579,11 @@ export class EscrowManager {
   }
 
   async createEscrow(params: EscrowCreateParams): Promise<EscrowResult> {
-    // TODO: Determine chain from params
+    // Extract chain from metadata for multichain support
+    const chain = (params.metadata?.chain as BlockchainProviderName) || "PAYGO"; // Default to PAYGO if not specified
     const engine = this.factory.createEngine(
       params.configuration.escrowModel,
-      "PAYGO",
+      chain,
     );
     if (!engine.validateConfiguration(params.configuration)) {
       return {
@@ -606,11 +608,9 @@ export class EscrowManager {
         throw new Error(`Escrow with blockchain ID ${escrowId} not found.`);
       }
 
-      // TODO: Determine chain from escrowRecord
-      const engine = this.factory.createEngine(
-        escrowRecord.escrowModel,
-        "PAYGO",
-      );
+      // Extract chain from escrow record for multichain support
+      const chain = (escrowRecord.chain as BlockchainProviderName) || "PAYGO"; // Default to PAYGO if not specified
+      const engine = this.factory.createEngine(escrowRecord.escrowModel, chain);
 
       return await engine.fulfillEscrow(escrowId, fulfillerAddress, proof);
     } catch (error) {
@@ -645,11 +645,9 @@ export class EscrowManager {
         throw new Error(`Escrow with blockchain ID ${escrowId} not found.`);
       }
 
-      // TODO: Determine chain from escrowRecord
-      const engine = this.factory.createEngine(
-        escrowRecord.escrowModel,
-        "PAYGO",
-      );
+      // Extract chain from escrow record for multichain support
+      const chain = (escrowRecord.chain as BlockchainProviderName) || "PAYGO"; // Default to PAYGO if not specified
+      const engine = this.factory.createEngine(escrowRecord.escrowModel, chain);
 
       return await engine.releaseEscrow(escrowId, reason);
     } catch (error) {

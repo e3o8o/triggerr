@@ -17,12 +17,12 @@ import {
   FlightAggregator,
   type AggregationResult,
   type FlightIdentifier,
-} from "../../flight-aggregator/src/aggregator";
+} from "@triggerr/flight-aggregator/aggregator";
 import {
   WeatherAggregator,
   type WeatherAggregationResult,
   type WeatherIdentifier,
-} from "../../weather-aggregator/src/aggregator";
+} from "@triggerr/weather-aggregator/aggregator";
 
 export interface PolicyDataRequest {
   flightNumber: string;

@@ -41,7 +41,49 @@
       ],
       "@triggerr/blockchain-interface/*": [
         "packages/blockchain/blockchain-interface/src/*"
-      ]
+      ],
+      "@triggerr/aviationstack-adapter": [
+        "packages/integrations/aviationstack-adapter/src"
+      ],
+      "@triggerr/aviationstack-adapter/*": [
+        "packages/integrations/aviationstack-adapter/src/*"
+      ],
+      "@triggerr/flightaware-adapter": [
+        "packages/integrations/flightaware-adapter/src"
+      ],
+      "@triggerr/flightaware-adapter/*": [
+        "packages/integrations/flightaware-adapter/src/*"
+      ],
+      "@triggerr/google-weather-adapter": [
+        "packages/integrations/google-weather-adapter/src"
+      ],
+      "@triggerr/google-weather-adapter/*": [
+        "packages/integrations/google-weather-adapter/src/*"
+      ],
+      "@triggerr/opensky-adapter": [
+        "packages/integrations/opensky-adapter/src"
+      ],
+      "@triggerr/opensky-adapter/*": [
+        "packages/integrations/opensky-adapter/src/*"
+      ],
+      "@triggerr/flight-aggregator": [
+        "packages/aggregators/flight-aggregator/src"
+      ],
+      "@triggerr/flight-aggregator/*": [
+        "packages/aggregators/flight-aggregator/src/*"
+      ],
+      "@triggerr/weather-aggregator": [
+        "packages/aggregators/weather-aggregator/src"
+      ],
+      "@triggerr/weather-aggregator/*": [
+        "packages/aggregators/weather-aggregator/src/*"
+      ],
+      "@triggerr/data-router": ["packages/aggregators/data-router/src"],
+      "@triggerr/data-router/*": ["packages/aggregators/data-router/src/*"],
+      "@triggerr/quote-engine": ["packages/services/quote-engine/src"],
+      "@triggerr/quote-engine/*": ["packages/services/quote-engine/src/*"],
+      "@triggerr/policy-engine": ["packages/services/policy-engine/src"],
+      "@triggerr/policy-engine/*": ["packages/services/policy-engine/src/*"]
     }
   },
   "exclude": ["drizzle/migrations/**/*", "node_modules", "dist", ".turbo"]

@@ -110,6 +110,7 @@ export const policyStatusEnum = pgEnum("policy_status", [
   "EXPIRED",
   "CLAIMED",
   "CANCELLED",
+  "FAILED",
 ]);
 export const coverageTypeEnum = pgEnum("coverage_type", [
   "DELAY_60",
@@ -265,10 +266,17 @@ export const conversationMessageRoleEnum = pgEnum("conversation_message_role", [
 ]);
 
 export const quoteCartItemStatusEnum = pgEnum("quote_cart_item_status", [
-  "ACTIVE",
+  "PENDING",
   "PURCHASED",
   "EXPIRED",
   "REMOVED",
+]);
+
+export const quoteStatusEnum = pgEnum("quote_status", [
+  "PENDING",
+  "ACCEPTED",
+  "EXPIRED",
+  "REJECTED",
 ]);
 
 export const paymentProviderEnum = pgEnum("payment_provider", [
@@ -625,6 +633,7 @@ export const quote = pgTable(
     confidence: decimal("confidence", { precision: 5, scale: 4 })
       .notNull()
       .default("0.8500"),
+    status: quoteStatusEnum("status").notNull().default("PENDING"),
     validUntil: timestamp("valid_until").notNull(),
     ipAddress: text("ip_address"),
     userAgent: text("user_agent"),
@@ -1794,7 +1803,7 @@ export const quoteCartItems = pgTable(
     quotedCoverageCents: integer("quoted_coverage_cents").notNull(),
     quoteDetails: jsonb("quote_details").notNull(),
     addedAt: timestamp("added_at").notNull().defaultNow(),
-    status: quoteCartItemStatusEnum("status").notNull().default("ACTIVE"),
+    status: quoteCartItemStatusEnum("status").notNull().default("PENDING"),
     expiresAt: timestamp("expires_at"),
   },
   (table) => [

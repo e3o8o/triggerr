@@ -12,18 +12,7 @@
  */
 
 import type { CanonicalFlightData } from "@triggerr/shared/models/canonical-models";
-
-// Generic interface for flight data API clients
-export interface IFlightApiClient {
-  name: string;
-  priority: number;
-  reliability: number; // 0.0 to 1.0
-  fetchFlight(
-    flightNumber: string,
-    date?: string,
-  ): Promise<CanonicalFlightData | null>;
-  isAvailable(): Promise<boolean>;
-}
+import type { IFlightApiClient } from "@triggerr/shared/types/integrations";
 
 // Type alias for cleaner code
 type DataSourceClient = IFlightApiClient;

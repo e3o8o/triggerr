@@ -5,13 +5,13 @@
  * by testing the complete flow from API clients through aggregators to the DataRouter.
  */
 
-import { FlightAggregator } from "./flight-aggregator/src/aggregator";
-import { WeatherAggregator } from "./weather-aggregator/src/aggregator";
-import { DataRouter } from "./data-router/src/router";
+import { FlightAggregator } from "../packages/aggregators/flight-aggregator/src/aggregator";
+import { WeatherAggregator } from "../packages/aggregators/weather-aggregator/src/aggregator";
+import { DataRouter } from "../packages/aggregators/data-router/src/router";
 
 // Import API clients
-import { AviationStackClient } from "../integrations/aviationstack-adapter/src/client";
-import { GoogleWeatherClient } from "../integrations/google-weather-adapter/src/client";
+import { AviationStackClient } from "../packages/integrations/aviationstack-adapter/src/client";
+import { GoogleWeatherClient } from "../packages/integrations/google-weather-adapter/src/client";
 
 // Mock clients for FlightAware and OpenSky since we need to implement them
 class MockFlightAwareClient {

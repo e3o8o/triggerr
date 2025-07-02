@@ -13,7 +13,7 @@ import type {
   StandardFlightStatus,
   SourceContributions,
 } from "@triggerr/shared/models/canonical-models";
-import type { IFlightApiClient } from "../../../aggregators/flight-aggregator/src/source-router";
+import type { IFlightApiClient } from "@triggerr/shared/types/integrations";
 
 interface AviationStackFlight {
   flight: {

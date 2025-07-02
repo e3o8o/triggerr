@@ -10,8 +10,9 @@
     "tsup.config.ts",
     "../../shared/src/**/*.ts",
     "../../core/src/**/*.ts",
-    "../../blockchain/blockchain-interface/src/**/*.ts",
-    "../../blockchain/service-registry/src/**/*.ts"
+    "../../aggregators/data-router/src/**/*.ts",
+    "../../aggregators/flight-aggregator/src/**/*.ts",
+    "../../aggregators/weather-aggregator/src/**/*.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }

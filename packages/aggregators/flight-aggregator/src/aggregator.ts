@@ -12,7 +12,8 @@
 
 import type { CanonicalFlightData } from "@triggerr/shared/models/canonical-models";
 import { CacheManager } from "@triggerr/core/utils/cache-manager";
-import { SourceRouter, type IFlightApiClient } from "./source-router";
+import { SourceRouter } from "./source-router";
+import { type IFlightApiClient } from "@triggerr/shared/types/integrations";
 import { ConflictResolver } from "./conflict-resolver";
 
 export interface FlightAggregatorConfig {
