@@ -3,6 +3,10 @@ import { z } from "zod";
 import { QuoteService } from "@triggerr/quote-engine";
 import { DataRouter } from "@triggerr/data-router";
 import { Logger, LogLevel } from "@triggerr/core";
+import { FlightAwareClient } from "@triggerr/flightaware-adapter";
+import { AviationStackClient } from "@triggerr/aviationstack-adapter";
+import { OpenSkyClient } from "@triggerr/opensky-adapter";
+import { GoogleWeatherClient } from "@triggerr/google-weather-adapter";
 
 // Request validation schema
 const insuranceQuoteRequestSchema = z.object({
@@ -76,7 +80,39 @@ export async function handleInsuranceQuote(req: Request): Promise<Response> {
   try {
     // Step 2: Initialize services
     const logger = new Logger(LogLevel.INFO, "QuoteAPI");
-    const dataRouter = new DataRouter({ logger });
+    // Initialize API clients only when API keys are available
+    const flightApiClients = [];
+    if (process.env.FLIGHTAWARE_API_KEY) {
+      flightApiClients.push(
+        new FlightAwareClient(process.env.FLIGHTAWARE_API_KEY),
+      );
+    }
+    if (process.env.AVIATIONSTACK_API_KEY) {
+      flightApiClients.push(
+        new AviationStackClient(process.env.AVIATIONSTACK_API_KEY),
+      );
+    }
+    if (process.env.OPENSKY_USERNAME && process.env.OPENSKY_PASSWORD) {
+      flightApiClients.push(
+        new OpenSkyClient(
+          process.env.OPENSKY_USERNAME,
+          process.env.OPENSKY_PASSWORD,
+        ),
+      );
+    }
+
+    const weatherApiClients = [];
+    if (process.env.GOOGLE_WEATHER_API_KEY) {
+      weatherApiClients.push(
+        new GoogleWeatherClient(process.env.GOOGLE_WEATHER_API_KEY),
+      );
+    }
+
+    const dataRouter = new DataRouter({
+      logger,
+      flightApiClients,
+      weatherApiClients,
+    });
     const quoteService = new QuoteService(dataRouter, logger);
 
     // Step 3: Prepare quote request with defaults

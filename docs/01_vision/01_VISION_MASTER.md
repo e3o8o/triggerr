@@ -294,6 +294,7 @@ Our multi-chain, API-first architecture directly enables three distinct business
 ### Primary Revenue Streams for `triggerr` Ecosystem:
   - **Direct Insurance Premiums (`triggerr Direct` - Phase 1+):** Majority of revenue from policies sold by the first-party insurer, after reinsurance and operational costs.
   - **Platform Commissions (Phase 2+):** Fees (e.g., 15-25%) on premiums from third-party insurers utilizing the `triggerr.com` marketplace.
+  - **x402 Protocol API Revenue (Phase 2.5+):** Micropayments for API access via x402 protocol - $0.001-0.05 per API call, targeting AI agents and programmatic access. Projected $60,000+ annual revenue with potential for 10x growth as AI agent adoption increases. See [x402 Integration Architecture](03_X402_INTEGRATION_ARCHITECTURE.md) for detailed analysis.
   - **Flight Booking Revenue (`FlightHub Connect` - Phase 3):** Commissions/markups on flight tickets, fees for ancillary services.
   - **B2B Financial Services (`Preterag Financial Solutions` - Phase 2+):** SaaS fees for white-label platforms, API access fees, revenue from risk analytics products, consulting.
   - **Data Licensing (Future):** Monetization of anonymized, aggregated risk data and travel trends (with strict adherence to privacy).

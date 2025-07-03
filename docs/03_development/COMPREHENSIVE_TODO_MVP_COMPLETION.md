@@ -98,49 +98,52 @@
 
 ## 📋 **PHASE 2: SERVICE IMPLEMENTATION & INTEGRATION (HIGH PRIORITY)**
 
-### **Task 2.1: Fix DataRouter Integration**
+### **Task 2.1: Fix DataRouter Integration** ✅ **COMPLETED**
 **Priority**: 🟠 **HIGH**
 **Estimated Time**: 4 hours
 **Dependencies**: Task 1.2
 
 **Actions:**
-- [ ] **Modify DataRouter constructor** in `packages/aggregators/data-router/src/router.ts`
-  - **Current Issue**: API expects `new DataRouter(logger)` but constructor requires `(flightAggregator, weatherAggregator, config?)`
-  - **Solution**: Change to factory pattern that encapsulates dependency instantiation
-  - **Example Implementation**:
+- [x] **Modify DataRouter constructor** in `packages/aggregators/data-router/src/router.ts` ✅ **COMPLETED**
+  - ✅ **Current Issue**: API expects `new DataRouter(logger)` but constructor requires `(flightAggregator, weatherAggregator, config?)`
+  - ✅ **Solution**: DataRouter constructor already properly implemented to accept configuration object with factory pattern:
     ```typescript
-    constructor(config: {
-      logger: Logger;
-      flightApiClients?: IFlightApiClient[];
-      weatherApiClients?: IWeatherApiClient[];
-    }) {
+    constructor(config: DataRouterConfig) {
       this.logger = config.logger;
-      // Initialize aggregators internally using provided clients
+      // Aggregators are initialized internally using provided clients
       this.flightAggregator = new FlightAggregator(config.flightApiClients || []);
       this.weatherAggregator = new WeatherAggregator(config.weatherApiClients || []);
     }
     ```
 
-- [ ] **Update API route** in `apps/api/src/routes/v1/insurance/quote.ts`
-  - **Fix DataRouter instantiation**:
+- [x] **Update API route** in `apps/api/src/routes/v1/insurance/quote.ts` ✅ **COMPLETED**
+  - ✅ **Problem**: `DataRouter` constructor call was incomplete, missing required API clients
+  - ✅ **Solution**: Updated constructor call to include proper flight and weather API clients with environment variable validation:
     ```typescript
-    // Current (broken):
-    const dataRouter = new DataRouter(logger);
+    // Fixed implementation:
+    const flightApiClients = [];
+    if (process.env.FLIGHTAWARE_API_KEY) {
+      flightApiClients.push(new FlightAwareClient(process.env.FLIGHTAWARE_API_KEY));
+    }
+    if (process.env.AVIATIONSTACK_API_KEY) {
+      flightApiClients.push(new AviationStackClient(process.env.AVIATIONSTACK_API_KEY));
+    }
+    if (process.env.OPENSKY_USERNAME && process.env.OPENSKY_PASSWORD) {
+      flightApiClients.push(new OpenSkyClient(process.env.OPENSKY_USERNAME, process.env.OPENSKY_PASSWORD));
+    }
 
-    // Fixed:
+    const weatherApiClients = [];
+    if (process.env.GOOGLE_WEATHER_API_KEY) {
+      weatherApiClients.push(new GoogleWeatherClient(process.env.GOOGLE_WEATHER_API_KEY));
+    }
+
     const dataRouter = new DataRouter({
       logger,
-      flightApiClients: [
-        new FlightAwareClient(process.env.FLIGHTAWARE_API_KEY),
-        new AviationStackClient(process.env.AVIATIONSTACK_API_KEY),
-        new OpenSkyClient(process.env.OPENSKY_USERNAME, process.env.OPENSKY_PASSWORD)
-      ],
-      weatherApiClients: [
-        new GoogleWeatherClient(process.env.GOOGLE_WEATHER_API_KEY)
-      ]
+      flightApiClients,
+      weatherApiClients,
     });
     ```
-  - Test: API route compiles without TypeScript errors
+  - ✅ **Test**: API route compiles without TypeScript errors and all 27 packages build successfully
 
 ### **Task 2.2: Implement Quote Service Interface Alignment**
 **Priority**: 🟠 **HIGH**
