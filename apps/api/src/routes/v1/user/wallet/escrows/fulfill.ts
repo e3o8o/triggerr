@@ -113,6 +113,15 @@ export async function handleFulfillEscrowRequest(
     }
 
     const userWallet = userWalletResult[0];
+    if (!userWallet) {
+      return new Response(
+        JSON.stringify(createApiError("WALLET_NOT_FOUND", "Wallet not found")),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
     const fulfillerAddress = userWallet.address as Hex;
 
     // 4. Verify the escrow exists and user is authorized to fulfill it

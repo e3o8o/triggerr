@@ -9,11 +9,11 @@
 export { FlightAwareClient } from "./client";
 
 // Re-export flight API client interface for convenience
-export type { IFlightApiClient } from "@triggerr/shared/types/integrations";
+export type { IFlightApiClient } from "@triggerr/shared";
 
 // Re-export canonical types for convenience
 export type {
   CanonicalFlightData,
   StandardFlightStatus,
   SourceContributions,
-} from "@triggerr/shared/models/canonical-models";
+} from "@triggerr/shared";

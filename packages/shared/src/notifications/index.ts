@@ -2,15 +2,31 @@
 // NOTIFICATION TEMPLATES & UTILITIES
 // ===========================================================================
 
-import type { Timestamp, UUID, EmailAddress, PhoneNumber, MoneyAmount } from '../types';
+import type {
+  Timestamp,
+  UUID,
+  EmailAddress,
+  PhoneNumber,
+  MoneyAmount,
+} from "../types";
 
 // ===========================================================================
 // INTERFACES & TYPES
 // ===========================================================================
 
-export type NotificationChannel = 'EMAIL' | 'SMS' | 'PUSH' | 'WEBHOOK' | 'IN_APP';
-export type NotificationPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
-export type NotificationStatus = 'PENDING' | 'SENT' | 'FAILED' | 'DELIVERED' | 'READ';
+export type NotificationChannel =
+  | "EMAIL"
+  | "SMS"
+  | "PUSH"
+  | "WEBHOOK"
+  | "IN_APP";
+export type NotificationPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+export type NotificationStatus =
+  | "PENDING"
+  | "SENT"
+  | "FAILED"
+  | "DELIVERED"
+  | "READ";
 
 // Context for interpolating variables into templates
 export interface NotificationContext {
@@ -72,24 +88,25 @@ export interface NotificationTemplate {
 // EMAIL TEMPLATES
 // ===========================================================================
 
-export const defaultPlatformName = 'triggerr';
-export const defaultSupportEmail = 'support@triggerr.com'; // Replace with actual support email
+export const defaultPlatformName = "triggerr";
+export const defaultSupportEmail = "support@triggerr.com"; // Replace with actual support email
 
 export const EMAIL_TEMPLATES: Record<string, NotificationTemplate> = {
   // --- USER ONBOARDING & ACCOUNT ---
   USER_WELCOME: {
-    id: 'USER_WELCOME',
-    name: 'User Welcome & Wallet Ready',
-    channel: 'EMAIL',
-    priority: 'MEDIUM',
-    subject: (ctx) => `Welcome to ${ctx.platformName || defaultPlatformName}! Your Wallet is Ready!`,
+    id: "USER_WELCOME",
+    name: "User Welcome & Wallet Ready",
+    channel: "EMAIL",
+    priority: "MEDIUM",
+    subject: (ctx) =>
+      `Welcome to ${ctx.platformName || defaultPlatformName}! Your Wallet is Ready!`,
     textBody: (ctx) => `
-Hi ${ctx.userName || 'there'},
+Hi ${ctx.userName || "there"},
 
 Welcome to ${ctx.platformName || defaultPlatformName}!
 
 We're thrilled to have you join our platform. Your secure, custodial PayGo wallet has been automatically created and is ready for use.
-Your Wallet Address: ${ctx.walletAddress || 'N/A'}
+Your Wallet Address: ${ctx.walletAddress || "N/A"}
 
 You can view your wallet and manage your policies by logging into your dashboard:
 ${ctx.actionUrl || `https://triggerr.com/dashboard`}
@@ -105,10 +122,10 @@ ${ctx.supportEmail || defaultSupportEmail}
 <html>
 <head><title>Welcome!</title></head>
 <body>
-  <p>Hi ${ctx.userName || 'there'},</p>
+  <p>Hi ${ctx.userName || "there"},</p>
   <p>Welcome to <strong>${ctx.platformName || defaultPlatformName}</strong>!</p>
   <p>We're thrilled to have you join our platform. Your secure, custodial PayGo wallet has been automatically created and is ready for use.</p>
-  <p><strong>Your Wallet Address:</strong> ${ctx.walletAddress || 'N/A'}</p>
+  <p><strong>Your Wallet Address:</strong> ${ctx.walletAddress || "N/A"}</p>
   <p>You can view your wallet and manage your policies by logging into your dashboard:</p>
   <p><a href="${ctx.actionUrl || `https://triggerr.com/dashboard`}">Go to Dashboard</a></p>
   <p>If you're testing on our Alpha/Testnet, you can request some test tokens from the faucet in your dashboard.</p>
@@ -117,17 +134,24 @@ ${ctx.supportEmail || defaultSupportEmail}
 </body>
 </html>
     `,
-    requiredContextKeys: ['userName', 'walletAddress', 'platformName', 'supportEmail', 'actionUrl'],
+    requiredContextKeys: [
+      "userName",
+      "walletAddress",
+      "platformName",
+      "supportEmail",
+      "actionUrl",
+    ],
   },
 
   PASSWORD_RESET_REQUEST: {
-    id: 'PASSWORD_RESET_REQUEST',
-    name: 'Password Reset Request',
-    channel: 'EMAIL',
-    priority: 'URGENT',
-    subject: (ctx) => `Password Reset Request for ${ctx.platformName || defaultPlatformName}`,
+    id: "PASSWORD_RESET_REQUEST",
+    name: "Password Reset Request",
+    channel: "EMAIL",
+    priority: "URGENT",
+    subject: (ctx) =>
+      `Password Reset Request for ${ctx.platformName || defaultPlatformName}`,
     textBody: (ctx) => `
-Hi ${ctx.userName || 'there'},
+Hi ${ctx.userName || "there"},
 
 We received a request to reset your password for your ${ctx.platformName || defaultPlatformName} account.
 If you did not make this request, please ignore this email.
@@ -144,7 +168,7 @@ The ${ctx.platformName || defaultPlatformName} Team
 <!DOCTYPE html>
 <html>
 <body>
-  <p>Hi ${ctx.userName || 'there'},</p>
+  <p>Hi ${ctx.userName || "there"},</p>
   <p>We received a request to reset your password for your ${ctx.platformName || defaultPlatformName} account. If you did not make this request, please ignore this email.</p>
   <p>To reset your password, click the link below:</p>
   <p><a href="${ctx.actionUrl}">Reset Password</a></p>
@@ -153,25 +177,26 @@ The ${ctx.platformName || defaultPlatformName} Team
 </body>
 </html>
     `,
-    requiredContextKeys: ['userName', 'actionUrl', 'platformName'],
+    requiredContextKeys: ["userName", "actionUrl", "platformName"],
   },
 
   // --- POLICY MANAGEMENT ---
   POLICY_PURCHASE_CONFIRMATION: {
-    id: 'POLICY_PURCHASE_CONFIRMATION',
-    name: 'Policy Purchase Confirmation',
-    channel: 'EMAIL',
-    priority: 'HIGH',
-    subject: (ctx) => `Your ${ctx.productName || 'Policy'} is Confirmed! (Policy #${ctx.policyNumber})`,
+    id: "POLICY_PURCHASE_CONFIRMATION",
+    name: "Policy Purchase Confirmation",
+    channel: "EMAIL",
+    priority: "HIGH",
+    subject: (ctx) =>
+      `Your ${ctx.productName || "Policy"} is Confirmed! (Policy #${ctx.policyNumber})`,
     textBody: (ctx) => `
-Hi ${ctx.userName || 'there'},
+Hi ${ctx.userName || "there"},
 
-Thank you for purchasing your ${ctx.productName || 'insurance policy'} with ${ctx.platformName || defaultPlatformName}!
+Thank you for purchasing your ${ctx.productName || "insurance policy"} with ${ctx.platformName || defaultPlatformName}!
 
 Policy Number: ${ctx.policyNumber}
 Product: ${ctx.productName}
-Coverage Amount: ${ctx.coverageAmount?.formatted || ctx.coverageAmount?.cents + ' cents'}
-Premium Paid: ${ctx.premiumAmount?.formatted || ctx.premiumAmount?.cents + ' cents'}
+Coverage Amount: ${ctx.coverageAmount?.formatted || ctx.coverageAmount?.cents + " cents"}
+Premium Paid: ${ctx.premiumAmount?.formatted || ctx.premiumAmount?.cents + " cents"}
 Effective Date: ${ctx.policyEffectiveDate}
 Expiration Date: ${ctx.policyExpirationDate}
 
@@ -191,12 +216,12 @@ The ${ctx.platformName || defaultPlatformName} Team
 <!DOCTYPE html>
 <html>
 <body>
-  <p>Hi ${ctx.userName || 'there'},</p>
-  <p>Thank you for purchasing your <strong>${ctx.productName || 'insurance policy'}</strong> with ${ctx.platformName || defaultPlatformName}!</p>
+  <p>Hi ${ctx.userName || "there"},</p>
+  <p>Thank you for purchasing your <strong>${ctx.productName || "insurance policy"}</strong> with ${ctx.platformName || defaultPlatformName}!</p>
   <p><strong>Policy Number:</strong> ${ctx.policyNumber}</p>
   <p><strong>Product:</strong> ${ctx.productName}</p>
-  <p><strong>Coverage Amount:</strong> ${ctx.coverageAmount?.formatted || ctx.coverageAmount?.cents + ' cents'}</p>
-  <p><strong>Premium Paid:</strong> ${ctx.premiumAmount?.formatted || ctx.premiumAmount?.cents + ' cents'}</p>
+  <p><strong>Coverage Amount:</strong> ${ctx.coverageAmount?.formatted || ctx.coverageAmount?.cents + " cents"}</p>
+  <p><strong>Premium Paid:</strong> ${ctx.premiumAmount?.formatted || ctx.premiumAmount?.cents + " cents"}</p>
   <p><strong>Effective Date:</strong> ${ctx.policyEffectiveDate}</p>
   <p><strong>Expiration Date:</strong> ${ctx.policyExpirationDate}</p>
   <p><strong>Flight Details:</strong></p>
@@ -212,20 +237,32 @@ The ${ctx.platformName || defaultPlatformName} Team
 </html>
     `,
     requiredContextKeys: [
-      'userName', 'productName', 'policyNumber', 'coverageAmount', 'premiumAmount',
-      'policyEffectiveDate', 'policyExpirationDate', 'flightNumber', 'originAirport',
-      'destinationAirport', 'departureTime', 'policyVerificationCode', 'platformName', 'actionUrl'
+      "userName",
+      "productName",
+      "policyNumber",
+      "coverageAmount",
+      "premiumAmount",
+      "policyEffectiveDate",
+      "policyExpirationDate",
+      "flightNumber",
+      "originAirport",
+      "destinationAirport",
+      "departureTime",
+      "policyVerificationCode",
+      "platformName",
+      "actionUrl",
     ],
   },
 
   FLIGHT_DELAY_DETECTED: {
-    id: 'FLIGHT_DELAY_DETECTED',
-    name: 'Flight Delay Detected for Your Policy',
-    channel: 'EMAIL',
-    priority: 'HIGH',
-    subject: (ctx) => `Flight Delay Detected: ${ctx.flightNumber} - Policy #${ctx.policyNumber}`,
+    id: "FLIGHT_DELAY_DETECTED",
+    name: "Flight Delay Detected for Your Policy",
+    channel: "EMAIL",
+    priority: "HIGH",
+    subject: (ctx) =>
+      `Flight Delay Detected: ${ctx.flightNumber} - Policy #${ctx.policyNumber}`,
     textBody: (ctx) => `
-Hi ${ctx.userName || 'there'},
+Hi ${ctx.userName || "there"},
 
 We've detected a significant delay for your insured flight:
 Flight: ${ctx.flightNumber}
@@ -247,7 +284,7 @@ The ${ctx.platformName || defaultPlatformName} Team
 <!DOCTYPE html>
 <html>
 <body>
-  <p>Hi ${ctx.userName || 'there'},</p>
+  <p>Hi ${ctx.userName || "there"},</p>
   <p>We've detected a significant delay for your insured flight:</p>
   <ul>
     <li><strong>Flight:</strong> ${ctx.flightNumber}</li>
@@ -263,27 +300,36 @@ The ${ctx.platformName || defaultPlatformName} Team
 </html>
     `,
     requiredContextKeys: [
-      'userName', 'flightNumber', 'originAirport', 'destinationAirport', 'departureTime',
-      'delayMinutes', 'policyNumber', 'policyVerificationCode', 'platformName', 'actionUrl'
+      "userName",
+      "flightNumber",
+      "originAirport",
+      "destinationAirport",
+      "departureTime",
+      "delayMinutes",
+      "policyNumber",
+      "policyVerificationCode",
+      "platformName",
+      "actionUrl",
     ],
   },
 
   PAYOUT_PROCESSED: {
-    id: 'PAYOUT_PROCESSED',
-    name: 'Parametric Payout Processed',
-    channel: 'EMAIL',
-    priority: 'HIGH',
-    subject: (ctx) => `Your Payout of ${ctx.payoutAmount?.formatted || ctx.payoutAmount?.cents + ' cents'} is On Its Way!`,
+    id: "PAYOUT_PROCESSED",
+    name: "Parametric Payout Processed",
+    channel: "EMAIL",
+    priority: "HIGH",
+    subject: (ctx) =>
+      `Your Payout of ${ctx.payoutAmount?.formatted || ctx.payoutAmount?.cents + " cents"} is On Its Way!`,
     textBody: (ctx) => `
-Hi ${ctx.userName || 'there'},
+Hi ${ctx.userName || "there"},
 
 Great news! Your parametric insurance payout has been processed.
 
 Policy Number: ${ctx.policyNumber}
 Flight: ${ctx.flightNumber}
-Payout Amount: ${ctx.payoutAmount?.formatted || ctx.payoutAmount?.cents + ' cents'}
+Payout Amount: ${ctx.payoutAmount?.formatted || ctx.payoutAmount?.cents + " cents"}
 Wallet Address: ${ctx.walletAddress}
-Transaction Hash (PayGo): ${ctx.transactionHash || 'N/A'}
+Transaction Hash (PayGo): ${ctx.transactionHash || "N/A"}
 
 The funds have been sent to your custodial PayGo wallet. You should see the balance updated shortly.
 
@@ -294,14 +340,14 @@ The ${ctx.platformName || defaultPlatformName} Team
 <!DOCTYPE html>
 <html>
 <body>
-  <p>Hi ${ctx.userName || 'there'},</p>
+  <p>Hi ${ctx.userName || "there"},</p>
   <p>Great news! Your parametric insurance payout has been processed.</p>
   <ul>
     <li><strong>Policy Number:</strong> ${ctx.policyNumber}</li>
     <li><strong>Flight:</strong> ${ctx.flightNumber}</li>
-    <li><strong>Payout Amount:</strong> ${ctx.payoutAmount?.formatted || ctx.payoutAmount?.cents + ' cents'}</li>
+    <li><strong>Payout Amount:</strong> ${ctx.payoutAmount?.formatted || ctx.payoutAmount?.cents + " cents"}</li>
     <li><strong>Wallet Address:</strong> ${ctx.walletAddress}</li>
-    <li><strong>Transaction Hash (PayGo):</strong> ${ctx.transactionHash || 'N/A'}</li>
+    <li><strong>Transaction Hash (PayGo):</strong> ${ctx.transactionHash || "N/A"}</li>
   </ul>
   <p>The funds have been sent to your custodial PayGo wallet. You should see the balance updated shortly.</p>
   <p>Thank you for choosing ${ctx.platformName || defaultPlatformName}.<br/>
@@ -310,24 +356,30 @@ The ${ctx.platformName || defaultPlatformName} Team
 </html>
     `,
     requiredContextKeys: [
-      'userName', 'policyNumber', 'flightNumber', 'payoutAmount', 'walletAddress', 'platformName'
+      "userName",
+      "policyNumber",
+      "flightNumber",
+      "payoutAmount",
+      "walletAddress",
+      "platformName",
     ],
   },
 
   // --- WALLET ---
   FAUCET_REQUEST_COMPLETED: {
-    id: 'FAUCET_REQUEST_COMPLETED',
-    name: 'Testnet Faucet Request Completed',
-    channel: 'EMAIL',
-    priority: 'MEDIUM',
-    subject: (ctx) => `Test Tokens Added: ${ctx.faucetAmount?.formatted || ctx.faucetAmount?.cents + ' cents'}`,
+    id: "FAUCET_REQUEST_COMPLETED",
+    name: "Testnet Faucet Request Completed",
+    channel: "EMAIL",
+    priority: "MEDIUM",
+    subject: (ctx) =>
+      `Test Tokens Added: ${ctx.faucetAmount?.formatted || ctx.faucetAmount?.cents + " cents"}`,
     textBody: (ctx) => `
-Hi ${ctx.userName || 'there'},
+Hi ${ctx.userName || "there"},
 
 Your request for test tokens has been successfully processed.
-Amount Added: ${ctx.faucetAmount?.formatted || ctx.faucetAmount?.cents + ' cents'}
+Amount Added: ${ctx.faucetAmount?.formatted || ctx.faucetAmount?.cents + " cents"}
 Wallet Address: ${ctx.walletAddress}
-Transaction Hash (PayGo): ${ctx.transactionHash || 'N/A'}
+Transaction Hash (PayGo): ${ctx.transactionHash || "N/A"}
 
 Your wallet balance has been updated. You can use these tokens for testing on the ${ctx.platformName || defaultPlatformName} Alpha/Testnet.
 
@@ -337,19 +389,24 @@ The ${ctx.platformName || defaultPlatformName} Team
 <!DOCTYPE html>
 <html>
 <body>
-  <p>Hi ${ctx.userName || 'there'},</p>
+  <p>Hi ${ctx.userName || "there"},</p>
   <p>Your request for test tokens has been successfully processed.</p>
   <ul>
-    <li><strong>Amount Added:</strong> ${ctx.faucetAmount?.formatted || ctx.faucetAmount?.cents + ' cents'}</li>
+    <li><strong>Amount Added:</strong> ${ctx.faucetAmount?.formatted || ctx.faucetAmount?.cents + " cents"}</li>
     <li><strong>Wallet Address:</strong> ${ctx.walletAddress}</li>
-    <li><strong>Transaction Hash (PayGo):</strong> ${ctx.transactionHash || 'N/A'}</li>
+    <li><strong>Transaction Hash (PayGo):</strong> ${ctx.transactionHash || "N/A"}</li>
   </ul>
   <p>Your wallet balance has been updated. You can use these tokens for testing on the ${ctx.platformName || defaultPlatformName} Alpha/Testnet.</p>
   <p>The ${ctx.platformName || defaultPlatformName} Team</p>
 </body>
 </html>
     `,
-    requiredContextKeys: ['userName', 'faucetAmount', 'walletAddress', 'platformName'],
+    requiredContextKeys: [
+      "userName",
+      "faucetAmount",
+      "walletAddress",
+      "platformName",
+    ],
   },
 };
 
@@ -367,8 +424,13 @@ The ${ctx.platformName || defaultPlatformName} Team
  */
 export function renderNotification(
   templateId: keyof typeof EMAIL_TEMPLATES, // Extend for other channels
-  context: NotificationContext
-): { subject?: string; textBody?: string; htmlBody?: string; payload?: object } {
+  context: NotificationContext,
+): {
+  subject?: string;
+  textBody?: string;
+  htmlBody?: string;
+  payload?: object;
+} {
   const template = EMAIL_TEMPLATES[templateId];
   if (!template) {
     throw new Error(`Notification template not found: ${templateId}`);
@@ -380,20 +442,37 @@ export function renderNotification(
       if (context[key] === undefined || context[key] === null) {
         // In a real app, you might want to handle this more gracefully,
         // e.g., by logging an error and returning a fallback message.
-        console.warn(`Missing required context key "${key}" for template "${templateId}"`);
+        console.warn(
+          `Missing required context key "${key}" for template "${templateId}"`,
+        );
         // throw new Error(`Missing required context key "${key}" for template "${templateId}"`);
       }
     }
   }
 
-  const rendered = {
-    subject: template.subject ? template.subject(context) : undefined,
-    textBody: template.textBody ? template.textBody(context) : undefined,
-    htmlBody: template.htmlBody ? template.htmlBody(context) : undefined,
-    payload: template.pushPayload ? template.pushPayload(context) :
-             template.webhookPayload ? template.webhookPayload(context) :
-             template.inAppContent ? template.inAppContent(context) : undefined,
-  };
+  const rendered: {
+    subject?: string;
+    textBody?: string;
+    htmlBody?: string;
+    payload?: object;
+  } = {};
+
+  if (template.subject) {
+    rendered.subject = template.subject(context);
+  }
+  if (template.textBody) {
+    rendered.textBody = template.textBody(context);
+  }
+  if (template.htmlBody) {
+    rendered.htmlBody = template.htmlBody(context);
+  }
+  if (template.pushPayload) {
+    rendered.payload = template.pushPayload(context);
+  } else if (template.webhookPayload) {
+    rendered.payload = template.webhookPayload(context);
+  } else if (template.inAppContent) {
+    rendered.payload = template.inAppContent(context);
+  }
 
   return rendered;
 }

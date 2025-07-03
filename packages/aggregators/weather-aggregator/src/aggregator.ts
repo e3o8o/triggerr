@@ -10,8 +10,8 @@
  * 5. Returning clean, canonical weather data
  */
 
-import type { CanonicalWeatherObservation } from "../../../shared/src/models/canonical-models";
-import { CacheManager } from "../../../core/src/utils/cache-manager";
+import type { CanonicalWeatherObservation } from "@triggerr/shared";
+import { CacheManager } from "@triggerr/core";
 import { WeatherSourceRouter, type IWeatherApiClient } from "./source-router";
 import {
   WeatherConflictResolver,

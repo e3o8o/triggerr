@@ -83,7 +83,7 @@ export async function handleLinkExistingWallet(
       userId,
       address,
       chain: chain as BlockchainProviderName,
-      publicKey,
+      ...(publicKey && { publicKey }),
     });
 
     console.log(

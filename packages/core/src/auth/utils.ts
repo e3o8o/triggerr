@@ -1,5 +1,31 @@
-import { auth, type Session, type User } from "./auth";
+import {
+  auth,
+  type Session as BetterAuthSession,
+  type User as BetterAuthUser,
+} from "./auth";
 import { edgeDb, setEdgeRLSContext, sql } from "../database/edge";
+
+// Define our own types that match exactOptionalPropertyTypes requirements
+export interface User {
+  id: string;
+  name: string;
+  emailVerified: boolean;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+  image: string | null;
+}
+
+export interface Session {
+  id: string;
+  token: string;
+  userId: string;
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  ipAddress: string | null;
+  userAgent: string | null;
+}
 
 export interface AuthContext {
   user: User | null;
@@ -26,9 +52,31 @@ export async function getAuthContext(
     });
 
     if (session?.session && session?.user) {
+      // Convert BetterAuth types to our exact types
+      const user: User = {
+        id: session.user.id,
+        name: session.user.name,
+        emailVerified: session.user.emailVerified,
+        email: session.user.email,
+        createdAt: session.user.createdAt,
+        updatedAt: session.user.updatedAt,
+        image: session.user.image ?? null,
+      };
+
+      const sessionData: Session = {
+        id: session.session.id,
+        token: session.session.token,
+        userId: session.session.userId,
+        expiresAt: session.session.expiresAt,
+        createdAt: session.session.createdAt,
+        updatedAt: session.session.updatedAt,
+        ipAddress: session.session.ipAddress ?? null,
+        userAgent: session.session.userAgent ?? null,
+      };
+
       return {
-        user: session.user,
-        session: session.session,
+        user,
+        session: sessionData,
         isAuthenticated: true,
         userId: session.user.id,
         anonymousSessionId: null,

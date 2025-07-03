@@ -12,8 +12,8 @@ import type {
   CanonicalFlightData,
   StandardFlightStatus,
   SourceContributions,
-} from "@triggerr/shared/models/canonical-models";
-import type { IFlightApiClient } from "@triggerr/shared/types/integrations";
+} from "@triggerr/shared";
+import type { IFlightApiClient } from "@triggerr/shared";
 
 interface FlightAwareFlight {
   ident: string;

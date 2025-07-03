@@ -166,10 +166,16 @@ export class PayoutEngine {
           results.push({
             policyId,
             success: true,
-            message: `Payout processed successfully`,
-            transactionHash: payoutResult.transactionHash,
-            amount: eligibility.payoutAmount,
-            recipientAddress: eligibility.recipientAddress,
+            message: "Payout processed successfully",
+            ...(payoutResult.transactionHash && {
+              transactionHash: payoutResult.transactionHash,
+            }),
+            ...(eligibility.payoutAmount && {
+              amount: eligibility.payoutAmount,
+            }),
+            ...(eligibility.recipientAddress && {
+              recipientAddress: eligibility.recipientAddress,
+            }),
           });
           processedCount++;
         } else {
@@ -382,6 +388,9 @@ export class PayoutEngine {
       // Determine payout amount (use claim amount from policy)
       const payoutAmount =
         policyRecord.claimAmount || policyRecord.premiumAmount;
+      if (!userWallet) {
+        throw new Error(`No wallet found for user ${policyRecord.user}`);
+      }
       const recipientAddress = userWallet.address;
 
       if (!payoutAmount || parseFloat(payoutAmount) <= 0) {

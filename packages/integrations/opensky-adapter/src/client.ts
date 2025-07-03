@@ -12,8 +12,8 @@ import type {
   CanonicalFlightData,
   StandardFlightStatus,
   SourceContributions,
-} from "@triggerr/shared/models/canonical-models";
-import type { IFlightApiClient } from "@triggerr/shared/types/integrations";
+} from "@triggerr/shared";
+import type { IFlightApiClient } from "@triggerr/shared";
 
 interface OpenSkyState {
   time: number;
@@ -66,8 +66,12 @@ export class OpenSkyClient implements IFlightApiClient {
   private readonly timeout = 20000; // 20 seconds (OpenSky can be slower)
 
   constructor(username?: string, password?: string) {
-    this.username = username;
-    this.password = password;
+    if (username !== undefined) {
+      this.username = username;
+    }
+    if (password !== undefined) {
+      this.password = password;
+    }
 
     if (username && password) {
       console.log(
@@ -254,25 +258,13 @@ export class OpenSkyClient implements IFlightApiClient {
     const canonicalData: CanonicalFlightData = {
       id: crypto.randomUUID(),
       flightNumber: callsign,
-      // OpenSky doesn't provide airline codes directly
-      airlineIataCode: undefined,
-      airlineIcaoCode: undefined,
+      // OpenSky doesn't provide airline codes directly - omit undefined values
       // OpenSky doesn't provide airport codes in state data
       originAirportIataCode: "UNKNOWN",
-      originAirportIcaoCode: undefined,
       destinationAirportIataCode: "UNKNOWN",
-      destinationAirportIcaoCode: undefined,
-      aircraftTypeIcaoCode: undefined,
       // OpenSky doesn't provide scheduled times in state data
       scheduledDepartureTimestampUTC: now, // Fallback to current time
-      scheduledArrivalTimestampUTC: undefined,
-      actualDepartureTimestampUTC: undefined,
-      actualArrivalTimestampUTC: undefined,
-      estimatedDepartureTimestampUTC: undefined,
-      estimatedArrivalTimestampUTC: undefined,
       flightStatus: status,
-      departureDelayMinutes: undefined,
-      arrivalDelayMinutes: undefined,
       sourceContributions,
       dataQualityScore: qualityScore,
       lastUpdatedUTC: now,
@@ -313,26 +305,15 @@ export class OpenSkyClient implements IFlightApiClient {
     const canonicalData: CanonicalFlightData = {
       id: crypto.randomUUID(),
       flightNumber: flightInfo.callsign || flightNumber,
-      airlineIataCode: undefined,
-      airlineIcaoCode: undefined,
       originAirportIataCode: flightInfo.estDepartureAirport || "UNKNOWN",
-      originAirportIcaoCode: undefined,
       destinationAirportIataCode: flightInfo.estArrivalAirport || "UNKNOWN",
-      destinationAirportIcaoCode: undefined,
-      aircraftTypeIcaoCode: undefined,
       scheduledDepartureTimestampUTC: new Date(
         flightInfo.firstSeen * 1000,
       ).toISOString(),
       scheduledArrivalTimestampUTC: new Date(
         flightInfo.lastSeen * 1000,
       ).toISOString(),
-      actualDepartureTimestampUTC: undefined,
-      actualArrivalTimestampUTC: undefined,
-      estimatedDepartureTimestampUTC: undefined,
-      estimatedArrivalTimestampUTC: undefined,
       flightStatus: "UNKNOWN", // Can't determine from historical data
-      departureDelayMinutes: undefined,
-      arrivalDelayMinutes: undefined,
       sourceContributions,
       dataQualityScore: 0.4, // Lower quality due to limited data
       lastUpdatedUTC: now,

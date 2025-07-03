@@ -3,23 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup --config tsup.config.ts",
-    "dev": "tsup --config tsup.config.ts --watch",
+    "build": "tsc",
+    "dev": "tsc --watch",
     "lint": "eslint .",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
   },
   "devDependencies": {
-    "@swc/core": "^1.11.31",
     "@types/node": "^20",
     "eslint": "^8",
     "eslint-config-custom": "*",
-    "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
   "peerDependencies": {

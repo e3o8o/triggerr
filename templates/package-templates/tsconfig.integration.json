@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "noPropertyAccessFromIndexSignature": false,
+
+    "suppressExcessPropertyErrors": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noStrictGenericChecks": false,
+
+    "useUnknownInCatchVariables": true,
+    "noErrorTruncation": false,
+    "preserveWatchOutput": true,
+    "pretty": true,
+
+    "declaration": true,
+    "declarationMap": true,
+    "removeComments": false,
+    "stripInternal": false,
+
+    "importHelpers": false,
+    "downlevelIteration": false,
+    "noEmitHelpers": false,
+
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "disableSourceOfProjectReferenceRedirect": false,
+
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "noImplicitOverride": false
+  },
+
+  "include": ["src/**/*.ts", "src/**/*.d.ts"],
+
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    ".turbo",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/test/**",
+    "**/tests/**",
+    "**/examples/**",
+    "**/docs/**",
+    "**/fixtures/**"
+  ],
+
+  "typeAcquisition": {
+    "enable": true,
+    "include": ["node", "fetch"],
+    "exclude": ["jquery", "lodash"]
+  }
+}

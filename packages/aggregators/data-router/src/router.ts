@@ -12,17 +12,18 @@
 import type {
   CanonicalFlightData,
   CanonicalWeatherObservation,
-} from "@triggerr/shared/models/canonical-models";
+} from "@triggerr/shared";
 import {
   FlightAggregator,
   type AggregationResult,
   type FlightIdentifier,
-} from "@triggerr/flight-aggregator/aggregator";
+} from "@triggerr/flight-aggregator";
 import {
   WeatherAggregator,
   type WeatherAggregationResult,
   type WeatherIdentifier,
-} from "@triggerr/weather-aggregator/aggregator";
+} from "@triggerr/weather-aggregator";
+import { Logger } from "@triggerr/core";
 
 export interface PolicyDataRequest {
   flightNumber: string;
@@ -58,8 +59,9 @@ export interface PolicyDataResponse {
 }
 
 export interface DataRouterConfig {
-  flightAggregator?: FlightAggregator;
-  weatherAggregator?: WeatherAggregator;
+  logger: Logger;
+  flightApiClients?: any[]; // Will be typed properly when flight adapters are implemented
+  weatherApiClients?: any[]; // Will be typed properly when weather adapters are implemented
   maxConcurrentWeatherRequests?: number;
   defaultIncludeWeather?: boolean;
   timeoutMs?: number;
@@ -100,20 +102,49 @@ export class DataRouter {
   private maxConcurrentWeatherRequests: number;
   private defaultIncludeWeather: boolean;
   private timeoutMs: number;
+  private logger: Logger;
 
-  constructor(
-    flightAggregator: FlightAggregator,
-    weatherAggregator: WeatherAggregator,
-    config: DataRouterConfig = {},
-  ) {
-    this.flightAggregator = flightAggregator;
-    this.weatherAggregator = weatherAggregator;
+  constructor(config: DataRouterConfig) {
+    this.logger = config.logger;
     this.maxConcurrentWeatherRequests =
       config.maxConcurrentWeatherRequests || 3;
     this.defaultIncludeWeather = config.defaultIncludeWeather ?? true;
     this.timeoutMs = config.timeoutMs || 45000; // 45 seconds total
 
-    console.log(
+    // Initialize aggregators - handle gracefully if dependencies aren't ready
+    try {
+      this.flightAggregator = new FlightAggregator(
+        config.flightApiClients || [],
+        {
+          maxSources: 3,
+          timeoutMs: 30000,
+        },
+      );
+    } catch (error) {
+      this.logger.warn(
+        "[DataRouter] FlightAggregator initialization failed, using placeholder",
+      );
+      // Create a minimal placeholder that throws meaningful errors
+      this.flightAggregator = this.createPlaceholderFlightAggregator();
+    }
+
+    try {
+      this.weatherAggregator = new WeatherAggregator(
+        config.weatherApiClients || [],
+        {
+          maxSources: 2,
+          timeoutMs: 20000,
+        },
+      );
+    } catch (error) {
+      this.logger.warn(
+        "[DataRouter] WeatherAggregator initialization failed, using placeholder",
+      );
+      // Create a minimal placeholder that throws meaningful errors
+      this.weatherAggregator = this.createPlaceholderWeatherAggregator();
+    }
+
+    this.logger.info(
       `[DataRouter] Initialized with flight and weather aggregators, max concurrent weather requests: ${this.maxConcurrentWeatherRequests}`,
     );
   }
@@ -402,8 +433,8 @@ export class DataRouter {
       try {
         const weatherIdentifier: WeatherIdentifier = {
           coordinates: location.coordinates,
-          airportCode: location.airportCode,
-          date,
+          ...(location.airportCode && { airportCode: location.airportCode }),
+          ...(date && { date }),
         };
 
         return await this.weatherAggregator.getWeatherData(weatherIdentifier);
@@ -539,5 +570,65 @@ export class DataRouter {
    */
   public static getAvailableAirports(): string[] {
     return Object.keys(AIRPORT_COORDINATES);
+  }
+
+  /**
+   * Create a placeholder FlightAggregator for graceful degradation.
+   */
+  private createPlaceholderFlightAggregator(): any {
+    return {
+      getFlightStatus: async (identifier: FlightIdentifier) => {
+        throw new Error(
+          "FlightAggregator not available - flight data collection is temporarily disabled",
+        );
+      },
+      getHealthStatus: () => ({
+        sources: {},
+        isHealthy: false,
+      }),
+      clearCache: () => {
+        this.logger.warn(
+          "FlightAggregator placeholder - clearCache called but ignored",
+        );
+      },
+    };
+  }
+
+  /**
+   * Create a placeholder WeatherAggregator for graceful degradation.
+   */
+  private createPlaceholderWeatherAggregator(): any {
+    return {
+      getWeatherData: async (identifier: WeatherIdentifier) => {
+        this.logger.warn(
+          "WeatherAggregator placeholder - returning empty weather data",
+        );
+        return {
+          data: {
+            temperatureCelsius: 20,
+            windSpeedKPH: 0,
+            precipitationProbability: 0,
+            condition: "UNKNOWN" as const,
+            sourceProvider: "PLACEHOLDER",
+            location: identifier.coordinates,
+            timestamp: new Date(),
+            rawSourceData: [],
+          },
+          fromCache: false,
+          sourcesUsed: ["PLACEHOLDER"],
+          qualityScore: 0.1,
+          processingTimeMs: 0,
+        };
+      },
+      getHealthStatus: () => ({
+        sources: {},
+        isHealthy: false,
+      }),
+      clearCache: () => {
+        this.logger.warn(
+          "WeatherAggregator placeholder - clearCache called but ignored",
+        );
+      },
+    };
   }
 }

@@ -6,15 +6,36 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "bun run src/index.ts",
-    "dev": "bun --watch src/index.ts"
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --target bun --outdir dist",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "bun-types": "latest",
     "@triggerr/api-contracts": "workspace:*",
     "@triggerr/core": "workspace:*",
+    "@triggerr/shared": "workspace:*",
     "@triggerr/paygo-adapter": "workspace:*",
     "@triggerr/wallet-service": "workspace:*",
     "@triggerr/escrow-engine": "workspace:*",
-    "@triggerr/payout-engine": "workspace:*"
-  }
+    "@triggerr/quote-engine": "workspace:*",
+    "@triggerr/policy-engine": "workspace:*",
+    "@triggerr/payout-engine": "workspace:*",
+    "@triggerr/data-router": "workspace:*",
+    "@triggerr/flight-aggregator": "workspace:*",
+    "@triggerr/weather-aggregator": "workspace:*",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "triggerr",
+    "api",
+    "insurance",
+    "bun"
+  ],
+  "author": "Triggerr Team",
+  "license": "MIT"
 }

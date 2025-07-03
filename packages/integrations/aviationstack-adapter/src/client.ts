@@ -12,8 +12,8 @@ import type {
   CanonicalFlightData,
   StandardFlightStatus,
   SourceContributions,
-} from "@triggerr/shared/models/canonical-models";
-import type { IFlightApiClient } from "@triggerr/shared/types/integrations";
+} from "@triggerr/shared";
+import type { IFlightApiClient } from "@triggerr/shared";
 
 interface AviationStackFlight {
   flight: {
@@ -130,6 +130,10 @@ export class AviationStackClient implements IFlightApiClient {
 
       // Use the first flight result
       const flight = data.data[0];
+      if (!flight) {
+        console.log(`[AviationStack] No flight data found for ${flightNumber}`);
+        return null;
+      }
       const canonicalData = this.transformToCanonical(flight);
 
       console.log(
@@ -207,16 +211,16 @@ export class AviationStackClient implements IFlightApiClient {
 
     // Add actual times if available
     if (flight.departure.actual) {
-      sourceContributions[0].fields.push("actualDepartureTimestampUTC");
+      sourceContributions[0]?.fields.push("actualDepartureTimestampUTC");
     }
     if (flight.arrival.actual) {
-      sourceContributions[0].fields.push("actualArrivalTimestampUTC");
+      sourceContributions[0]?.fields.push("actualArrivalTimestampUTC");
     }
     if (departureDelay !== null) {
-      sourceContributions[0].fields.push("departureDelayMinutes");
+      sourceContributions[0]?.fields.push("departureDelayMinutes");
     }
     if (arrivalDelay !== null) {
-      sourceContributions[0].fields.push("arrivalDelayMinutes");
+      sourceContributions[0]?.fields.push("arrivalDelayMinutes");
     }
 
     // Calculate data quality score
@@ -224,31 +228,46 @@ export class AviationStackClient implements IFlightApiClient {
 
     const canonicalData: CanonicalFlightData = {
       id: crypto.randomUUID(),
-      flightNumber: flight.flight.iata || flight.flight.icao,
-      airlineIataCode: flight.airline.iata || undefined,
-      airlineIcaoCode: flight.airline.icao || undefined,
+      flightNumber: flight.flight.iata || flight.flight.icao || "UNKNOWN",
+      ...(flight.airline?.iata && { airlineIataCode: flight.airline.iata }),
+      ...(flight.airline?.icao && { airlineIcaoCode: flight.airline.icao }),
       originAirportIataCode: flight.departure.iata || "UNKNOWN",
-      originAirportIcaoCode: flight.departure.icao || undefined,
+      ...(flight.departure.icao && {
+        originAirportIcaoCode: flight.departure.icao,
+      }),
       destinationAirportIataCode: flight.arrival.iata || "UNKNOWN",
-      destinationAirportIcaoCode: flight.arrival.icao || undefined,
-      aircraftTypeIcaoCode: flight.aircraft?.icao || undefined,
+      ...(flight.arrival.icao && {
+        destinationAirportIcaoCode: flight.arrival.icao,
+      }),
+      ...(flight.aircraft?.icao && {
+        aircraftTypeIcaoCode: flight.aircraft.icao,
+      }),
       scheduledDepartureTimestampUTC: this.parseTimestamp(
         flight.departure.scheduled,
       ),
-      scheduledArrivalTimestampUTC:
-        this.parseTimestamp(flight.arrival.scheduled) || undefined,
-      actualDepartureTimestampUTC: flight.departure.actual
-        ? this.parseTimestamp(flight.departure.actual)
-        : undefined,
-      actualArrivalTimestampUTC: flight.arrival.actual
-        ? this.parseTimestamp(flight.arrival.actual)
-        : undefined,
-      estimatedDepartureTimestampUTC: flight.departure.estimated
-        ? this.parseTimestamp(flight.departure.estimated)
-        : undefined,
-      estimatedArrivalTimestampUTC: flight.arrival.estimated
-        ? this.parseTimestamp(flight.arrival.estimated)
-        : undefined,
+      ...(flight.arrival.scheduled && {
+        scheduledArrivalTimestampUTC: this.parseTimestamp(
+          flight.arrival.scheduled,
+        ),
+      }),
+      ...(flight.departure.actual && {
+        actualDepartureTimestampUTC: this.parseTimestamp(
+          flight.departure.actual,
+        ),
+      }),
+      ...(flight.arrival.actual && {
+        actualArrivalTimestampUTC: this.parseTimestamp(flight.arrival.actual),
+      }),
+      ...(flight.departure.estimated && {
+        estimatedDepartureTimestampUTC: this.parseTimestamp(
+          flight.departure.estimated,
+        ),
+      }),
+      ...(flight.arrival.estimated && {
+        estimatedArrivalTimestampUTC: this.parseTimestamp(
+          flight.arrival.estimated,
+        ),
+      }),
       flightStatus: status,
       departureDelayMinutes: departureDelay || undefined,
       arrivalDelayMinutes: arrivalDelay || undefined,

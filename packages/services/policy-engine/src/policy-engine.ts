@@ -15,7 +15,7 @@ import {
   policy as policyTable,
   quote as quoteTable,
 } from "@triggerr/core/database/schema";
-import type { Logger } from "@triggerr/core/logging";
+import type { Logger } from "@triggerr/core";
 import { generateId, generatePolicyEscrowId } from "@triggerr/core/utils";
 import {
   EscrowManager,

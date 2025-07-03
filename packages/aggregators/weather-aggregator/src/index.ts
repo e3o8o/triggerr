@@ -21,7 +21,7 @@ export type { IWeatherApiClient } from "./source-router";
 export { WeatherConflictResolver } from "./conflict-resolver";
 
 // Re-export weather API client interface for convenience
-export type { IWeatherApiClient as GoogleWeatherApiClient } from "../../../integrations/google-weather-adapter/src/client";
+export type { IWeatherApiClient as GoogleWeatherApiClient } from "@triggerr/shared";
 
 // Re-export canonical types for convenience
 export type {
@@ -29,4 +29,4 @@ export type {
   CanonicalWeatherObservationModel,
   StandardWeatherCondition,
   SourceContributions,
-} from "@triggerr/shared/models/canonical-models";
+} from "@triggerr/shared";

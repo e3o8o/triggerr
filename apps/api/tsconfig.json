@@ -1,54 +1,100 @@
 {
-  "extends": "../../packages/config/tsconfig/base.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/": ["./src/"],
-      "@triggerr/core": ["../../packages/core/src"],
-      "@triggerr/core/*": ["../../packages/core/src/*"],
-      "@triggerr/api-contracts": ["../../packages/api/contracts/src"],
-      "@triggerr/api-contracts/*": ["../../packages/api/contracts/src/*"],
-      "@triggerr/api-sdk": ["../../packages/api/sdk/src"],
-      "@triggerr/api-sdk/*": ["../../packages/api/sdk/src/*"],
-      "@triggerr/shared": ["../../packages/shared/src"],
-      "@triggerr/shared/*": ["../../packages/shared/src/*"],
-      "@triggerr/ui": ["../../packages/ui/src"],
-      "@triggerr/ui/*": ["../../packages/ui/src/*"],
-      "@triggerr/utils": ["../../packages/utils/src"],
-      "@triggerr/utils/*": ["../../packages/utils/src/*"],
-      "@triggerr/config": ["../../packages/config/src"],
-      "@triggerr/config/*": ["../../packages/config/src/*"],
-      "@triggerr/paygo-adapter": [
-        "../../packages/blockchain/paygo-adapter/src"
-      ],
-      "@triggerr/paygo-adapter/*": [
-        "../../packages/blockchain/paygo-adapter/src/*"
-      ],
-      "@triggerr/stripe": ["../../packages/integrations/stripe/src"],
-      "@triggerr/stripe/*": ["../../packages/integrations/stripe/src/*"],
-      "@triggerr/wallet-service": [
-        "../../packages/services/wallet-service/src"
-      ],
-      "@triggerr/wallet-service/*": [
-        "../../packages/services/wallet-service/src/*"
-      ],
-      "@triggerr/escrow-engine": [
-        "../../packages/services/escrow-engine/src"
-      ],
-      "@triggerr/escrow-engine/*": [
-        "../../packages/services/escrow-engine/src/*"
-      ],
-      "@triggerr/payout-engine": [
-        "../../packages/services/payout-engine/src"
-      ],
-      "@triggerr/payout-engine/*": [
-        "../../packages/services/payout-engine/src/*"
-      ]
-    },
-    "noEmit": true,
+    "target": "ES2022",
+    "lib": ["ES2022"],
     "module": "ESNext",
-    "lib": ["ES2022"]
+    "moduleResolution": "bundler",
+
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noEmit": false,
+
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    "skipLibCheck": true,
+
+    "preserveWatchOutput": true,
+    "pretty": true,
+    "listEmittedFiles": false,
+    "listFiles": false,
+
+    "verbatimModuleSyntax": false,
+    "allowJs": true,
+    "checkJs": false
   },
+
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage",
+    ".turbo",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/test/**",
+    "**/tests/**"
+  ],
+
+  "references": [
+    {
+      "path": "../../packages/shared"
+    },
+    {
+      "path": "../../packages/core"
+    },
+    {
+      "path": "../../packages/api/contracts"
+    },
+    {
+      "path": "../../packages/services/quote-engine"
+    },
+    {
+      "path": "../../packages/aggregators/data-router"
+    },
+    {
+      "path": "../../packages/services/policy-engine"
+    },
+    {
+      "path": "../../packages/services/escrow-engine"
+    },
+    {
+      "path": "../../packages/services/wallet-service"
+    },
+    {
+      "path": "../../packages/services/payout-engine"
+    }
+  ],
+
+  "typeAcquisition": {
+    "enable": false,
+    "disableFilenameBasedTypeAcquisition": true
+  }
 }

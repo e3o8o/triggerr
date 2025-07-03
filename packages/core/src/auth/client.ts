@@ -6,7 +6,9 @@ import { createAuthClient } from "better-auth/react";
 export const authClient = createAuthClient({
   // Base URL will be automatically detected in most cases
   // but can be overridden if needed for different environments
-  baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || undefined,
+  ...(process.env.NEXT_PUBLIC_BETTER_AUTH_URL && {
+    baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+  }),
 
   // Fetch configuration for API calls
   fetchOptions: {
@@ -153,7 +155,7 @@ export const signInWithGoogle = async (options?: { callbackURL?: string }) => {
 export const signInWithEmail = async (
   email: string,
   password: string,
-  options?: { callbackURL?: string }
+  options?: { callbackURL?: string },
 ) => {
   try {
     const result = await signIn.email({
@@ -173,7 +175,7 @@ export const signUpWithEmail = async (
   email: string,
   password: string,
   name: string,
-  options?: { callbackURL?: string }
+  options?: { callbackURL?: string },
 ) => {
   try {
     const result = await signUp.email({

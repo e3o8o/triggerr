@@ -2,7 +2,10 @@
   "extends": "../../config/tsconfig/build.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "composite": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "skipLibCheck": true
   },
   "include": ["src"],
   "exclude": [

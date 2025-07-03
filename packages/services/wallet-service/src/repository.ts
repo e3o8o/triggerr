@@ -65,6 +65,10 @@ export class UserWalletRepository {
       })
       .returning();
 
+    if (!newWalletRecord) {
+      throw new Error("[UserWalletRepository] Failed to create wallet record");
+    }
+
     console.log(
       `[UserWalletRepository] Wallet record created with ID: ${newWalletRecord.id}`,
     );

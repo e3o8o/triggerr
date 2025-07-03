@@ -1,5 +1,6 @@
 // Utils package exports
 export * from "./escrow-id-generator";
+export * from "./cache-manager";
 
 /**
  * Generate a unique ID with a given prefix

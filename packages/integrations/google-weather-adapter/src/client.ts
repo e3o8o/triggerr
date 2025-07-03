@@ -12,7 +12,7 @@ import type {
   CanonicalWeatherObservationModel,
   StandardWeatherCondition,
   SourceContributions
-} from "@triggerr/shared/models/canonical-models";
+} from "@triggerr/shared";
 
 export interface IWeatherApiClient {
   name: string;

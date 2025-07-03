@@ -4,10 +4,9 @@
   "private": true,
   "description": "A runtime registry for managing and providing access to multiple, concurrent blockchain service adapters.",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup",
+    "build": "tsc",
     "clean": "rm -rf .turbo dist"
   },
   "dependencies": {
@@ -15,7 +14,6 @@
     "@triggerr/paygo-adapter": "*"
   },
   "devDependencies": {
-    "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   }
 }

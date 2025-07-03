@@ -72,7 +72,16 @@ export async function handleSendFunds(
       });
     }
 
-    const data: WalletSendRequest = validationResult.data;
+    const data: WalletSendRequest = {
+      amount: validationResult.data.amount,
+      toAddress: validationResult.data.toAddress,
+      ...(validationResult.data.metadata !== undefined && {
+        metadata: validationResult.data.metadata,
+      }),
+      ...(validationResult.data.description !== undefined && {
+        description: validationResult.data.description,
+      }),
+    };
 
     // 3. Validate recipient address format
     if (!isAddress(data.toAddress)) {
@@ -116,6 +125,17 @@ export async function handleSendFunds(
     }
 
     const senderWallet = userWalletResult[0];
+    if (!senderWallet) {
+      return new Response(
+        JSON.stringify(
+          createApiError("WALLET_NOT_FOUND", "Sender wallet not found"),
+        ),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
     const senderAddress = senderWallet.address as Hex;
     const recipientAddress = data.toAddress as Hex;
 

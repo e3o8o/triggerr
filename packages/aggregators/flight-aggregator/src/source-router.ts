@@ -11,8 +11,8 @@
  * In the future, this can be enhanced with dynamic logic.
  */
 
-import type { CanonicalFlightData } from "@triggerr/shared/models/canonical-models";
-import type { IFlightApiClient } from "@triggerr/shared/types/integrations";
+import type { CanonicalFlightData } from "@triggerr/shared";
+import type { IFlightApiClient } from "@triggerr/shared";
 
 // Type alias for cleaner code
 type DataSourceClient = IFlightApiClient;

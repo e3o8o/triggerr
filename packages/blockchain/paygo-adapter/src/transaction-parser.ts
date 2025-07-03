@@ -205,8 +205,8 @@ export function parsePayGoTransaction(
       type: displayType,
       amount: parsed.amount,
       formattedAmount: formatBalanceDisplay(parsed.amount),
-      from: parsed.from || undefined,
-      to: parsed.to || undefined,
+      ...(parsed.from && { from: parsed.from }),
+      ...(parsed.to && { to: parsed.to }),
       date: new Date(timestamp).toISOString(),
       hash,
       metadata: {

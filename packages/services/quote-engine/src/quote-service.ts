@@ -10,18 +10,18 @@
  */
 
 import type { Database } from "@triggerr/core/database";
-import type { Logger } from "@triggerr/core/logging";
+import type { Logger } from "@triggerr/core";
 import {
   DataRouter,
   type PolicyDataRequest,
   type PolicyDataResponse,
-} from "@triggerr/data-router/router";
+} from "@triggerr/data-router";
 import type {
   CanonicalFlightData,
   CanonicalWeatherObservation,
   StandardFlightStatus,
   StandardWeatherCondition,
-} from "@triggerr/shared/models/canonical-models";
+} from "@triggerr/shared";
 import { db } from "@triggerr/core/database";
 import { quote as quoteTable } from "@triggerr/core/database/schema";
 import { generateId } from "@triggerr/core/utils";
@@ -255,7 +255,7 @@ export class QuoteService {
     const policyRequest: PolicyDataRequest = {
       flightNumber: request.flightNumber,
       date: request.flightDate,
-      airports: request.airports,
+      ...(request.airports && { airports: request.airports }),
       includeWeather: true, // Always include weather for risk analysis
     };
 
@@ -527,7 +527,9 @@ export class QuoteService {
         flightId: policyData.flight.id,
         coverageType: request.coverageType as any,
         coverageAmount: request.coverageAmount,
-        premium: (parseFloat(primaryQuote.premium) / 100).toString(), // Convert cents to dollars
+        premium: primaryQuote
+          ? (parseFloat(primaryQuote.premium) / 100).toString()
+          : "0", // Convert cents to dollars
         riskFactors: {
           flightRisk: riskAnalysis.flightRisk,
           weatherRisk: riskAnalysis.weatherRisk,

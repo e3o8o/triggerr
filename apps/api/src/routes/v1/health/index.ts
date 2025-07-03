@@ -52,7 +52,9 @@ export async function handleSystemHealthCheck(
       healthCheckPromises.map(async ({ name, check }) => {
         try {
           const response = await check;
-          const data: { data?: any } = await response.json();
+          const data: { data?: any } = (await response.json()) as {
+            data?: any;
+          };
           // The actual service data is nested under a `data` property by our API contract
           const serviceData = data.data || data;
 

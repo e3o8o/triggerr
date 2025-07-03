@@ -10,8 +10,8 @@
 import type {
   CanonicalWeatherObservation,
   SourceContributions,
-} from "../../../shared/src/models/canonical-models";
-import { SOURCE_RELIABILITY_SCORES } from "../../../shared/src/models/canonical-models";
+} from "@triggerr/shared";
+import { SOURCE_RELIABILITY_SCORES } from "@triggerr/shared";
 
 interface ConflictField {
   field: keyof CanonicalWeatherObservation;

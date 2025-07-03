@@ -122,6 +122,15 @@ export async function handleCreateEscrowRequest(
     }
 
     const userWallet = userWalletResult[0];
+    if (!userWallet) {
+      return new Response(
+        JSON.stringify(createApiError("WALLET_NOT_FOUND", "Wallet not found")),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
     const senderAddress = userWallet.address as Hex;
 
     // 5. Generate unique escrow ID using the escrow ID generator

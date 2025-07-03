@@ -22,7 +22,9 @@ export class CostOptimizer {
 
   constructor(profiles: ApiCostProfile[]) {
     this.costProfiles = new Map<string, ApiCostProfile>();
-    profiles.forEach(profile => this.costProfiles.set(profile.sourceName, profile));
+    profiles.forEach((profile) =>
+      this.costProfiles.set(profile.sourceName, profile),
+    );
     console.log("CostOptimizer instantiated with API cost profiles.");
   }
 
@@ -36,18 +38,24 @@ export class CostOptimizer {
    */
   public getOptimalSource(
     availableSources: string[],
-    requirements: { minQuality: number }
+    requirements: { minQuality: number },
   ): string | null {
-    console.log(`[CostOptimizer] Finding optimal source from [${availableSources.join(', ')}] with min quality ${requirements.minQuality}`);
+    console.log(
+      `[CostOptimizer] Finding optimal source from [${availableSources.join(", ")}] with min quality ${requirements.minQuality}`,
+    );
 
     const eligibleSources = availableSources
-      .map(sourceName => this.costProfiles.get(sourceName))
-      .filter((profile): profile is ApiCostProfile =>
-        profile !== undefined && profile.qualityScore >= requirements.minQuality
+      .map((sourceName) => this.costProfiles.get(sourceName))
+      .filter(
+        (profile): profile is ApiCostProfile =>
+          profile !== undefined &&
+          profile.qualityScore >= requirements.minQuality,
       );
 
     if (eligibleSources.length === 0) {
-      console.warn(`[CostOptimizer] No sources meet the minimum quality requirement of ${requirements.minQuality}.`);
+      console.warn(
+        `[CostOptimizer] No sources meet the minimum quality requirement of ${requirements.minQuality}.`,
+      );
       return null;
     }
 
@@ -55,7 +63,16 @@ export class CostOptimizer {
     eligibleSources.sort((a, b) => a.costPerCall - b.costPerCall);
 
     const bestSource = eligibleSources[0];
-    console.log(`[CostOptimizer] Recommending source: ${bestSource.sourceName} (Cost: ${bestSource.costPerCall})`);
+    if (!bestSource) {
+      console.warn(
+        `[CostOptimizer] No sources available despite length check.`,
+      );
+      return null;
+    }
+
+    console.log(
+      `[CostOptimizer] Recommending source: ${bestSource.sourceName} (Cost: ${bestSource.costPerCall})`,
+    );
 
     return bestSource.sourceName;
   }

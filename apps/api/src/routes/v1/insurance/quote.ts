@@ -2,7 +2,7 @@ import { createApiError, createApiResponse } from "@triggerr/api-contracts";
 import { z } from "zod";
 import { QuoteService } from "@triggerr/quote-engine";
 import { DataRouter } from "@triggerr/data-router";
-import { Logger } from "@triggerr/core/logging";
+import { Logger, LogLevel } from "@triggerr/core";
 
 // Request validation schema
 const insuranceQuoteRequestSchema = z.object({
@@ -75,32 +75,34 @@ export async function handleInsuranceQuote(req: Request): Promise<Response> {
 
   try {
     // Step 2: Initialize services
-    const logger = new Logger("QuoteAPI");
-    const dataRouter = new DataRouter(logger);
+    const logger = new Logger(LogLevel.INFO, "QuoteAPI");
+    const dataRouter = new DataRouter({ logger });
     const quoteService = new QuoteService(dataRouter, logger);
 
     // Step 3: Prepare quote request with defaults
+    // Map coverage types from API format to QuoteService format
+    const mapCoverageType = (
+      apiType: string,
+    ): "FLIGHT_DELAY" | "FLIGHT_CANCELLATION" | "WEATHER_DISRUPTION" => {
+      switch (apiType) {
+        case "CANCELLATION":
+          return "FLIGHT_CANCELLATION";
+        case "DELAY":
+          return "FLIGHT_DELAY";
+        case "BAGGAGE_LOSS":
+        case "MEDICAL_EMERGENCY":
+        default:
+          return "FLIGHT_DELAY"; // Default fallback
+      }
+    };
+
     const quoteRequest = {
       flightNumber: body.flightNumber,
       flightDate: body.flightDate,
-      originAirport: body.originAirport,
-      destinationAirport: body.destinationAirport,
-      coverageTypes: body.coverageTypes,
-      coverageAmounts: body.coverageAmounts || {
-        DELAY: 50000, // Default $500.00 coverage
-        CANCELLATION: 100000, // Default $1000.00 coverage
-        BAGGAGE_LOSS: 150000, // Default $1500.00 coverage
-        MEDICAL_EMERGENCY: 500000, // Default $5000.00 coverage
-      },
+      coverageType: mapCoverageType(body.coverageTypes?.[0] || "DELAY"),
+      coverageAmount: body.coverageAmounts?.DELAY?.toString() || "50000", // Default $500.00 coverage as string
       airports: body.airports || [body.originAirport, body.destinationAirport],
-      requestMetadata: {
-        ipAddress:
-          req.headers.get("x-forwarded-for") ||
-          req.headers.get("x-real-ip") ||
-          "unknown",
-        userAgent: req.headers.get("user-agent") || "unknown",
-        requestId,
-      },
+      productType: "BASIC" as const,
     };
 
     console.log(
@@ -120,7 +122,7 @@ export async function handleInsuranceQuote(req: Request): Promise<Response> {
       validUntil: quoteResponse.validUntil,
       flightNumber: quoteResponse.flightNumber,
       flightDate: quoteResponse.flightDate,
-      quotes: quoteResponse.quotes.map((quote) => ({
+      quotes: quoteResponse.quotes.map((quote: any) => ({
         productName: quote.productName,
         coverageType: quote.coverageType,
         premium: quote.premium, // In cents

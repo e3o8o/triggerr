@@ -4,6 +4,7 @@ export * from "./chat-types";
 export * from "./api-types";
 export * from "./business-types";
 export * from "./auth-types";
+export * from "./integrations";
 
 // Common utility types
 export type UUID = string;

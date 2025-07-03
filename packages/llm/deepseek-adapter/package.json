@@ -1,20 +1,43 @@
 {
   "name": "@triggerr/deepseek-adapter",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "An adapter to interact with the DeepSeek LLM API, implementing the generic ILLMClient interface.",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "build": "tsup",
-    "clean": "rm -rf .turbo dist"
+  "description": "DeepSeek LLM adapter stub implementation - Phase 5 placeholder",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "dependencies": {
-    "@triggerr/llm-interface": "*"
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "echo \"Phase 5 implementation pending\""
   },
   "devDependencies": {
-    "tsup": "^8.0.0",
+    "@types/node": "^20.0.0",
     "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "deepseek",
+    "llm",
+    "adapter",
+    "stub",
+    "triggerr",
+    "phase5"
+  ],
+  "author": "Triggerr Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/triggerr/triggerr.git",
+    "directory": "packages/llm/deepseek-adapter"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }

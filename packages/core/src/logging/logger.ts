@@ -12,7 +12,9 @@ export class Logger {
 
   constructor(level: LogLevel = LogLevel.INFO, context?: string) {
     this.level = level;
-    this.context = context;
+    if (context !== undefined) {
+      this.context = context;
+    }
   }
 
   private log(level: LogLevel, message: string, ...args: any[]): void {

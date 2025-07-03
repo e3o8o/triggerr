@@ -10,8 +10,8 @@
 import type {
   CanonicalFlightData,
   SourceContributions,
-} from "@triggerr/shared/models/canonical-models";
-import { SOURCE_RELIABILITY_SCORES } from "@triggerr/shared/models/canonical-models";
+} from "@triggerr/shared";
+import { SOURCE_RELIABILITY_SCORES } from "@triggerr/shared";
 
 interface ConflictField {
   field: string;

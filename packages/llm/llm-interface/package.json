@@ -4,14 +4,12 @@
   "private": true,
   "description": "Defines the generic, provider-agnostic interfaces and models for LLM interactions.",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsup",
+    "build": "tsc",
     "clean": "rm -rf .turbo dist"
   },
   "devDependencies": {
-    "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   }
 }

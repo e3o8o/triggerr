@@ -9,7 +9,7 @@
     "tsconfig"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsc",
     "clean": "rm -rf .turbo dist",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
@@ -21,7 +21,6 @@
     "@types/node": "^20",
     "eslint": "^8",
     "eslint-config-custom": "*",
-    "tsup": "^8.2.3",
     "typescript": "^5"
   },
   "publishConfig": {

@@ -1151,7 +1151,7 @@ async function seedRoutesFromFile() {
         }
 
         const codeshare = parts[6] === "Y";
-        const stops = parseInt(parts[7]);
+        const stops = parseInt(parts[7] || "0");
         if (isNaN(stops)) {
           logger.warn(
             `  ⚠️ Skipping route (invalid stops value '${parts[7]}'): ${line}`,
@@ -1331,21 +1331,25 @@ async function seedSystemConfiguration() {
     // Platform Wallets & Finance
     {
       key: "PLATFORM_REVENUE_WALLET_ADDRESS",
-      value: process.env.PLATFORM_REVENUE_WALLET_ADDRESS || "placeholder_platform_wallet_address_not_set_in_env",
-      description: "Main wallet address for triggerr platform revenue collection.",
+      value:
+        process.env.PLATFORM_REVENUE_WALLET_ADDRESS ||
+        "placeholder_platform_wallet_address_not_set_in_env",
+      description:
+        "Main wallet address for triggerr platform revenue collection.",
       category: "FINANCE" as const,
       isEditableRuntime: false,
       isSecret: true,
-      order: 10
+      order: 10,
     },
     {
       key: "PLATFORM_REVENUE_SHARE_PERCENTAGE",
       value: "10.00",
-      description: "Default platform revenue share percentage for all transactions.",
+      description:
+        "Default platform revenue share percentage for all transactions.",
       category: "FINANCE" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 20
+      order: 20,
     },
     {
       key: "DEFAULT_PAYOUT_CURRENCY",
@@ -1354,7 +1358,7 @@ async function seedSystemConfiguration() {
       category: "FINANCE" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 30
+      order: 30,
     },
 
     // Policy & Quoting
@@ -1365,7 +1369,7 @@ async function seedSystemConfiguration() {
       category: "QUOTING" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 110
+      order: 110,
     },
     {
       key: "MAX_POLICY_DURATION_DAYS",
@@ -1374,36 +1378,39 @@ async function seedSystemConfiguration() {
       category: "POLICIES" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 120
+      order: 120,
     },
 
     // Parametric Triggers (Flight Delay Insurance)
     {
       key: "FLIGHT_DELAY_TRIGGER_MINUTES",
       value: "60",
-      description: "Minimum flight delay in minutes to trigger automatic payout.",
+      description:
+        "Minimum flight delay in minutes to trigger automatic payout.",
       category: "PARAMETRIC_TRIGGERS" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 210
+      order: 210,
     },
     {
       key: "AUTOMATIC_PAYOUT_DELAY_MINUTES",
       value: "15",
-      description: "Delay in minutes after a qualifying event before processing automatic payouts.",
+      description:
+        "Delay in minutes after a qualifying event before processing automatic payouts.",
       category: "PARAMETRIC_TRIGGERS" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 220
+      order: 220,
     },
     {
       key: "FLIGHT_DATA_VERIFICATION_WINDOW_HOURS",
       value: "24",
-      description: "Time window in hours after scheduled arrival to verify flight data for payouts.",
+      description:
+        "Time window in hours after scheduled arrival to verify flight data for payouts.",
       category: "PARAMETRIC_TRIGGERS" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 230
+      order: 230,
     },
 
     // System & Support
@@ -1414,7 +1421,7 @@ async function seedSystemConfiguration() {
       category: "LEGAL" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 310
+      order: 310,
     },
     {
       key: "SUPPORT_EMAIL",
@@ -1423,7 +1430,7 @@ async function seedSystemConfiguration() {
       category: "SUPPORT" as const,
       isEditableRuntime: true,
       isSecret: false,
-      order: 320
+      order: 320,
     },
     {
       key: "ESCROW_EXPIRY_DAYS",
@@ -1432,8 +1439,8 @@ async function seedSystemConfiguration() {
       category: "PAYGO" as const,
       isEditableRuntime: false,
       isSecret: false,
-      order: 410
-    }
+      order: 410,
+    },
   ];
 
   // Sort configurations by order
@@ -1457,7 +1464,10 @@ async function seedSystemConfiguration() {
         logger.info(`  ⏭️ System configuration already exists: ${config.key}`);
       }
     } catch (error) {
-      logger.error(`  ❌ Failed to seed system configuration ${config.key}:`, error);
+      logger.error(
+        `  ❌ Failed to seed system configuration ${config.key}:`,
+        error,
+      );
     }
   }
 }

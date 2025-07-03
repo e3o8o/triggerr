@@ -105,18 +105,24 @@ const authConfig = {
   user: {
     changeEmail: {
       enabled: true,
-      sendChangeEmailVerification: async ({
-        user,
-        newEmail,
-        token,
-      }: {
-        user: User;
+      sendChangeEmailVerification: async (data: {
+        user: {
+          id: string;
+          name: string;
+          emailVerified: boolean;
+          email: string;
+          createdAt: Date;
+          updatedAt: Date;
+          image?: string | null | undefined;
+        };
         newEmail: string;
+        url: string;
         token: string;
       }) => {
         // TODO: Implement email sending logic in Phase F
+        // For now, just log the verification details
         console.log(
-          `Change email verification for ${user.email} to ${newEmail}: ${token}`,
+          `Change email verification for ${data.user.email} to ${data.newEmail}: ${data.token}`,
         );
       },
     },
@@ -141,8 +147,9 @@ const authConfig = {
     },
     crossSubDomainCookies: {
       enabled: true,
-      domain:
-        process.env.NODE_ENV === "production" ? ".triggerr.com" : undefined,
+      ...(process.env.NODE_ENV === "production" && {
+        domain: ".triggerr.com",
+      }),
     },
   },
   plugins: [nextCookies()],
@@ -182,8 +189,8 @@ export type Session = {
   expiresAt: Date;
   createdAt: Date;
   updatedAt: Date;
-  ipAddress?: string | null;
-  userAgent?: string | null;
+  ipAddress?: string | null | undefined;
+  userAgent?: string | null | undefined;
 };
 
 export type User = {
@@ -191,7 +198,7 @@ export type User = {
   name: string;
   email: string;
   emailVerified: boolean;
-  image?: string | null;
+  image?: string | null | undefined;
   createdAt: Date;
   updatedAt: Date;
 };

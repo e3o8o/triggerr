@@ -1,15 +1,105 @@
 {
-  "extends": "../config/tsconfig/build.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "outDir": "dist",
-    "rootDir": "src"
+    // === TARGET & MODULE SYSTEM ===
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    // === PROJECT REFERENCES & COMPOSITE BUILD ===
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+
+    // === OUTPUT CONFIGURATION ===
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noEmit": false,
+
+    // === MODULE RESOLUTION ===
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // === ENTERPRISE-GRADE TYPE SAFETY ===
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "useUnknownInCatchVariables": true,
+
+    // === DEPENDENCY HANDLING ===
+    // Strategic: Skip lib checking for external deps but maintain strict checking for our code
+    "skipLibCheck": true,
+
+    // === PERFORMANCE & DEVELOPMENT ===
+    "preserveWatchOutput": true,
+    "pretty": true,
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "noErrorTruncation": true,
+
+    // === DECLARATION GENERATION ===
+    "removeComments": false,
+    "stripInternal": true,
+
+    // === EMIT OPTIMIZATION ===
+    "importHelpers": false,
+    "downlevelIteration": false,
+    "noEmitHelpers": false,
+
+    // === JSX (for packages that might need it) ===
+    "jsx": "preserve",
+    "jsxImportSource": "react",
+
+    // === COMPATIBILITY ===
+    "verbatimModuleSyntax": false,
+    "allowJs": false,
+    "checkJs": false,
+
+    // === PERFORMANCE ===
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "disableSourceOfProjectReferenceRedirect": false
   },
-  "include": ["src"],
+
+  // === STANDARD INCLUDE PATTERNS ===
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
+
+  // === STANDARD EXCLUDE PATTERNS ===
   "exclude": [
     "node_modules",
     "dist",
+    "build",
+    "coverage",
+    ".turbo",
     "**/*.test.ts",
+    "**/*.test.tsx",
     "**/*.spec.ts",
-    "**/__tests__/**"
-  ]
+    "**/*.spec.tsx",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/test/**",
+    "**/tests/**",
+    "**/examples/**",
+    "**/docs/**"
+  ],
+
+  // === TYPE ACQUISITION ===
+  "typeAcquisition": {
+    "enable": false,
+    "disableFilenameBasedTypeAcquisition": true
+  }
 }

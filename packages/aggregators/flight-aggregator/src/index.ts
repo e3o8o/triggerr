@@ -15,17 +15,17 @@ export type {
 
 // Source routing
 export { SourceRouter } from "./source-router";
-export type { IFlightApiClient } from "@triggerr/shared/types/integrations";
+export type { IFlightApiClient } from "@triggerr/shared";
 
 // Conflict resolution
 export { ConflictResolver } from "./conflict-resolver";
 
 // Cache management
-export { CacheManager } from "@triggerr/core/utils/cache-manager";
+export { CacheManager } from "@triggerr/core";
 
 // Re-export canonical types for convenience
 export type {
   CanonicalFlightData,
   StandardFlightStatus,
   SourceContributions,
-} from "@triggerr/shared/models/canonical-models";
+} from "@triggerr/shared";

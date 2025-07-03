@@ -10,10 +10,10 @@
  * 5. Returning clean, canonical flight data
  */
 
-import type { CanonicalFlightData } from "@triggerr/shared/models/canonical-models";
-import { CacheManager } from "@triggerr/core/utils/cache-manager";
+import type { CanonicalFlightData } from "@triggerr/shared";
+import { CacheManager } from "@triggerr/core";
 import { SourceRouter } from "./source-router";
-import { type IFlightApiClient } from "@triggerr/shared/types/integrations";
+import { type IFlightApiClient } from "@triggerr/shared";
 import { ConflictResolver } from "./conflict-resolver";
 
 export interface FlightAggregatorConfig {

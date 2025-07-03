@@ -2,9 +2,9 @@ import { createApiError, createApiResponse } from "@triggerr/api-contracts";
 import { z } from "zod";
 import { PolicyEngine } from "@triggerr/policy-engine";
 import { EscrowManager, EscrowEngineFactory } from "@triggerr/escrow-engine";
-import { BlockchainServiceRegistry } from "@triggerr/blockchain-interface";
-import { Logger } from "@triggerr/core/logging";
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
+import { BlockchainServiceRegistry } from "@triggerr/service-registry";
+import { Logger, LogLevel } from "@triggerr/core";
+import { getAuthContext, setRLSContext } from "@triggerr/core";
 
 // Request validation schema
 const policyPurchaseRequestSchema = z.object({
@@ -115,7 +115,7 @@ export async function handleAnonymousPolicyPurchase(
 
   try {
     // Step 3: Initialize services
-    const logger = new Logger("PolicyPurchaseAPI");
+    const logger = new Logger(LogLevel.INFO, "PolicyPurchaseAPI");
     const blockchainRegistry = new BlockchainServiceRegistry();
     const escrowEngineFactory = new EscrowEngineFactory(blockchainRegistry);
     const escrowManager = new EscrowManager(escrowEngineFactory);

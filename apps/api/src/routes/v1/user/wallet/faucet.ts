@@ -73,7 +73,14 @@ export async function handleFaucetRequest(
       });
     }
 
-    const data: FaucetRequest = validationResult.data;
+    const data: FaucetRequest = {
+      ...(validationResult.data.amount !== undefined && {
+        amount: validationResult.data.amount,
+      }),
+      ...(validationResult.data.reason !== undefined && {
+        reason: validationResult.data.reason,
+      }),
+    };
 
     // 3. Get user's primary wallet
     const userWalletResult = await db
@@ -103,6 +110,15 @@ export async function handleFaucetRequest(
     }
 
     const userWallet = userWalletResult[0];
+    if (!userWallet) {
+      return new Response(
+        JSON.stringify(createApiError("WALLET_NOT_FOUND", "Wallet not found")),
+        {
+          status: 404,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
     const recipientAddress = userWallet.address as Hex;
     const recipientChain = userWallet.chain as BlockchainProviderName;
 

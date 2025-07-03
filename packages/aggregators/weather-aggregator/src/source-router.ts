@@ -10,7 +10,7 @@
  * For the MVP, it returns a static, prioritized list.
  */
 
-import type { CanonicalWeatherObservation } from "@triggerr/shared/models/canonical-models";
+import type { CanonicalWeatherObservation } from "@triggerr/shared";
 
 // Generic interface for weather data API clients
 export interface IWeatherApiClient {

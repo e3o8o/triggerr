@@ -118,7 +118,7 @@ export class WalletService {
       address: address as Hex,
       chain,
       walletType: "NON_CUSTODIAL",
-      publicKey,
+      ...(publicKey && { publicKey }),
       encryptedSecret: "", // Empty for non-custodial wallets
       kmsKeyId: "", // Empty for non-custodial wallets
       isPrimary: false, // Linked wallets are not primary by default

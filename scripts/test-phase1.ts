@@ -8,6 +8,7 @@
 import { FlightAggregator } from "../packages/aggregators/flight-aggregator/src/aggregator";
 import { WeatherAggregator } from "../packages/aggregators/weather-aggregator/src/aggregator";
 import { DataRouter } from "../packages/aggregators/data-router/src/router";
+import { Logger, LogLevel } from "../packages/core/src/logging/logger";
 
 // Import API clients
 import { AviationStackClient } from "../packages/integrations/aviationstack-adapter/src/client";
@@ -83,7 +84,9 @@ async function testPhase1Implementation() {
     // Step 3: Initialize DataRouter
     console.log("\n🎯 Step 3: Initializing DataRouter...");
 
-    const dataRouter = new DataRouter(flightAggregator, weatherAggregator);
+    const dataRouter = new DataRouter({
+      logger: new Logger(LogLevel.INFO, "DataRouter"),
+    });
 
     console.log("✅ DataRouter initialized");
 

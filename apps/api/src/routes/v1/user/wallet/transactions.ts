@@ -135,11 +135,11 @@ export async function handleGetTransactions(
         type: tx.type,
         amount: tx.amount,
         formattedAmount: tx.formattedAmount,
-        from: tx.from,
-        to: tx.to,
+        ...(tx.from && { from: tx.from }),
+        ...(tx.to && { to: tx.to }),
         date: tx.date,
         hash: tx.hash,
-        metadata: tx.metadata,
+        ...(tx.metadata && { metadata: tx.metadata }),
       }),
     );
 
