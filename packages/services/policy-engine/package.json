@@ -22,7 +22,7 @@
     "@triggerr/core": "workspace:*",
     "@triggerr/shared": "workspace:*",
     "@triggerr/escrow-engine": "workspace:*",
-    "drizzle-orm": "^0.31.2"
+    "drizzle-orm": "^0.44.2"
   },
   "devDependencies": {
     "@types/node": "^22.15.30",

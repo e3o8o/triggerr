@@ -1,9 +1,9 @@
 # COMPREHENSIVE TODO: MVP COMPLETION PLAN
 
-**Document Version**: 2.0  
-**Date**: January 2025  
-**Status**: ACTIVE IMPLEMENTATION PLAN  
-**Based On**: TypeScript compiler analysis and build system diagnostics  
+**Document Version**: 2.0
+**Date**: January 2025
+**Status**: ACTIVE IMPLEMENTATION PLAN
+**Based On**: TypeScript compiler analysis and build system diagnostics
 
 ---
 
@@ -24,114 +24,84 @@
 
 ## 📋 **PHASE 1: FOUNDATION REPAIR (CRITICAL - BLOCKING ALL DEVELOPMENT)**
 
-### **Task 1.1: Fix Build System Configuration**
-**Priority**: 🔴 **BLOCKER**  
-**Estimated Time**: 2 hours  
-**Dependencies**: None  
+### **Task 1.1: Fix Build System Configuration** ✅ **COMPLETED**
+**Priority**: 🔴 **BLOCKER**
+**Estimated Time**: 2 hours
+**Dependencies**: None
 
 **Actions:**
-- [ ] **Fix Turbo workspace configuration**
-  - Identify and fix malformed package.json causing line 65 error
-  - Verify all workspace packages have proper `name` fields
-  - Test: `bun run build` should not show workspace resolution errors
+- [x] **Fix Turbo workspace configuration**
+  - ✅ Fixed malformed package.json causing line 65 error
+  - ✅ Verified all workspace packages have proper `name` fields
+  - ✅ Test: `bun run build` now shows 27/27 successful builds
 
-- [ ] **Fix Root TypeScript Configuration & Workspace Resolution**
-  - Update root `tsconfig.json` with:
-    - `"target": "ES2022"` to fix BigInt literal errors
-    - `"module": "ESNext"` to support top-level await
-    - `"moduleResolution": "bundler"` for better workspace resolution
-    - `"esModuleInterop": true` globally
-  - Add path mapping to root `tsconfig.json`: `"paths": { "@triggerr/*": ["./packages/*", "./apps/*"] }`
-  - Fix `packages/services/quote-engine/tsconfig.json` - remove overly aggressive exclude patterns
-  - Fix `packages/services/policy-engine/tsconfig.json` - ensure consistent with other services  
-  - Update exclude patterns to: `["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]`
-  - **Action**: In each package's `package.json`, ensure the `exports` and `types` fields are present and correct to support module resolution
-  - **Action**: Create `scripts/validate-build.ts` to programmatically build packages in the correct dependency order and validate their exports
-  - Test: `tsc --noEmit` should show fewer config-related errors
+- [x] **Migrated to TypeScript Project References**
+  - ✅ Created standardized tsconfig templates (`tsconfig.core.json`, `tsconfig.integration.json`, `tsconfig.base.json`)
+  - ✅ Migrated all 27 packages from `tsup` to `tsc` build system
+  - ✅ Fixed dependency resolution issues in `@triggerr/data-router`
+  - ✅ Added missing workspace dependencies to package.json files
+  - ✅ Resolved strict TypeScript errors (`TS7006`, `TS2307`)
+  - ✅ Test: All packages now build successfully with strict type checking
 
-### **Task 1.2: Resolve Drizzle ORM Version Conflicts**
-**Priority**: 🔴 **BLOCKER**  
-**Estimated Time**: 3 hours  
-**Dependencies**: Task 1.1  
+### **Task 1.2: Resolve Drizzle ORM Version Conflicts** ✅ **COMPLETED**
+**Priority**: 🔴 **BLOCKER**
+**Estimated Time**: 3 hours
+**Dependencies**: Task 1.1
 
 **Actions:**
-- [ ] **Audit Drizzle dependencies across all packages**
-  - Run: `bun list | grep drizzle` to identify version mismatches
-  - Ensure all packages use same drizzle-orm version
-  - Update package.json files to use consistent versions
+- [x] **Audit Drizzle dependencies across all packages**
+  - ✅ Identified version mismatch: policy-engine had `^0.31.2` (fixed to `^0.44.2` now), others had `^0.44.2`
+  - ✅ Root package.json `overrides` field ensures consistent `^0.44.2` across all packages
+  - ✅ All packages now use consistent drizzle-orm version via override mechanism
 
-- [ ] **Fix SQL type conflicts in affected files:**
-  - `packages/integrations/stripe-adapter/src/webhook-handler.ts` (lines 83, 114)
-  - `scripts/apply-new-migration.ts` (lines 19, 30, 45, 50, 61, 69)
-  - `scripts/check-schema.ts` (lines 21, 35)
-  - Replace incompatible `sql` template usage with compatible alternatives
+- [x] **Fix SQL type conflicts in affected files:**
+  - ✅ No actual conflicts found - all files compile successfully
+  - ✅ Version override resolves compatibility issues at runtime
+  - ✅ Database operations work correctly with current configuration
 
-- [ ] **Test database connection and queries**
-  - Verify: All database operations compile without type errors
-  - Test: Basic CRUD operations work in development environment
+- [x] **Test database connection and queries**
+  - ✅ All database operations compile without type errors
+  - ✅ Database is working as expected in development environment
+  - ✅ All 27 packages build successfully including database-dependent ones
 
 ---
 
 ## 📋 **PHASE 1B: BUILD SYSTEM STABILIZATION & VALIDATION**
 
-### **Task 1.3: Fix Turbo Configuration & Validate Build Chain**
-**Priority**: 🔴 **BLOCKER**  
-**Estimated Time**: 3 hours  
-**Dependencies**: Task 1.1  
+### **Task 1.3: Fix Turbo Configuration & Validate Build Chain** ✅ **COMPLETED**
+**Priority**: 🔴 **BLOCKER**
+**Estimated Time**: 2 hours
+**Dependencies**: Task 1.2
 
 **Actions:**
-- [ ] **Fix `turbo.json` Configuration**
-  - Ensure the file has the correct schema and task dependencies.
-  - **Example `turbo.json`**:
-    ```json
-    {
-      "$schema": "https://turbo.build/schema.json",
-      "globalDependencies": ["bun.lockb"],
-      "globalEnv": ["NODE_ENV", "DATABASE_URL"],
-      "tasks": {
-        "dev": {
-          "cache": false,
-          "persistent": true,
-          "dependsOn": ["^build"]
-        },
-        "build": {
-          "dependsOn": ["^build"],
-          "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
-        }
-      },
-      "ui": "tui"
-    }
-    ```
-- [ ] **Validate Full Build Process**
-  - **Run build commands in dependency order**:
-    ```bash
-    # Build packages in dependency order to ensure proper type generation
-    1. packages/shared (contains canonical models)
-    2. packages/core (contains utilities and database)
-    3. packages/blockchain/* (interface, adapter, registry)
-    4. packages/aggregators/* (data layer)
-    5. packages/integrations/* (external API adapters)
-    6. packages/services/* (business logic)
-    ```
-  - **Validation commands**:
-    ```bash
-    bun run clean
-    bun run build
-    bun tsc --noEmit
-    ```
-  - **Verify compiled output**: `find packages -name "dist" -type d | wc -l` should match the number of packages
-- [ ] **Test Development Server**
-  - Run `bun dev` and ensure the API and web app start without errors
-  - Both web app and API should be accessible
+- [x] **Fix `turbo.json` Configuration**
+  - ✅ Verified turbo.json has correct schema and task dependencies
+  - ✅ Added DATABASE_URL to globalEnv for database-dependent packages
+  - ✅ Build dependencies properly configured with `dependsOn: ["^build"]`
+  - ✅ Output paths correctly specified for caching
+
+- [x] **Validate Full Build Process**
+  - ✅ TypeScript Project References ensure proper build order automatically
+  - ✅ All 27 packages build successfully in correct dependency order
+  - ✅ Build validation commands pass:
+    - `bun run build`: 27/27 successful builds
+    - `bun tsc --noEmit`: No type errors
+  - ✅ Verified compiled output: 25/25 packages have dist folders (2 apps use different output)
+
+- [x] **Test Development Server**
+  - ✅ `bun dev` starts all services successfully
+  - ✅ Web app accessible at http://localhost:3000
+  - ✅ API service compiles and runs without errors
+  - ✅ All TypeScript watch modes working properly
 
 ---
 
 ## 📋 **PHASE 2: SERVICE IMPLEMENTATION & INTEGRATION (HIGH PRIORITY)**
 
 ### **Task 2.1: Fix DataRouter Integration**
-**Priority**: 🟠 **HIGH**  
-**Estimated Time**: 4 hours  
-**Dependencies**: Task 1.2  
+**Priority**: 🟠 **HIGH**
+**Estimated Time**: 4 hours
+**Dependencies**: Task 1.2
 
 **Actions:**
 - [ ] **Modify DataRouter constructor** in `packages/aggregators/data-router/src/router.ts`
@@ -173,9 +143,9 @@
   - Test: API route compiles without TypeScript errors
 
 ### **Task 2.2: Implement Quote Service Interface Alignment**
-**Priority**: 🟠 **HIGH**  
-**Estimated Time**: 6 hours  
-**Dependencies**: Task 2.1  
+**Priority**: 🟠 **HIGH**
+**Estimated Time**: 6 hours
+**Dependencies**: Task 2.1
 
 **Actions:**
 - [ ] **Fix request/response type mismatch**
@@ -244,9 +214,9 @@
   - Verify: Quote response matches expected interface
 
 ### **Task 2.3: Implement Policy Engine Integration**
-**Priority**: 🟠 **HIGH**  
-**Estimated Time**: 5 hours  
-**Dependencies**: Task 2.2  
+**Priority**: 🟠 **HIGH**
+**Estimated Time**: 5 hours
+**Dependencies**: Task 2.2
 
 **Actions:**
 - [ ] **Complete PolicyEngine implementation** in `packages/services/policy-engine/src/policy-engine.ts`
@@ -303,9 +273,9 @@
 ## 📋 **PHASE 3: DATA AGGREGATION LAYER (MEDIUM PRIORITY)**
 
 ### **Task 3.1: Implement Core Aggregators**
-**Priority**: 🟡 **MEDIUM**  
-**Estimated Time**: 8 hours  
-**Dependencies**: Task 2.1  
+**Priority**: 🟡 **MEDIUM**
+**Estimated Time**: 8 hours
+**Dependencies**: Task 2.1
 
 **Actions:**
 - [ ] **Complete FlightAggregator** in `packages/aggregators/flight-aggregator/src/aggregator.ts`
@@ -328,9 +298,9 @@
 ## 📋 **PHASE 4: PAYOUT ENGINE IMPLEMENTATION (MEDIUM PRIORITY)**
 
 ### **Task 4.1: Build Payout Engine Service**
-**Priority**: 🟡 **MEDIUM**  
-**Estimated Time**: 6 hours  
-**Dependencies**: Task 2.3, Task 3.1  
+**Priority**: 🟡 **MEDIUM**
+**Estimated Time**: 6 hours
+**Dependencies**: Task 2.3, Task 3.1
 
 **Actions:**
 - [ ] **Implement PayoutEngine** in `packages/services/payout-engine/src/payout-engine.ts`
@@ -340,16 +310,16 @@
       async processTriggeredPayouts(policyIds: string[]): Promise<ProcessPayoutsResponse> {
         // 1. Fetch active policies with flight details
         const policies = await this.fetchPolicies(policyIds);
-        
+
         // 2. Check each policy for trigger conditions
         const triggeredPolicies = await this.evaluateTriggerConditions(policies);
-        
+
         // 3. Execute payouts for triggered policies
         const payoutResults = await this.executePayouts(triggeredPolicies);
-        
+
         // 4. Update policy statuses
         await this.updatePolicyStatuses(triggeredPolicies);
-        
+
         return this.formatPayoutResponse(payoutResults);
       }
 
@@ -397,9 +367,9 @@
 ## 📋 **PHASE 5: CHAT & LLM INTEGRATION (LOW PRIORITY)**
 
 ### **Task 5.1: Implement LLM Interface Layer**
-**Priority**: 🟢 **LOW**  
-**Estimated Time**: 4 hours  
-**Dependencies**: Task 2.2  
+**Priority**: 🟢 **LOW**
+**Estimated Time**: 4 hours
+**Dependencies**: Task 2.2
 
 **Actions:**
 - [ ] **Build ILLMClient interface** in `packages/llm/llm-interface/src/interface.ts`
@@ -413,9 +383,9 @@
   - Implement response transformation logic
 
 ### **Task 5.2: Build Chat Service Integration**
-**Priority**: 🟢 **LOW**  
-**Estimated Time**: 5 hours  
-**Dependencies**: Task 5.1  
+**Priority**: 🟢 **LOW**
+**Estimated Time**: 5 hours
+**Dependencies**: Task 5.1
 
 **Actions:**
 - [ ] **Complete ChatService** in `packages/services/chat-service/src/chat-service.ts`
@@ -430,13 +400,13 @@
       async processUserMessage(message: string, conversationId?: string): Promise<ChatResponse> {
         // 1. Extract flight entities from natural language
         const entities = await this.extractFlightEntities(message);
-        
+
         // 2. If sufficient entities, generate quote
         if (this.hasRequiredEntities(entities)) {
           const quote = await this.quoteEngine.generateQuote(entities);
           return this.formatQuoteResponse(quote);
         }
-        
+
         // 3. Otherwise, ask for clarification
         return this.askForClarification(entities);
       }
@@ -455,9 +425,9 @@
 ## 📋 **PHASE 6: TESTING & VALIDATION (CONTINUOUS)**
 
 ### **Task 6.1: Fix Existing Test Suites**
-**Priority**: 🟡 **ONGOING**  
-**Estimated Time**: 3 hours per phase  
-**Dependencies**: Each phase completion  
+**Priority**: 🟡 **ONGOING**
+**Estimated Time**: 3 hours per phase
+**Dependencies**: Each phase completion
 
 **Actions:**
 - [ ] **Update Phase 2 tests** in `scripts/testPhase2Implementation.js`
@@ -483,9 +453,9 @@
   - Add comprehensive error case testing
 
 ### **Task 6.2: Create Comprehensive Test Coverage**
-**Priority**: 🟡 **ONGOING**  
-**Estimated Time**: 2 hours per service  
-**Dependencies**: Service implementations  
+**Priority**: 🟡 **ONGOING**
+**Estimated Time**: 2 hours per service
+**Dependencies**: Service implementations
 
 **Actions:**
 - [ ] **Unit tests for all services**
@@ -504,9 +474,9 @@
 ## 📋 **PHASE 7: DEPLOYMENT PREPARATION (FINAL)**
 
 ### **Task 7.1: Production Readiness**
-**Priority**: 🟢 **FINAL**  
-**Estimated Time**: 4 hours  
-**Dependencies**: All previous tasks  
+**Priority**: 🟢 **FINAL**
+**Estimated Time**: 4 hours
+**Dependencies**: All previous tasks
 
 **Actions:**
 - [ ] **Environment configuration**
@@ -597,7 +567,7 @@ bun run scripts/testPhase2API.js
 - **Phase 6** (Testing): 8 hours - *CONTINUOUS*
 - **Phase 7** (Production): 5 hours - *FINAL*
 
-**Minimum Viable Product**: Phases 1-4 (41 hours)  
+**Minimum Viable Product**: Phases 1-4 (41 hours)
 **Full Featured Product**: All phases (55 hours)
 
 This plan prioritizes getting a working foundation first, then builds upon it systematically to achieve a fully functional MVP.
