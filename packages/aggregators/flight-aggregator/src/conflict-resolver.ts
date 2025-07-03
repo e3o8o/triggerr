@@ -10,6 +10,7 @@
 import type {
   CanonicalFlightData,
   SourceContributions,
+  SourceContribution,
 } from "@triggerr/shared";
 import { SOURCE_RELIABILITY_SCORES } from "@triggerr/shared";
 
@@ -203,14 +204,17 @@ export class ConflictResolver {
     }
 
     // Remove duplicates and sort by confidence
-    const uniqueContributions = allContributions.reduce((acc, contribution) => {
-      const existing = acc.find((c) => c.source === contribution.source);
-      if (!existing || contribution.confidence > existing.confidence) {
-        acc = acc.filter((c) => c.source !== contribution.source);
-        acc.push(contribution);
-      }
-      return acc;
-    }, [] as SourceContributions);
+    const uniqueContributions = allContributions.reduce(
+      (acc: SourceContributions, contribution: SourceContribution) => {
+        const existing = acc.find((c) => c.source === contribution.source);
+        if (!existing || contribution.confidence > existing.confidence) {
+          acc = acc.filter((c) => c.source !== contribution.source);
+          acc.push(contribution);
+        }
+        return acc;
+      },
+      [] as SourceContributions,
+    );
 
     return uniqueContributions.sort((a, b) => b.confidence - a.confidence);
   }
@@ -247,9 +251,12 @@ export class ConflictResolver {
     }
 
     // Factor in source reliability
-    const sourceScore = data.sourceContributions.reduce((acc, contrib) => {
-      return acc + contrib.confidence * 0.1;
-    }, 0);
+    const sourceScore = data.sourceContributions.reduce(
+      (acc: number, contrib: SourceContribution) => {
+        return acc + contrib.confidence * 0.1;
+      },
+      0,
+    );
 
     return Math.min(1.0, score / totalFields + sourceScore);
   }
@@ -263,7 +270,7 @@ export class ConflictResolver {
   ): number {
     // Base quality from individual responses
     const averageQuality =
-      responses.reduce((sum, response) => {
+      responses.reduce((sum: number, response: CanonicalFlightData) => {
         return sum + this.calculateQualityScore(response);
       }, 0) / responses.length;
 

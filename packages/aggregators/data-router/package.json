@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@triggerr/shared": "workspace:*",
-    "@triggerr/core": "workspace:*"
+    "@triggerr/core": "workspace:*",
+    "@triggerr/flight-aggregator": "workspace:*",
+    "@triggerr/weather-aggregator": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

@@ -125,7 +125,9 @@
       "version": "0.1.0",
       "dependencies": {
         "@triggerr/core": "workspace:*",
+        "@triggerr/flight-aggregator": "workspace:*",
         "@triggerr/shared": "workspace:*",
+        "@triggerr/weather-aggregator": "workspace:*",
       },
       "devDependencies": {
         "typescript": "^5.0.0",
