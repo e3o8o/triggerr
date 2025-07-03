@@ -15,12 +15,8 @@
   },
   "license": "MIT",
   "workspaces": [
-    "packages/*",
-    "packages/api/*",
-    "packages/blockchain/*",
-    "packages/services/*",
-    "packages/integrations/*",
-    "apps/*"
+    "apps/*",
+    "packages/**/*"
   ],
   "scripts": {
     "dev": "turbo dev",
