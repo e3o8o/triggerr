@@ -518,7 +518,9 @@ const DevDashboardPage: FC = () => {
           onConsolidate={handleConsolidateWallet}
           onExportKey={handleExportPrivateKey}
           policyCode={reconciliationData.policyCode}
-          temporaryPrivateKey={reconciliationData.temporaryPrivateKey}
+          {...(reconciliationData.temporaryPrivateKey && {
+            temporaryPrivateKey: reconciliationData.temporaryPrivateKey,
+          })}
         />
 
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">

@@ -7,11 +7,12 @@
   "scripts": {
     "start": "bun run src/index.ts",
     "dev": "bun --watch src/index.ts",
-    "build": "bun build src/index.ts --target bun --outdir dist",
+    "build": "tsc",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "bun-types": "latest",
+    "better-auth": "^1.2.10",
     "@triggerr/api-contracts": "workspace:*",
     "@triggerr/core": "workspace:*",
     "@triggerr/shared": "workspace:*",

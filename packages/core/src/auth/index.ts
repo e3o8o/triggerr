@@ -1,5 +1,5 @@
 // Core auth exports for Better-Auth integration
-export { auth, type User, type Session } from './auth';
+export { auth, type User, type Session } from "./auth";
 export {
   getAuthContext,
   requireAuth,
@@ -11,7 +11,7 @@ export {
   isValidAnonymousSessionId,
   migrateAnonymousDataToUser,
   type AuthContext,
-} from './utils';
+} from "./utils";
 
-// Re-export Better-Auth client for frontend
-export { createAuthClient } from 'better-auth/client';
+// Note: Client-side auth exports are available in separate client module
+// Import from @triggerr/core/auth/client for React components

@@ -26,6 +26,10 @@
       "import": "./dist/auth/index.js",
       "types": "./dist/auth/index.d.ts"
     },
+    "./auth/client": {
+      "import": "./dist/auth/client.js",
+      "types": "./dist/auth/client.d.ts"
+    },
     "./types": {
       "import": "./dist/types/index.js",
       "types": "./dist/types/index.d.ts"

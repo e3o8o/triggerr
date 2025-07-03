@@ -3,57 +3,57 @@
 import { createAuthClient } from "better-auth/react";
 
 // Create the auth client for React components
-export const authClient = createAuthClient({
-  // Base URL will be automatically detected in most cases
-  // but can be overridden if needed for different environments
-  ...(process.env.NEXT_PUBLIC_BETTER_AUTH_URL && {
-    baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
-  }),
+export const authClient: ReturnType<typeof createAuthClient> = createAuthClient(
+  {
+    // Base URL will be automatically detected in most cases
+    // but can be overridden if needed for different environments
+    ...(process.env.NEXT_PUBLIC_BETTER_AUTH_URL && {
+      baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
+    }),
 
-  // Fetch configuration for API calls
-  fetchOptions: {
-    onError: (ctx) => {
-      // Log authentication errors for debugging
-      console.error("Auth error:", ctx.error);
+    // Fetch configuration for API calls
+    fetchOptions: {
+      onError: (ctx) => {
+        // Log authentication errors for debugging
+        console.error("Auth error:", ctx.error);
 
-      // Handle specific insurance-related auth errors
-      if (ctx.error.message?.includes("wallet")) {
-        console.error("Wallet-related authentication error");
-      }
+        // Handle specific insurance-related auth errors
+        if (ctx.error.message?.includes("wallet")) {
+          console.error("Wallet-related authentication error");
+        }
 
-      if (ctx.error.message?.includes("provider")) {
-        console.error("Provider-related authentication error");
-      }
-    },
-    onRequest: (ctx) => {
-      // Add request logging in development
-      if (process.env.NODE_ENV === "development") {
-        console.log("Auth request:", ctx.url);
-      }
-    },
-    onSuccess: (ctx) => {
-      // Log successful auth operations in development
-      if (process.env.NODE_ENV === "development") {
-        console.log("Auth success: operation completed");
-      }
+        if (ctx.error.message?.includes("provider")) {
+          console.error("Provider-related authentication error");
+        }
+      },
+      onRequest: (ctx) => {
+        // Add request logging in development
+        if (process.env.NODE_ENV === "development") {
+          console.log("Auth request:", ctx.url);
+        }
+      },
+      onSuccess: (ctx) => {
+        // Log successful auth operations in development
+        if (process.env.NODE_ENV === "development") {
+          console.log("Auth success: operation completed");
+        }
+      },
     },
   },
-});
+);
 
-// Export commonly used authentication methods
-export const {
-  signIn,
-  signOut,
-  signUp,
-  useSession,
-  getSession,
-  updateUser,
-  changePassword,
-  forgetPassword,
-  resetPassword,
-  verifyEmail,
-  sendVerificationEmail,
-} = authClient;
+// Export commonly used authentication methods with explicit types
+export const signIn = authClient.signIn;
+export const signOut = authClient.signOut;
+export const signUp = authClient.signUp;
+export const useSession = authClient.useSession;
+export const getSession = authClient.getSession;
+export const updateUser = authClient.updateUser;
+export const changePassword = authClient.changePassword;
+export const forgetPassword = authClient.forgetPassword;
+export const resetPassword = authClient.resetPassword;
+export const verifyEmail = authClient.verifyEmail;
+export const sendVerificationEmail = authClient.sendVerificationEmail;
 
 // Insurance-specific auth hooks and utilities
 export const useInsuranceUser = () => {

@@ -1,51 +1,108 @@
 {
-  "extends": "../../packages/config/tsconfig/nextjs.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./.next/.tsbuildinfo",
+    "outDir": "./.next/types",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noEmit": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "skipLibCheck": true,
+    "preserveWatchOutput": true,
+    "pretty": true,
+    "listEmittedFiles": false,
+    "listFiles": false,
+    "jsx": "preserve",
+    "jsxImportSource": "react",
+    "verbatimModuleSyntax": false,
+    "allowJs": true,
+    "checkJs": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@triggerr/core": ["../../packages/core/src"],
-      "@triggerr/core/*": ["../../packages/core/src/*"],
-      "@triggerr/api-contracts": ["../../packages/api/contracts/src"],
-      "@triggerr/api-contracts/*": ["../../packages/api/contracts/src/*"],
-      "@triggerr/api-sdk": ["../../packages/api/sdk/src"],
-      "@triggerr/api-sdk/*": ["../../packages/api/sdk/src/*"],
-      "@triggerr/shared": ["../../packages/shared/src"],
-      "@triggerr/shared/*": ["../../packages/shared/src/*"],
-      "@triggerr/ui": ["../../packages/ui/src"],
-      "@triggerr/ui/*": ["../../packages/ui/src/*"],
-      "@triggerr/utils": ["../../packages/utils/src"],
-      "@triggerr/utils/*": ["../../packages/utils/src/*"],
-      "@triggerr/config": ["../../packages/config/src"],
-      "@triggerr/config/*": ["../../packages/config/src/*"],
-      "@triggerr/paygo-adapter": [
-        "../../packages/blockchain/paygo-adapter/src"
-      ],
-      "@triggerr/paygo-adapter/*": [
-        "../../packages/blockchain/paygo-adapter/src/*"
-      ],
-      "@triggerr/stripe": ["../../packages/integrations/stripe/src"],
-      "@triggerr/stripe/*": ["../../packages/integrations/stripe/src/*"],
-      "@triggerr/wallet-service": [
-        "../../packages/services/wallet-service/src"
-      ],
-      "@triggerr/wallet-service/*": [
-        "../../packages/services/wallet-service/src/*"
-      ],
-      "@triggerr/escrow-engine": [
-        "../../packages/services/escrow-engine/src"
-      ],
-      "@triggerr/escrow-engine/*": [
-        "../../packages/services/escrow-engine/src/*"
-      ],
-      "@triggerr/payout-engine": [
-        "../../packages/services/payout-engine/src"
-      ],
-      "@triggerr/payout-engine/*": [
-        "../../packages/services/payout-engine/src/*"
+      "@/*": [
+        "./src/*"
       ]
-    }
+    },
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "dist",
+    "build",
+    "coverage",
+    ".turbo",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/test/**",
+    "**/tests/**"
+  ],
+  "references": [
+    {
+      "path": "../../packages/config"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/core"
+    },
+    {
+      "path": "../../packages/ui"
+    },
+    {
+      "path": "../../packages/api/contracts"
+    },
+    {
+      "path": "../../packages/api/sdk"
+    },
+    {
+      "path": "../../packages/integrations/stripe-adapter"
+    }
+  ],
+  "typeAcquisition": {
+    "enable": false,
+    "disableFilenameBasedTypeAcquisition": true
+  }
 }
