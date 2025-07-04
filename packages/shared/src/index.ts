@@ -1,43 +1,41 @@
 // ============================================================================
-// MAIN SHARED PACKAGE ENTRY POINT
+// TRIGGERR SHARED PACKAGE - DOMAIN-DRIVEN BARREL EXPORTS
 // ============================================================================
 
-// Re-exports all shared modules for easy importing across the triggerr platform
-
 // ============================================================================
-// TYPE DEFINITIONS
+// DOMAIN-SPECIFIC NAMESPACE EXPORTS
 // ============================================================================
 
-// Export all types from the types directory
+// Common/Core Domain
+export * as Common from "./types/api-types";
+export * as Business from "./types/business-types";
+export * as Models from "./models";
+export * as Constants from "./constants";
+export * as Validators from "./validators";
+
+// Authentication Domain
+export * as Auth from "./types/auth-types";
+
+// Chat Domain
+export * as Chat from "./types/chat-types";
+
+// Integration Domain
+export * as Integrations from "./types/integrations";
+
+// Notification Domain
+export * as Notifications from "./notifications";
+
+// ============================================================================
+// FLAT EXPORTS FOR BACKWARD COMPATIBILITY
+// ============================================================================
+
+// Export all types for backward compatibility
 export * from "./types";
-
-// ============================================================================
-// MODELS
-// ============================================================================
-
-// Export all models (canonical data models, etc.)
 export * from "./models";
-
-// ============================================================================
-// BUSINESS CONSTANTS
-// ============================================================================
-
-// Export business constants (insurance products, providers, limits, etc.)
 export * from "./constants";
-
-// ============================================================================
-// VALIDATION SCHEMAS
-// ============================================================================
-
-// Export Zod validation schemas for API requests/responses
 export * from "./validators";
 
-// ============================================================================
-// NOTIFICATION UTILITIES
-// ============================================================================
-
-// Export notification templates and utilities
-// Note: Only export specific items to avoid conflicts with types
+// Export specific notification items to avoid conflicts
 export {
   EMAIL_TEMPLATES,
   renderNotification,
@@ -47,14 +45,42 @@ export {
 } from "./notifications";
 
 // ============================================================================
-// UTILITY EXPORTS
+// COMMON UTILITY TYPES (MOST FREQUENTLY USED)
 // ============================================================================
 
-// Common utility types are already exported via the wildcard export above
-// No need to re-export them specifically to avoid conflicts
+// Re-export the most commonly used types directly for convenience
+export type {
+  UUID,
+  Timestamp,
+  EmailAddress,
+  PhoneNumber,
+  CurrencyCode,
+  CountryCode,
+  LanguageCode,
+  PaginationParams,
+  PaginatedResponse,
+  MoneyAmount,
+  Address,
+  Coordinates,
+  TimeRange,
+  FileUpload,
+  ContactInfo,
+  AuditMetadata,
+  Environment,
+  LogLevel,
+  Status,
+} from "./types";
+
+// Re-export canonical data models
+export type {
+  CanonicalFlightData,
+  CanonicalWeatherObservation,
+  StandardFlightStatus,
+  StandardWeatherCondition,
+} from "./models";
 
 // ============================================================================
-// VERSION INFO
+// PACKAGE METADATA
 // ============================================================================
 
 export const SHARED_PACKAGE_VERSION = "0.1.0";

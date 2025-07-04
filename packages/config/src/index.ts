@@ -1,87 +1,119 @@
-/**
- * Configuration Package Index
- *
- * Central configuration management for the triggerr platform.
- * This package provides environment-specific configuration for all
- * external services and internal settings.
- */
-
 // ============================================================================
-// STRIPE CONFIGURATION
+// TRIGGERR CONFIG PACKAGE - ENVIRONMENT-DRIVEN BARREL EXPORTS
 // ============================================================================
 
+// ============================================================================
+// ENVIRONMENT-SPECIFIC NAMESPACE EXPORTS
+// ============================================================================
+
+// Environment Management
+export * as Environment from "./lib/environment";
+
+// Payment Configuration
+export * as Payment from "./stripe";
+
+// Security Configuration
+export * as Security from "./lib/security";
+
+// External Services Configuration
+export * as Services from "./lib/services";
+
+// Feature Flags
+export * as Features from "./lib/features";
+
+// ============================================================================
+// DIRECT EXPORTS FOR BACKWARD COMPATIBILITY
+// ============================================================================
+
+// Stripe Configuration
 export {
   stripeConfig,
   stripeSettings,
   getStripeConfigForEnv,
   getCurrentStripeEnvironment,
-} from './stripe';
+} from "./stripe";
 
 export type {
   StripeConfig,
   StripeApiVersion,
   StripeEnvironment,
-} from './stripe';
+} from "./stripe";
 
 // ============================================================================
-// ENVIRONMENT UTILITIES
+// RE-EXPORTED CONFIGURATION FROM MODULES
 // ============================================================================
 
-/**
- * Gets the current environment
- */
-export function getCurrentEnvironment(): 'development' | 'staging' | 'production' | 'test' {
-  const env = (process.env.NODE_ENV || 'development') as string; // Cast to string
+// Re-export from environment module
+export {
+  getCurrentEnvironment,
+  isDevelopment,
+  isProduction,
+  isStaging,
+  baseUrls,
+  apiUrls,
+  getCurrentEnvironmentConfig,
+  getCurrentBaseUrl,
+  getCurrentApiUrl,
+  isDebugMode,
+  getLogLevel,
+} from "./lib/environment";
 
-  if (env === 'production') return 'production';
-  if (env === 'staging') return 'staging';
-  if (env === 'test') return 'test';
-  return 'development';
-}
+// Re-export from security module
+export {
+  jwtConfig,
+  sessionConfig,
+  corsConfig,
+  rateLimitConfig,
+  passwordPolicyConfig,
+  encryptionConfig,
+  securityHeadersConfig,
+  apiKeyConfig,
+  endpointRateLimits,
+  getSecurityHeaders,
+  generateApiKey,
+} from "./lib/security";
 
-/**
- * Checks if we're in development environment
- */
-export function isDevelopment(): boolean {
-  return getCurrentEnvironment() === 'development';
-}
+// Re-export from services module
+export {
+  externalServices,
+  flightDataServices,
+  weatherServices,
+  paymentServices,
+  llmServices,
+  getEnabledFlightDataServices,
+  getEnabledWeatherServices,
+  getEnabledPaymentServices,
+  getEnabledLLMServices,
+} from "./lib/services";
 
-/**
- * Checks if we're in production environment
- */
-export function isProduction(): boolean {
-  return getCurrentEnvironment() === 'production';
-}
-
-/**
- * Checks if we're in staging environment
- */
-export function isStaging(): boolean {
-  return getCurrentEnvironment() === 'staging';
-}
+// Re-export from features module
+export {
+  features as featureFlags,
+  isFeatureEnabled,
+  getEnabledFeatures,
+  getCurrentPhase,
+  getFeatureFlagSummary,
+} from "./lib/features";
 
 // ============================================================================
-// COMMON CONFIGURATION
+// LEGACY CONFIGURATION (for backward compatibility)
 // ============================================================================
 
-/**
- * Base URLs for different environments
- */
-export const baseUrls = {
-  development: 'http://localhost:3000',
-  staging: process.env.STAGING_URL || 'https://staging.triggerr.com',
-  production: process.env.PRODUCTION_URL || 'https://triggerr.com',
-  test: process.env.TEST_URL || 'http://localhost:3000', // Add test environment URL
-} as const;
+import {
+  getCurrentEnvironment as getEnv,
+  isDevelopment as isDev,
+  isProduction as isProd,
+  baseUrls,
+} from "./lib/environment";
 
 /**
  * API configuration
  */
 export const apiConfig = {
-  version: 'v1',
+  version: "v1",
   timeout: 30000, // 30 seconds
   retries: 3,
-  baseUrl: baseUrls[getCurrentEnvironment()],
+  baseUrl: baseUrls[getEnv()],
 } as const;
 
 /**
@@ -91,125 +123,25 @@ export const dbConfig = {
   maxConnections: 20,
   connectionTimeout: 30000,
   idleTimeout: 600000, // 10 minutes
-  ssl: isProduction(),
+  ssl: isProd(),
 } as const;
 
-// ============================================================================
-// SECURITY CONFIGURATION
-// ============================================================================
-
-/**
- * Security-related configuration
- */
-export const securityConfig = {
-  // JWT settings
-  jwt: {
-    expiresIn: '24h',
-    refreshExpiresIn: '7d',
-    issuer: 'triggerr',
-  },
-
-  // Session settings
-  session: {
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    secure: isProduction(),
-    sameSite: 'lax' as const,
-  },
-
-  // CORS settings
-  cors: {
-    origins: isDevelopment()
-      ? ['http://localhost:3000', 'http://localhost:3001']
-      : [baseUrls[getCurrentEnvironment()]],
-    credentials: true,
-  },
-
-  // Rate limiting
-  rateLimit: {
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: isDevelopment() ? 1000 : 100, // requests per window
-  },
-} as const;
+// Legacy securityConfig removed - use individual exports from ./lib/security instead
 
 // ============================================================================
-// FEATURE FLAGS
+// COMMONLY USED CONFIGURATION (DIRECT EXPORTS)
 // ============================================================================
 
-/**
- * Feature flags for different environments
- */
-export const featureFlags = {
-  // PayGo integration
-  paygoEnabled: true,
-  paygoTestMode: !isProduction(),
-
-  // Stripe integration
-  stripeEnabled: true,
-
-  // Chat features
-  chatEnabled: true,
-  chatDebugMode: isDevelopment(),
-
-  // Monitoring and analytics
-  analyticsEnabled: isProduction(),
-  debugLogging: isDevelopment(),
-
-  // External API integrations
-  flightDataEnabled: true,
-  weatherDataEnabled: true,
-
-  // Experimental features
-  experimentalFeaturesEnabled: isDevelopment(),
-} as const;
+// Most commonly used utilities are already re-exported above
 
 // ============================================================================
-// EXTERNAL SERVICE CONFIGURATION
+// PACKAGE METADATA
 // ============================================================================
 
-/**
- * Configuration for external APIs and services
- */
-export const externalServices = {
-  // Flight data APIs
-  aviationStack: {
-    baseUrl: 'http://api.aviationstack.com/v1',
-    timeout: 10000,
-    retries: 2,
-  },
-
-  flightAware: {
-    baseUrl: 'https://aeroapi.flightaware.com/aeroapi',
-    timeout: 10000,
-    retries: 2,
-  },
-
-  openSky: {
-    baseUrl: 'https://opensky-network.org/api',
-    timeout: 15000,
-    retries: 1,
-  },
-
-  // Weather APIs
-  openWeather: {
-    baseUrl: 'https://api.openweathermap.org/data/2.5',
-    timeout: 5000,
-    retries: 2,
-  },
-
-  // LLM APIs
-  deepSeek: {
-    baseUrl: 'https://api.deepseek.com',
-    timeout: 30000,
-    retries: 1,
-  },
-} as const;
-
-// ============================================================================
-// PACKAGE INFO
-// ============================================================================
-
+export const CONFIG_PACKAGE_VERSION = "1.0.0";
+export const CONFIG_PACKAGE_NAME = "@triggerr/config";
 export const CONFIG_PACKAGE_INFO = {
-  name: '@triggerr/config',
-  version: '1.0.0',
-  description: 'Configuration management for triggerr platform',
+  name: "@triggerr/config",
+  version: "1.0.0",
+  description: "Configuration management for triggerr platform",
 } as const;
