@@ -1,6 +1,7 @@
 "use client";
 
 import { createAuthClient } from "better-auth/client";
+
 import {
   useEffect,
   useState,

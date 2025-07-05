@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, FC } from "react";
 import { useAuth, useAnonymousSession } from "@/lib/auth-client";
-import type { EscrowPurpose } from "@triggerr/core";
 import { fetchTravelImages, UnsplashImage } from "@/lib/image-fetcher";
+import React, { useState, useEffect, useCallback, FC } from "react";
+import type { EscrowPurpose } from "@triggerr/core";
 
 // Import Tab Components
 import SystemTab from "./components/SystemTab";

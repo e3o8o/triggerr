@@ -2,32 +2,26 @@
 // API SDK - POLICY SERVICE (PARAMETRIC MODEL)
 // ===========================================================================
 
-import type { ApiClient } from '../client';
-import type { ApiResponse } from '@triggerr/api-contracts';
-import { convertToQueryParams } from '../utils';
+import type { ApiClient } from "../client";
+import type { ApiResponse } from "@triggerr/api-contracts";
+import { convertToQueryParams } from "../utils";
 import type {
-  // DTOs from @triggerr/api-contracts/dtos/policy
-  Policy as PolicyDto,
-  ListUserPoliciesRequest as ListUserPoliciesRequestDto, // Used by UserService primarily
-  ListUserPoliciesResponse as ListUserPoliciesResponseDto,
-  AutomatedPayoutRecord as AutomatedPayoutRecordDto,
-  // GetPolicyDetailsRequestDto is available from '../services/types' if needed
-  // PolicySummaryDto is available from '../services/types' if needed
-  GetAutomatedPayoutRecordRequest as GetAutomatedPayoutRecordRequestDto,
-  ListPolicyAutomatedPayoutsRequest as ListPolicyAutomatedPayoutsRequestDto,
-  ListPolicyAutomatedPayoutsResponse as ListPolicyAutomatedPayoutsResponseDto,
-  GetPolicyTimelineRequest as GetPolicyTimelineRequestDto,
-  GetPolicyTimelineResponse as GetPolicyTimelineResponseDto,
-  // PolicyEventDto is available from '../services/types' if needed
-  CancelPolicyRequest as CancelPolicyRequestDto,
-  CancelPolicyResponse as CancelPolicyResponseDto,
-  // PolicyDocumentDto is available from '../services/types' if needed
-  AddPolicyDocumentRequest as AddPolicyDocumentRequestDto,
-  AddPolicyDocumentResponse as AddPolicyDocumentResponseDto,
-  ManuallyReviewPayoutRequest as ManuallyReviewPayoutRequestDto,
-  ManuallyReviewPayoutResponse as ManuallyReviewPayoutResponseDto,
-} from '@triggerr/api-contracts/dtos/policy';
-
+  PolicyType as Policy,
+  ListUserPoliciesRequest,
+  ListUserPoliciesResponse,
+  AutomatedPayoutRecord,
+  GetAutomatedPayoutRecordRequest,
+  ListPolicyAutomatedPayoutsRequest,
+  ListPolicyAutomatedPayoutsResponse,
+  GetPolicyTimelineRequest,
+  GetPolicyTimelineResponse,
+  CancelPolicyRequest,
+  CancelPolicyResponse,
+  AddPolicyDocumentRequest,
+  AddPolicyDocumentResponse,
+  ManuallyReviewPayoutRequest,
+  ManuallyReviewPayoutResponse,
+} from "@triggerr/api-contracts";
 
 /**
  * Service class for interacting with parametric Policy API endpoints.
@@ -36,7 +30,7 @@ import type {
  */
 export class PolicyService {
   private apiClient: ApiClient;
-  private readonly basePath = '/policies'; // Base path for policy endpoints
+  private readonly basePath = "/policies"; // Base path for policy endpoints
 
   constructor(apiClient: ApiClient) {
     this.apiClient = apiClient;
@@ -54,9 +48,9 @@ export class PolicyService {
   public async getPolicyDetails(
     policyIdentifier: string,
     // trackingNumber?: string, // The OpenAPI path is /policies/{policyIdentifier}, tracking number can be a query param
-  ): Promise<ApiResponse<PolicyDto>> {
+  ): Promise<ApiResponse<Policy>> {
     // const queryParams = trackingNumber ? { trackingNumber } : undefined;
-    return this.apiClient.get<PolicyDto>(
+    return this.apiClient.get<Policy>(
       `${this.basePath}/${encodeURIComponent(policyIdentifier)}`,
       // queryParams,
     );
@@ -72,12 +66,14 @@ export class PolicyService {
    */
   public async getPolicyTimeline(
     policyId: string,
-    params?: Omit<GetPolicyTimelineRequestDto, 'policyId'>,
-  ): Promise<ApiResponse<GetPolicyTimelineResponseDto>> {
+    params?: Omit<GetPolicyTimelineRequest, "policyId">,
+  ): Promise<ApiResponse<GetPolicyTimelineResponse>> {
     if (!policyId) {
-      throw new Error('PolicyService: policyId is required for getPolicyTimeline.');
+      throw new Error(
+        "PolicyService: policyId is required for getPolicyTimeline.",
+      );
     }
-    return this.apiClient.get<GetPolicyTimelineResponseDto>(
+    return this.apiClient.get<GetPolicyTimelineResponse>(
       `${this.basePath}/${policyId}/timeline`,
       convertToQueryParams(params),
     );
@@ -93,12 +89,14 @@ export class PolicyService {
    */
   public async listAutomatedPayouts(
     policyId: string,
-    params?: Omit<ListPolicyAutomatedPayoutsRequestDto, 'policyId'>,
-  ): Promise<ApiResponse<ListPolicyAutomatedPayoutsResponseDto>> {
+    params?: Omit<ListPolicyAutomatedPayoutsRequest, "policyId">,
+  ): Promise<ApiResponse<ListPolicyAutomatedPayoutsResponse>> {
     if (!policyId) {
-      throw new Error('PolicyService: policyId is required for listAutomatedPayouts.');
+      throw new Error(
+        "PolicyService: policyId is required for listAutomatedPayouts.",
+      );
     }
-    return this.apiClient.get<ListPolicyAutomatedPayoutsResponseDto>(
+    return this.apiClient.get<ListPolicyAutomatedPayoutsResponse>(
       `${this.basePath}/${policyId}/payouts`,
       params,
     );
@@ -112,8 +110,8 @@ export class PolicyService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async getAutomatedPayoutRecord(
-    params: GetAutomatedPayoutRecordRequestDto,
-  ): Promise<ApiResponse<AutomatedPayoutRecordDto | null>> {
+    params: GetAutomatedPayoutRecordRequest,
+  ): Promise<ApiResponse<AutomatedPayoutRecord | null>> {
     // The actual endpoint for this might vary. OpenAPI doesn't explicitly define a GET for a single payout record yet.
     // Assuming it might be something like /payouts/{payoutRecordId} or queried via policy.
     // For now, this method is a placeholder for that functionality.
@@ -121,19 +119,21 @@ export class PolicyService {
     // return this.apiClient.get<AutomatedPayoutRecordDto | null>(`/payouts`, params);
     // If it's /policies/{policyId}/payouts/{payoutRecordId}
     if (params.payoutRecordId && params.policyId) {
-         return this.apiClient.get<AutomatedPayoutRecordDto | null>(
-        `${this.basePath}/${params.policyId}/payouts/${params.payoutRecordId}`
+      return this.apiClient.get<AutomatedPayoutRecord | null>(
+        `${this.basePath}/${params.policyId}/payouts/${params.payoutRecordId}`,
       );
     } else if (params.payoutRecordId) {
-        // This path might not exist, depends on API design
-        return this.apiClient.get<AutomatedPayoutRecordDto | null>(
-        `/payouts/${params.payoutRecordId}` // Hypothetical path
+      // This path might not exist, depends on API design
+      return this.apiClient.get<AutomatedPayoutRecord | null>(
+        `/payouts/${params.payoutRecordId}`, // Hypothetical path
       );
     }
     // This implies an API that can find a single payout record for a policy if only policyId is given.
     // This usually makes more sense as part of listAutomatedPayouts with specific filters if a policy
     // can have multiple payouts.
-    throw new Error('getAutomatedPayoutRecord: Not fully implemented based on current OpenAPI. Requires specific endpoint for single payout record retrieval.');
+    throw new Error(
+      "getAutomatedPayoutRecord: Not fully implemented based on current OpenAPI. Requires specific endpoint for single payout record retrieval.",
+    );
   }
 
   /**
@@ -145,12 +145,15 @@ export class PolicyService {
    */
   public async cancelPolicy(
     policyId: string, // Assuming policyId is part of the path, e.g., /policies/{policyId}/cancel
-    request: Omit<CancelPolicyRequestDto, 'policyId'>,
-  ): Promise<ApiResponse<CancelPolicyResponseDto>> {
+    request: Omit<CancelPolicyRequest, "policyId">,
+  ): Promise<ApiResponse<CancelPolicyResponse>> {
     if (!policyId) {
-      throw new Error('PolicyService: policyId is required for cancelPolicy.');
+      throw new Error("PolicyService: policyId is required for cancelPolicy.");
     }
-    return this.apiClient.post<CancelPolicyResponseDto, Omit<CancelPolicyRequestDto, 'policyId'>>(
+    return this.apiClient.post<
+      CancelPolicyResponse,
+      Omit<CancelPolicyRequest, "policyId">
+    >(
       `${this.basePath}/${policyId}/cancel`, // Hypothetical path
       request,
     );
@@ -165,13 +168,18 @@ export class PolicyService {
    */
   public async addPolicyDocument(
     policyId: string, // Assuming policyId is part of the path
-    request: Omit<AddPolicyDocumentRequestDto, 'policyId'>,
-  ): Promise<ApiResponse<AddPolicyDocumentResponseDto>> {
-     if (!policyId) {
-      throw new Error('PolicyService: policyId is required for addPolicyDocument.');
+    request: Omit<AddPolicyDocumentRequest, "policyId">,
+  ): Promise<ApiResponse<AddPolicyDocumentResponse>> {
+    if (!policyId) {
+      throw new Error(
+        "PolicyService: policyId is required for addPolicyDocument.",
+      );
     }
     // Path could be /policies/{policyId}/documents
-    return this.apiClient.post<AddPolicyDocumentResponseDto, Omit<AddPolicyDocumentRequestDto, 'policyId'>>(
+    return this.apiClient.post<
+      AddPolicyDocumentResponse,
+      Omit<AddPolicyDocumentRequest, "policyId">
+    >(
       `${this.basePath}/${policyId}/documents`, // Hypothetical path
       request,
     );
@@ -187,13 +195,18 @@ export class PolicyService {
    */
   public async manuallyReviewPayout(
     payoutRecordId: string, // Assuming payoutRecordId is part of path, e.g. /admin/payouts/{payoutRecordId}/review
-    request: Omit<ManuallyReviewPayoutRequestDto, 'payoutRecordId'>,
-  ): Promise<ApiResponse<ManuallyReviewPayoutResponseDto>> {
+    request: Omit<ManuallyReviewPayoutRequest, "payoutRecordId">,
+  ): Promise<ApiResponse<ManuallyReviewPayoutResponse>> {
     if (!payoutRecordId) {
-      throw new Error('PolicyService: payoutRecordId is required for manuallyReviewPayout.');
+      throw new Error(
+        "PolicyService: payoutRecordId is required for manuallyReviewPayout.",
+      );
     }
     // This endpoint is likely under an /admin path
-    return this.apiClient.post<ManuallyReviewPayoutResponseDto, Omit<ManuallyReviewPayoutRequestDto, 'payoutRecordId'>>(
+    return this.apiClient.post<
+      ManuallyReviewPayoutResponse,
+      Omit<ManuallyReviewPayoutRequest, "payoutRecordId">
+    >(
       `/admin/payouts/${payoutRecordId}/review`, // Hypothetical admin path
       request,
     );
@@ -208,10 +221,10 @@ export class PolicyService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async listUserPolicies(
-    params?: ListUserPoliciesRequestDto, // This DTO might include userId for admin or be implicit for user
-  ): Promise<ApiResponse<ListUserPoliciesResponseDto>> {
+    params?: ListUserPoliciesRequest, // This DTO might include userId for admin or be implicit for user
+  ): Promise<ApiResponse<ListUserPoliciesResponse>> {
     // Path from OpenAPI is /user/policies
-    return this.apiClient.get<ListUserPoliciesResponseDto>(
+    return this.apiClient.get<ListUserPoliciesResponse>(
       `/user/policies`,
       convertToQueryParams(params),
     );

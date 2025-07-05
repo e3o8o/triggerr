@@ -71,6 +71,9 @@
       "path": "../../packages/core"
     },
     {
+      "path": "../../packages/blockchain"
+    },
+    {
       "path": "../../packages/api/contracts"
     },
     {

@@ -30,14 +30,15 @@ const mockEq = mock(() => "eq-condition");
 const mockAnd = mock(() => "and-condition");
 
 // Mock the modules
-mock.module("@triggerr/core/database", () => ({
-  db: mockDb,
-}));
-
-mock.module("@triggerr/core/database/schema", () => ({
-  userWallets: {
-    userId: "userId",
-    address: "address",
+mock.module("@triggerr/core", () => ({
+  Database: {
+    db: mockDb,
+  },
+  Schema: {
+    userWallets: {
+      userId: "userId",
+      address: "address",
+    },
   },
 }));
 

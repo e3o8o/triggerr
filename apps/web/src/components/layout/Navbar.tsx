@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { NavLink } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { NavBarProps } from "@/types/navigation";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import ThemeToggler from "@/components/theme/toggler";
 
 function useScroll(threshold: number = 50) {
@@ -124,8 +124,8 @@ export function Navbar({
               <div className="hidden md:flex items-center space-x-2">
                 {user?.image && (
                   <Image
-                    src={user.image || "/default-avatar.png"}
-                    alt={user.name || "User"}
+                    src={user?.image || "/default-avatar.png"}
+                    alt={user?.name || "User"}
                     className="h-8 w-8 rounded-full"
                     width={32}
                     height={32}

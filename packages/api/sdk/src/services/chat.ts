@@ -2,28 +2,26 @@
 // API SDK - CHAT SERVICE
 // ===========================================================================
 
-import type { ApiClient } from '../client';
+import type { ApiClient } from "../client";
 import type {
   ApiResponse,
-} from '@triggerr/api-contracts';
-import { convertToQueryParams } from '../utils';
-import type {
-  ChatMessageRequest as ChatMessageRequestDto,
-  ChatMessageResponse as ChatMessageResponseDto,
-  ConversationListRequest as ConversationListRequestDto,
-  ConversationListResponse as ConversationListResponseDto,
-  ConversationMessagesRequest as ConversationMessagesRequestDto,
-  ConversationMessagesResponse as ConversationMessagesResponseDto,
-  SyncAnonymousConversationRequest as SyncAnonymousConversationRequestDto,
-  SyncAnonymousConversationResponse as SyncAnonymousConversationResponseDto,
-} from '@triggerr/api-contracts/dtos/chat';
+  ChatMessageRequest,
+  ChatMessageResponse,
+  ConversationListRequest,
+  ConversationListResponse,
+  ConversationMessagesRequest,
+  ConversationMessagesResponse,
+  SyncAnonymousConversationRequest,
+  SyncAnonymousConversationResponse,
+} from "@triggerr/api-contracts";
+import { convertToQueryParams } from "../utils";
 
 /**
  * Service class for interacting with the Chat API endpoints.
  */
 export class ChatService {
   private apiClient: ApiClient;
-  private readonly basePath = '/chat'; // Base path for chat endpoints
+  private readonly basePath = "/chat"; // Base path for chat endpoints
 
   constructor(apiClient: ApiClient) {
     this.apiClient = apiClient;
@@ -37,9 +35,9 @@ export class ChatService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async sendMessage(
-    request: ChatMessageRequestDto,
-  ): Promise<ApiResponse<ChatMessageResponseDto>> {
-    return this.apiClient.post<ChatMessageResponseDto, ChatMessageRequestDto>(
+    request: ChatMessageRequest,
+  ): Promise<ApiResponse<ChatMessageResponse>> {
+    return this.apiClient.post<ChatMessageResponse, ChatMessageRequest>(
       `${this.basePath}/message`,
       request,
     );
@@ -53,9 +51,9 @@ export class ChatService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async listConversations(
-    params?: ConversationListRequestDto,
-  ): Promise<ApiResponse<ConversationListResponseDto>> {
-    return this.apiClient.get<ConversationListResponseDto>(
+    params?: ConversationListRequest,
+  ): Promise<ApiResponse<ConversationListResponse>> {
+    return this.apiClient.get<ConversationListResponse>(
       `${this.basePath}/conversations`,
       convertToQueryParams(params),
     );
@@ -73,12 +71,14 @@ export class ChatService {
    */
   public async getConversationMessages(
     conversationId: string,
-    params?: Omit<ConversationMessagesRequestDto, 'conversationId'>, // conversationId is part of path
-  ): Promise<ApiResponse<ConversationMessagesResponseDto>> {
+    params?: Omit<ConversationMessagesRequest, "conversationId">, // conversationId is part of path
+  ): Promise<ApiResponse<ConversationMessagesResponse>> {
     if (!conversationId) {
-      throw new Error('ChatService: conversationId is required for getConversationMessages.');
+      throw new Error(
+        "ChatService: conversationId is required for getConversationMessages.",
+      );
     }
-    return this.apiClient.get<ConversationMessagesResponseDto>(
+    return this.apiClient.get<ConversationMessagesResponse>(
       `${this.basePath}/conversations/${conversationId}/messages`,
       convertToQueryParams(params),
     );
@@ -94,15 +94,15 @@ export class ChatService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async syncAnonymousConversations(
-    request: SyncAnonymousConversationRequestDto,
-  ): Promise<ApiResponse<SyncAnonymousConversationResponseDto>> {
+    request: SyncAnonymousConversationRequest,
+  ): Promise<ApiResponse<SyncAnonymousConversationResponse>> {
     // This endpoint might be under a user-specific path, e.g., /user/chat/sync-conversations
     // Adjust the path if necessary based on actual API design.
     // For now, assuming a hypothetical path, as it's not explicitly in the OpenAPI paths yet.
     // A common pattern is to put user-specific actions under /user/*
     return this.apiClient.post<
-      SyncAnonymousConversationResponseDto,
-      SyncAnonymousConversationRequestDto
+      SyncAnonymousConversationResponse,
+      SyncAnonymousConversationRequest
     >(`/user/chat/sync-anonymous-data`, request); // Example path, adjust as needed
   }
 

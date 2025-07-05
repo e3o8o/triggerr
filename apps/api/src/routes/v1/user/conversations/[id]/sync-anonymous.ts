@@ -1,5 +1,6 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
 
+
 /**
  * Handles POST requests for the /api/v1/user/conversations/[id]/sync-anonymous endpoint.
  *
@@ -15,7 +16,7 @@ export async function handleSyncAnonymousConversation(req: Request): Promise<Res
   console.log(`[API Sync Anonymous] Received request for conversation: ${conversationId} by user: ${userId}`);
 
   // TODO: Implement the business logic for associating an anonymous conversation
-  // with a newly authenticated user. This will involve updating the `userId` on the
+  // with a newly authenticated Schema.userSchema. This will involve updating the `userId` on the
   // conversation record and potentially merging other related data.
 
   const responseData = {

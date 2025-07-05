@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { ArrowDown, ArrowUp, QrCode } from "lucide-react";
-import type { EscrowPurpose } from "@triggerr/core";
 import { createHttpClient } from "@triggerr/api-sdk";
+
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import type { EscrowPurpose } from "@triggerr/core";
 
 // --- TYPE DEFINITIONS ---
 
@@ -249,7 +250,7 @@ const WalletTab: React.FC<WalletTabProps> = ({
       }
     } catch (error) {
       console.error("Error creating escrow:", error);
-      alert("Failed to create escrow. Please try again.");
+      alert("Failed to create Schema.escrowSchema. Please try again.");
     }
   };
 
@@ -272,7 +273,7 @@ const WalletTab: React.FC<WalletTabProps> = ({
       }
     } catch (error) {
       console.error("Error fulfilling escrow:", error);
-      alert("Failed to fulfill escrow. Please try again.");
+      alert("Failed to fulfill Schema.escrowSchema. Please try again.");
     }
   };
 
@@ -295,7 +296,7 @@ const WalletTab: React.FC<WalletTabProps> = ({
       }
     } catch (error) {
       console.error("Error releasing escrow:", error);
-      alert("Failed to release escrow. Please try again.");
+      alert("Failed to release Schema.escrowSchema. Please try again.");
     }
   };
 

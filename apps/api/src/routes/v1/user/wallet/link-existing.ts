@@ -1,7 +1,7 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { linkExistingWalletRequestSchema } from "@triggerr/api-contracts/validators/wallet";
+import { Wallet } from "@triggerr/api-contracts";
 import { WalletService } from "@triggerr/wallet-service";
-import { getAuthContext } from "@triggerr/core/auth";
+import { Auth } from "@triggerr/core";
 import type { BlockchainProviderName } from "@triggerr/blockchain-interface";
 import { isAddress } from "viem";
 
@@ -23,7 +23,7 @@ export async function handleLinkExistingWallet(
 
   try {
     // 1. Get authenticated user context
-    const authContext = await getAuthContext(request.headers);
+    const authContext = await Auth.getAuthContext(request.headers);
     if (!authContext.isAuthenticated || !authContext.user?.id) {
       console.warn(
         `[API Link Existing Wallet] [${requestId}] User not authenticated.`,
@@ -42,7 +42,8 @@ export async function handleLinkExistingWallet(
 
     // 2. Parse and validate request body
     const body = await request.json();
-    const validationResult = linkExistingWalletRequestSchema.safeParse(body);
+    const validationResult =
+      Wallet.validators.linkExistingRequest.safeParse(body);
 
     if (!validationResult.success) {
       console.warn(

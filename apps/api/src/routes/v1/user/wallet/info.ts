@@ -1,13 +1,13 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { userWallets } from "@triggerr/core/database/schema";
+import { Auth } from "@triggerr/core";
+import { Database } from "@triggerr/core";
+import { Schema } from "@triggerr/core";
 import { eq } from "drizzle-orm";
 import { WalletService } from "@triggerr/wallet-service";
 import {
   formatBalanceDisplay,
   formatAddressDisplay,
-} from "@triggerr/paygo-adapter/src/utils";
+} from "@triggerr/blockchain";
 import { isAddress, type Hex } from "viem";
 import type { BlockchainProviderName } from "@triggerr/blockchain-interface";
 
@@ -23,7 +23,7 @@ export async function handleGetWalletInfo(
   console.log(`[API Get Wallet Info] [${requestId}] Received request.`);
 
   // 1. Authenticate user
-  const authContext = await getAuthContext(
+  const authContext = await Auth.getAuthContext(
     req.headers,
     req.headers.get("Cookie") || undefined,
   );
@@ -46,15 +46,15 @@ export async function handleGetWalletInfo(
   );
 
   // Set RLS context for any potential subsequent database operations
-  await setRLSContext(authContext);
+  await Auth.setRLSContext(authContext);
 
   try {
     // 2. Fetch user's wallet from the database
     // 2. Fetch user's wallet from the database
     // For now, we assume the user has one primary wallet.
     // In the future, this could be extended to select a specific wallet.
-    const wallet = await db.query.userWallets.findFirst({
-      where: eq(userWallets.userId, userId),
+    const wallet = await Database.db.query.userWallets.findFirst({
+      where: eq(Schema.userWalletsSchema.userId, userId),
     });
 
     if (!wallet) {

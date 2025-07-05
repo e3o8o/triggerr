@@ -1,6 +1,5 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { db } from "@triggerr/core/database";
-import { user } from "@triggerr/core/database/schema";
+import { Database, Schema } from "@triggerr/core";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -53,8 +52,8 @@ export async function handleCheckExistence(
       `[API Check Existence] [${requestId}] Checking for user with email: ${email}`,
     );
 
-    const existingUser = await db.query.user.findFirst({
-      where: eq(user.email, email.toLowerCase()),
+    const existingUser = await Database.db.query.user.findFirst({
+      where: eq(Schema.userSchema.email, email.toLowerCase()),
       columns: {
         id: true, // Only select the ID for efficiency
       },

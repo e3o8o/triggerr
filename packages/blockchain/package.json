@@ -1,0 +1,21 @@
+{
+  "name": "@triggerr/blockchain",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Blockchain utilities and interfaces for Triggerr - Aggregates PayGo adapter, blockchain interface, and service registry",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf .turbo dist"
+  },
+  "dependencies": {
+    "@triggerr/paygo-adapter": "workspace:*",
+    "@triggerr/blockchain-interface": "workspace:*",
+    "@triggerr/service-registry": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

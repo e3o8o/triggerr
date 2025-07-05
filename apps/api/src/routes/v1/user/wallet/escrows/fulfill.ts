@@ -2,9 +2,9 @@ import { createApiError, createApiResponse } from "@triggerr/api-contracts";
 import { z } from "zod";
 import { EscrowManager } from "@triggerr/escrow-engine";
 
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { userWallets, escrow } from "@triggerr/core/database/schema";
+import { Auth } from "@triggerr/core";
+import { Database } from "@triggerr/core";
+import { Schema } from "@triggerr/core";
 import { eq, and } from "drizzle-orm";
 import type { Hex } from "viem";
 
@@ -36,7 +36,7 @@ export async function handleFulfillEscrowRequest(
 
   try {
     // 1. Authenticate user and set RLS context
-    const authContext = await getAuthContext(
+    const authContext = await Auth.getAuthContext(
       request.headers,
       request.headers.get("Cookie") || undefined,
     );
@@ -61,7 +61,7 @@ export async function handleFulfillEscrowRequest(
     );
 
     // Set RLS context for database operations
-    await setRLSContext(authContext);
+    await Auth.setRLSContext(authContext);
 
     // 2. Parse and validate request body
     const body = await request.json();
@@ -87,14 +87,17 @@ export async function handleFulfillEscrowRequest(
     const { escrowId, proof } = data;
 
     // 3. Get user's primary wallet to verify they can fulfill the escrow
-    const userWalletResult = await db
+    const userWalletResult = await Database.db
       .select({
-        id: userWallets.id,
-        address: userWallets.address,
+        id: Schema.userWalletsSchema.id,
+        address: Schema.userWalletsSchema.address,
       })
-      .from(userWallets)
+      .from(Schema.userWalletsSchema)
       .where(
-        and(eq(userWallets.userId, userId), eq(userWallets.isPrimary, true)),
+        and(
+          eq(Schema.userWalletsSchema.userId, userId),
+          eq(Schema.userWalletsSchema.isPrimary, true),
+        ),
       )
       .limit(1);
 
@@ -125,8 +128,8 @@ export async function handleFulfillEscrowRequest(
     const fulfillerAddress = userWallet.address as Hex;
 
     // 4. Verify the escrow exists and user is authorized to fulfill it
-    const escrowRecord = await db.query.escrow.findFirst({
-      where: eq(escrow.blockchainId, escrowId),
+    const escrowRecord = await Database.db.query.escrow.findFirst({
+      where: eq(Schema.escrowSchema.blockchainId, escrowId),
     });
 
     if (!escrowRecord) {
@@ -204,8 +207,8 @@ export async function handleFulfillEscrowRequest(
     // 7. Fetch the wallet of the escrow creator to correctly record the 'from' address
     let fromAddress: string = "system"; // Default fallback
     if (escrowRecord.userId) {
-      const creatorWallet = await db.query.userWallets.findFirst({
-        where: eq(userWallets.userId, escrowRecord.userId),
+      const creatorWallet = await Database.db.query.userWallets.findFirst({
+        where: eq(Schema.userWalletsSchema.userId, escrowRecord.userId),
         columns: { address: true },
       });
       if (creatorWallet) {

@@ -1,6 +1,7 @@
+import { Send } from "lucide-react";
+
 import React, { useState } from "react";
 import Image from "next/image";
-import { Send } from "lucide-react";
 import type { UnsplashImage } from "@/lib/image-fetcher";
 
 // --- TYPE DEFINITIONS ---

@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
 import { Lock, CreditCard, CheckCircle, AlertTriangle } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
+
+import React, { useState, useEffect } from "react";
 
 // --- TYPE DEFINITIONS ---
 

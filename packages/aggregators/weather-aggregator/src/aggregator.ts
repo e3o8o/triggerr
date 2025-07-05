@@ -19,7 +19,7 @@ import {
 } from "./conflict-resolver";
 
 export interface WeatherAggregatorConfig {
-  cacheManager?: CacheManager<CanonicalWeatherObservation>;
+  cacheManager?: InstanceType<typeof CacheManager<CanonicalWeatherObservation>>;
   sourceRouter?: WeatherSourceRouter;
   conflictResolver?: WeatherConflictResolver;
   maxSources?: number;
@@ -42,7 +42,9 @@ export interface WeatherAggregationResult {
 }
 
 export class WeatherAggregator {
-  private cacheManager: CacheManager<CanonicalWeatherObservation>;
+  private cacheManager: InstanceType<
+    typeof CacheManager<CanonicalWeatherObservation>
+  >;
   private sourceRouter: WeatherSourceRouter;
   private conflictResolver: WeatherConflictResolver;
   private maxSources: number;

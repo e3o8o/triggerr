@@ -1,0 +1,44 @@
+{
+  "totalViolations": 0,
+  "violationsByCategory": {
+    "services": 0,
+    "integrations": 0,
+    "aggregators": 0,
+    "blockchain": 0
+  },
+  "violationsBySeverity": {
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "violationsByPackage": {},
+  "violations": [],
+  "auditDate": "2025-07-04T23:33:22.896Z",
+  "phase4Packages": {
+    "services": [
+      "policy-engine",
+      "wallet-service",
+      "payout-engine",
+      "escrow-engine",
+      "quote-engine"
+    ],
+    "integrations": [
+      "google-weather-adapter",
+      "stripe-adapter",
+      "opensky-adapter",
+      "flightaware-adapter",
+      "aviationstack-adapter"
+    ],
+    "aggregators": [
+      "weather-aggregator",
+      "data-router",
+      "flight-aggregator"
+    ],
+    "blockchain": [
+      "blockchain-interface",
+      "paygo-adapter",
+      "service-registry"
+    ]
+  }
+}

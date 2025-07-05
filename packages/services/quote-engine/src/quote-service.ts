@@ -9,7 +9,7 @@
  * 5. Returning structured quote responses
  */
 
-import type { Database } from "@triggerr/core/database";
+import { Database, Schema } from "@triggerr/core";
 import type { Logger } from "@triggerr/core";
 import {
   DataRouter,
@@ -22,8 +22,7 @@ import type {
   StandardFlightStatus,
   StandardWeatherCondition,
 } from "@triggerr/shared";
-import { db } from "@triggerr/core/database";
-import { quote as quoteTable } from "@triggerr/core/database/schema";
+
 import { generateId } from "@triggerr/core/utils";
 
 // Request and Response Types
@@ -520,7 +519,7 @@ export class QuoteService {
       // Save the primary quote (use the first/best option)
       const primaryQuote = quoteOptions[0];
 
-      await db.insert(quoteTable).values({
+      await Database.db.insert(Schema.quote).values({
         id: quoteId,
         userId: request.userId || null,
         providerId: "provider_triggerr_direct", // Default provider

@@ -1,13 +1,8 @@
 import { EscrowManager, EscrowEngineFactory } from "@triggerr/escrow-engine";
 import { BlockchainServiceRegistry } from "@triggerr/service-registry";
-import { db, eq, and, inArray, desc } from "@triggerr/core/database";
-import {
-  policy,
-  escrow,
-  payout,
-  userWallets,
-  user,
-} from "@triggerr/core/database/schema";
+import { Database, Schema } from "@triggerr/core";
+import { eq, and, inArray, desc } from "drizzle-orm";
+
 import type { Hex } from "viem";
 
 /**
@@ -234,8 +229,8 @@ export class PayoutEngine {
       console.log(`[PayoutEngine] Fetching policy ${policyId} from database`);
 
       // Use drizzle query with relations to get policy data
-      const policyRecord = await db.query.policy.findFirst({
-        where: eq(policy.id, policyId),
+      const policyRecord = await Database.db.query.policy.findFirst({
+        where: eq(Schema.policy.id, policyId),
         with: {
           user: true,
           provider: true,
@@ -282,16 +277,16 @@ export class PayoutEngine {
       }
 
       // Fetch user's primary wallet from database
-      const userWalletResult = await db
+      const userWalletResult = await Database.db
         .select({
-          id: userWallets.id,
-          address: userWallets.address,
+          id: Schema.userWallets.id,
+          address: Schema.userWallets.address,
         })
-        .from(userWallets)
+        .from(Schema.userWallets)
         .where(
           and(
-            eq(userWallets.userId, policyRecord.userId),
-            eq(userWallets.isPrimary, true),
+            eq(Schema.userWallets.userId, policyRecord.userId),
+            eq(Schema.userWallets.isPrimary, true),
           ),
         )
         .limit(1);
@@ -463,7 +458,7 @@ export class PayoutEngine {
       // 2. Record the payout in database
       const payoutId = crypto.randomUUID();
 
-      await db.insert(payout).values({
+      await Database.db.insert(Schema.payout).values({
         id: payoutId,
         policyId: policyRecord.id,
         escrowId: primaryEscrow.id,
@@ -485,26 +480,26 @@ export class PayoutEngine {
       );
 
       // 3. Update policy status to CLAIMED
-      await db
-        .update(policy)
+      await Database.db
+        .update(Schema.policy)
         .set({
           status: "CLAIMED",
           updatedAt: new Date(),
         })
-        .where(eq(policy.id, policyRecord.id));
+        .where(eq(Schema.policy.id, policyRecord.id));
 
       console.log(
         `[PayoutEngine] [${requestId}] Policy status updated to CLAIMED`,
       );
 
       // 4. Update escrow status to RELEASED
-      await db
-        .update(escrow)
+      await Database.db
+        .update(Schema.escrow)
         .set({
           status: "RELEASED",
           updatedAt: new Date(),
         })
-        .where(eq(escrow.id, primaryEscrow.id));
+        .where(eq(Schema.escrow.id, primaryEscrow.id));
 
       console.log(
         `[PayoutEngine] [${requestId}] Escrow status updated to RELEASED`,
@@ -523,7 +518,7 @@ export class PayoutEngine {
       // Try to record failed payout attempt
       try {
         const failedPayoutId = crypto.randomUUID();
-        await db.insert(payout).values({
+        await Database.db.insert(Schema.payout).values({
           id: failedPayoutId,
           policyId: policyRecord.id,
           escrowId: primaryEscrow.id,
@@ -571,23 +566,23 @@ export class PayoutEngine {
         `[PayoutEngine] Fetching payout history for policies: ${policyIds.join(", ")}`,
       );
 
-      const payoutHistory = await db
+      const payoutHistory = await Database.db
         .select({
-          id: payout.id,
-          policyId: payout.policyId,
-          amount: payout.amount,
-          status: payout.status,
-          reason: payout.reason,
-          txHash: payout.txHash,
-          processedAt: payout.processedAt,
-          createdAt: payout.createdAt,
-          updatedAt: payout.updatedAt,
-          errorMessage: payout.errorMessage,
-          metadata: payout.metadata,
+          id: Schema.payout.id,
+          policyId: Schema.payout.policyId,
+          amount: Schema.payout.amount,
+          status: Schema.payout.status,
+          reason: Schema.payout.reason,
+          txHash: Schema.payout.txHash,
+          processedAt: Schema.payout.processedAt,
+          createdAt: Schema.payout.createdAt,
+          updatedAt: Schema.payout.updatedAt,
+          errorMessage: Schema.payout.errorMessage,
+          metadata: Schema.payout.metadata,
         })
-        .from(payout)
-        .where(inArray(payout.policyId, policyIds))
-        .orderBy(desc(payout.createdAt));
+        .from(Schema.payout)
+        .where(inArray(Schema.payout.policyId, policyIds))
+        .orderBy(desc(Schema.payout.createdAt));
 
       console.log(
         `[PayoutEngine] Found ${payoutHistory.length} payout records`,
@@ -628,13 +623,13 @@ export class PayoutEngine {
         `[PayoutEngine] Calculating statistics for policies: ${policyIds.join(", ")}`,
       );
 
-      const payoutRecords = await db
+      const payoutRecords = await Database.db
         .select({
-          status: payout.status,
-          amount: payout.amount,
+          status: Schema.payout.status,
+          amount: Schema.payout.amount,
         })
-        .from(payout)
-        .where(inArray(payout.policyId, policyIds));
+        .from(Schema.payout)
+        .where(inArray(Schema.payout.policyId, policyIds));
 
       const stats = payoutRecords.reduce(
         (acc, record) => {

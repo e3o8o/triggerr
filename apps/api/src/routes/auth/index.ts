@@ -1,4 +1,4 @@
-import { auth } from "@triggerr/core/auth";
+import { Auth } from "@triggerr/core";
 
 /**
  * Handles authentication requests for the Bun API server.
@@ -10,7 +10,7 @@ export async function handleAuthRequest(request: Request): Promise<Response> {
     // Pass the original request directly to the better-auth handler.
     // The better-auth handler is designed to parse the full request URL
     // based on its internal configuration (e.g., baseURL).
-    const response = await auth.handler(request);
+    const response = await Auth.auth.handler(request);
 
     return response;
   } catch (error) {

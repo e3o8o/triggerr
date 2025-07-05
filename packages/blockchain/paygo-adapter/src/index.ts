@@ -4,7 +4,7 @@
 
 /**
  * PayGo Adapter - Clean interface for @witnessco/paygo-ts-client
- * 
+ *
  * This module serves as a proxy re-export and wrapper for the PayGo client,
  * working around known TypeScript declaration issues in the upstream package.
  */
@@ -14,6 +14,8 @@ export {
   safePayGoCall,
   convertToPayGoAmount,
   convertFromPayGoAmount,
+  formatBalanceDisplay,
+  formatAddressDisplay,
 } from "./utils";
 export type { SafePayGoCallResult } from "./utils";
 

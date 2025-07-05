@@ -1,5 +1,6 @@
 import { createApiResponse } from "@triggerr/api-contracts";
 
+
 /**
  * Handles POST requests for the /api/v1/user/policies/purchase endpoint.
  *
@@ -13,7 +14,7 @@ export async function handleUserPolicyPurchase(req: Request): Promise<Response> 
 
   // TODO:
   // 1. Validate request body (e.g., quoteId, payment method).
-  // 2. Look up the quote in the database and verify it's still valid for this user.
+  // 2. Look up the quote in the database and verify it's still valid for this Schema.userSchema.
   // 3. Create a policy record in the database with a 'pending_payment' status.
   // 4. Initiate a Stripe payment session.
   // 5. On successful payment webhook, fund the policy escrow via PayGo.

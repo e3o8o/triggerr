@@ -14,9 +14,7 @@ import {
   getCheckoutSession,
 } from "./payment-service";
 import { stripeConfig, stripeSettings } from "@triggerr/config";
-import { edgeDb } from "@triggerr/core/database/edge";
-import { policy, policyEvent, payout } from "@triggerr/core/database/schema";
-import { eq } from "drizzle-orm";
+import { edgeDb, Schema, eq } from "@triggerr/core";
 import type Stripe from "stripe";
 
 export interface WebhookEventResult {
@@ -80,7 +78,7 @@ async function handleCheckoutSessionCompleted(
   try {
     // Find the policy in our database
     const policyRecord = await edgeDb.query.policy.findFirst({
-      where: eq(policy.id, policyId!),
+      where: eq(Schema.policy.id, policyId!),
     });
 
     if (!policyRecord) {
@@ -106,12 +104,12 @@ async function handleCheckoutSessionCompleted(
 
     // Update policy status to ACTIVE
     await edgeDb
-      .update(policy)
+      .update(Schema.policy)
       .set({
         status: "ACTIVE",
         updatedAt: new Date(),
       })
-      .where(eq(policy.id, policyId!));
+      .where(eq(Schema.policy.id, policyId!));
 
     // Create policy events for audit trail
     const eventData = {
@@ -123,7 +121,7 @@ async function handleCheckoutSessionCompleted(
       paymentStatus: session.payment_status,
     };
 
-    await edgeDb.insert(policyEvent).values([
+    await edgeDb.insert(Schema.policyEvent).values([
       {
         policyId: policyId!,
         type: "PAYMENT_RECEIVED",
@@ -188,7 +186,7 @@ async function handleCheckoutSessionExpired(
 
   try {
     // Log the session expiration
-    await edgeDb.insert(policyEvent).values({
+    await edgeDb.insert(Schema.policyEvent).values({
       policyId: policyId!,
       type: "PAYMENT_PENDING",
       notes: `Stripe checkout session expired without payment. Session: ${session.id}`,
@@ -237,7 +235,7 @@ async function handlePaymentIntentSucceeded(
 
   try {
     // Log the successful payment intent
-    await edgeDb.insert(policyEvent).values({
+    await edgeDb.insert(Schema.policyEvent).values({
       policyId,
       type: "PAYMENT_RECEIVED",
       notes: `Payment intent succeeded. Amount: ${paymentIntent.amount} ${paymentIntent.currency?.toUpperCase()}`,
@@ -292,7 +290,7 @@ async function handlePaymentIntentFailed(
       paymentIntent.last_payment_error?.message || "Unknown payment failure";
 
     // Log the payment failure
-    await edgeDb.insert(policyEvent).values({
+    await edgeDb.insert(Schema.policyEvent).values({
       policyId,
       type: "PAYOUT_FAILED",
       notes: `Payment intent failed. Reason: ${failureReason}`,
@@ -351,7 +349,7 @@ async function handleChargeDisputeCreated(
 
   try {
     // Log the dispute
-    await edgeDb.insert(policyEvent).values({
+    await edgeDb.insert(Schema.policyEvent).values({
       policyId,
       type: "REFUND_PROCESSED",
       notes: `Payment disputed. Reason: ${dispute.reason}. Amount: ${dispute.amount} ${dispute.currency?.toUpperCase()}`,

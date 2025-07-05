@@ -232,6 +232,28 @@ export const policyEventSchema = z.object({
   details: z.record(z.any()).optional(),
 });
 
+export const beneficiarySchema = z.object({
+  id: z.string().uuid(),
+  policyId: z.string().uuid(),
+  name: z.string().min(1).max(255),
+  email: z.string().email().optional(),
+  relationship: z.string().max(100).optional(),
+  percentage: z.number().int().min(0).max(100),
+  type: beneficiaryTypeSchema,
+  createdAt: z.string().datetime({ precision: 0, offset: true }),
+  updatedAt: z.string().datetime({ precision: 0, offset: true }),
+});
+
+export const endorsementSchema = z.object({
+  id: z.string().uuid(),
+  policyId: z.string().uuid(),
+  type: endorsementTypeSchema,
+  description: z.string().min(1),
+  effectiveDate: z.string().datetime({ precision: 0, offset: true }),
+  createdAt: z.string().datetime({ precision: 0, offset: true }),
+  details: z.record(z.any()).optional(),
+});
+
 // ============================================================================
 // API REQUEST & RESPONSE SCHEMAS
 // ============================================================================
@@ -417,3 +439,6 @@ export type ManuallyReviewPayoutRequest = z.infer<
 export type ManuallyReviewPayoutResponse = z.infer<
   typeof manuallyReviewPayoutResponseSchema
 >;
+
+export type Beneficiary = z.infer<typeof beneficiarySchema>;
+export type Endorsement = z.infer<typeof endorsementSchema>;

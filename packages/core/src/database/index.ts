@@ -7,7 +7,7 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
   throw new Error(
-    "DATABASE_URL environment variable is required. Please set it in your .env file."
+    "DATABASE_URL environment variable is required. Please set it in your .env file.",
   );
 }
 
@@ -17,15 +17,28 @@ const pool = new Pool({
 });
 
 // Create Drizzle instance with schema
-export const db = drizzle(pool, { 
+export const db = drizzle(pool, {
   schema,
-  logger: process.env.NODE_ENV === "development"
+  logger: process.env.NODE_ENV === "development",
 });
+
+// Export edge database for edge runtime compatibility
+export { edgeDb } from "./edge";
 
 // Export types for use in other packages
 export type Database = typeof db;
 export * from "./schema";
 
 // Re-export commonly used Drizzle utilities
-export { eq, and, or, not, isNull, isNotNull, inArray, notInArray, sql } from "drizzle-orm";
+export {
+  eq,
+  and,
+  or,
+  not,
+  isNull,
+  isNotNull,
+  inArray,
+  notInArray,
+  sql,
+} from "drizzle-orm";
 export { desc, asc } from "drizzle-orm";

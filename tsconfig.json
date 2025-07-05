@@ -62,6 +62,9 @@
       "path": "./packages/api/sdk"
     },
     {
+      "path": "./packages/blockchain"
+    },
+    {
       "path": "./packages/blockchain/blockchain-interface"
     },
     {

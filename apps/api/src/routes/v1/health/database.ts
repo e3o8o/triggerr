@@ -1,5 +1,5 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { db } from "@triggerr/core/database";
+import { Database } from "@triggerr/core";
 import { sql } from "drizzle-orm";
 
 /**
@@ -23,7 +23,7 @@ export async function handleDatabaseHealthCheck(
 
   try {
     // Test basic connectivity with a simple query
-    const testQuery = await db.execute(
+    const testQuery = await Database.db.execute(
       sql`SELECT 1 as health_check, NOW() as timestamp`,
     );
     const responseTime = Date.now() - startTime;

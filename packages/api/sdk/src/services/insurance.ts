@@ -2,22 +2,19 @@
 // API SDK - INSURANCE SERVICE
 // ===========================================================================
 
-import type { ApiClient } from '../client';
-import type { ApiResponse } from '@triggerr/api-contracts';
-import { convertToQueryParams } from '../utils';
+import type { ApiClient } from "../client";
 import type {
-  InsuranceQuoteRequest as InsuranceQuoteRequestDto,
-  InsuranceQuoteResponse as InsuranceQuoteResponseDto,
-  InsuranceProductsResponse as InsuranceProductsResponseDto,
-  PolicyPurchaseRequest as PolicyPurchaseRequestDto,
-  PolicyPurchaseResponse as PolicyPurchaseResponseDto,
-  AddToCartRequest as AddToCartRequestDto,
-  AddToCartResponse as AddToCartResponseDto,
-  // Assuming a DTO for listing products might not have complex query params
-  // or they are simple enough to be passed as an object.
-  // If InsuranceProductsListRequestDto exists in api-contracts, import it.
-} from '@triggerr/api-contracts/dtos/insurance'; // Importing DTOs from the specific dtos path
-import type { PaginationRequest } from '@triggerr/api-contracts/dtos/common';
+  ApiResponse,
+  PaginationRequest,
+  InsuranceQuoteRequest,
+  InsuranceQuoteResponse,
+  InsuranceProductsResponse,
+  PolicyPurchaseRequest,
+  PolicyPurchaseResponse,
+  AddToCartRequest,
+  AddToCartResponse,
+} from "@triggerr/api-contracts";
+import { convertToQueryParams } from "../utils";
 
 /**
  * Service class for interacting with the Insurance API endpoints,
@@ -25,7 +22,7 @@ import type { PaginationRequest } from '@triggerr/api-contracts/dtos/common';
  */
 export class InsuranceService {
   private apiClient: ApiClient;
-  private readonly basePath = '/insurance'; // Base path for insurance endpoints
+  private readonly basePath = "/insurance"; // Base path for insurance endpoints
 
   constructor(apiClient: ApiClient) {
     this.apiClient = apiClient;
@@ -42,8 +39,8 @@ export class InsuranceService {
    */
   public async listProducts(
     params?: PaginationRequest & { productType?: string; tier?: string }, // Inline type for example
-  ): Promise<ApiResponse<InsuranceProductsResponseDto>> {
-    return this.apiClient.get<InsuranceProductsResponseDto>(
+  ): Promise<ApiResponse<InsuranceProductsResponse>> {
+    return this.apiClient.get<InsuranceProductsResponse>(
       `${this.basePath}/products`,
       convertToQueryParams(params),
     );
@@ -57,12 +54,12 @@ export class InsuranceService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async getQuote(
-    request: InsuranceQuoteRequestDto,
-  ): Promise<ApiResponse<InsuranceQuoteResponseDto>> {
-    return this.apiClient.post<
-      InsuranceQuoteResponseDto,
-      InsuranceQuoteRequestDto
-    >(`${this.basePath}/quote`, request);
+    request: InsuranceQuoteRequest,
+  ): Promise<ApiResponse<InsuranceQuoteResponse>> {
+    return this.apiClient.post<InsuranceQuoteResponse, InsuranceQuoteRequest>(
+      `${this.basePath}/quote`,
+      request,
+    );
   }
 
   /**
@@ -73,9 +70,9 @@ export class InsuranceService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async addToCart(
-    request: AddToCartRequestDto,
-  ): Promise<ApiResponse<AddToCartResponseDto>> {
-    return this.apiClient.post<AddToCartResponseDto, AddToCartRequestDto>(
+    request: AddToCartRequest,
+  ): Promise<ApiResponse<AddToCartResponse>> {
+    return this.apiClient.post<AddToCartResponse, AddToCartRequest>(
       `${this.basePath}/cart/add`,
       request,
     );
@@ -90,15 +87,15 @@ export class InsuranceService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async purchasePolicy(
-    request: PolicyPurchaseRequestDto,
-  ): Promise<ApiResponse<PolicyPurchaseResponseDto>> {
+    request: PolicyPurchaseRequest,
+  ): Promise<ApiResponse<PolicyPurchaseResponse>> {
     // Note: The OpenAPI spec has this as /insurance/purchase,
     // while an earlier version might have had /policies/purchase.
     // Using /insurance/purchase to align with current OpenAPI.
-    return this.apiClient.post<
-      PolicyPurchaseResponseDto,
-      PolicyPurchaseRequestDto
-    >(`${this.basePath}/purchase`, request);
+    return this.apiClient.post<PolicyPurchaseResponse, PolicyPurchaseRequest>(
+      `${this.basePath}/purchase`,
+      request,
+    );
   }
 
   // Note: The /insurance/track endpoint from OpenAPI is for anonymous policy tracking.

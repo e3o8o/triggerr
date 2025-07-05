@@ -1,12 +1,15 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { userWallets } from "@triggerr/core/database/schema";
+import { Auth } from "@triggerr/core";
+import { Database } from "@triggerr/core";
+import { Schema } from "@triggerr/core";
 import { eq } from "drizzle-orm";
 import { WalletService } from "@triggerr/wallet-service";
 import type { BlockchainProviderName } from "@triggerr/blockchain-interface";
 import type { Hex } from "viem";
-import { formatBalanceDisplay } from "@triggerr/paygo-adapter/src/utils";
+import {
+  formatBalanceDisplay,
+  formatAddressDisplay,
+} from "@triggerr/blockchain";
 
 /**
  * Handles GET requests for the /api/v1/user/wallets/summary endpoint.
@@ -24,7 +27,7 @@ export async function handleGetWalletsSummary(
 
   try {
     // 1. Authenticate user and set RLS context
-    const authContext = await getAuthContext(request.headers);
+    const authContext = await Auth.getAuthContext(request.headers);
     if (!authContext.isAuthenticated || !authContext.user?.id) {
       return new Response(
         JSON.stringify(
@@ -34,12 +37,12 @@ export async function handleGetWalletsSummary(
       );
     }
     const userId = authContext.user.id;
-    await setRLSContext(authContext);
+    await Auth.setRLSContext(authContext);
 
     // 2. Fetch all wallets for the user from the database
-    const walletsInDb = await db.query.userWallets.findMany({
-      where: eq(userWallets.userId, userId),
-      orderBy: (wallets, { desc }) => [desc(wallets.createdAt)],
+    const walletsInDb = await Database.db.query.userWallets.findMany({
+      where: eq(Schema.userWalletsSchema.userId, userId),
+      orderBy: (wallets: any, { desc }: any) => [desc(wallets.createdAt)],
     });
 
     if (walletsInDb.length === 0) {
@@ -52,7 +55,7 @@ export async function handleGetWalletsSummary(
     }
 
     // 3. Fetch balance for each wallet concurrently
-    const balancePromises = walletsInDb.map((wallet) =>
+    const balancePromises = walletsInDb.map((wallet: any) =>
       walletService
         .getAccountBalance(
           wallet.address as Hex,
@@ -74,7 +77,7 @@ export async function handleGetWalletsSummary(
     // TODO: Implement a price oracle to get real USD values for different chain tokens.
     // For now, we assume all balances are in a similar "cent-like" unit for aggregation.
     let totalBalanceCents = 0n;
-    const walletSummaries = walletsInDb.map((wallet, index) => {
+    const walletSummaries = walletsInDb.map((wallet: any, index: number) => {
       const balanceInfo = balances[index];
       const balanceBigInt = BigInt(balanceInfo.balance || "0");
       totalBalanceCents += balanceBigInt;

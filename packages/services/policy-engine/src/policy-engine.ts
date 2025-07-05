@@ -10,11 +10,7 @@
  * 5. Handling all potential errors in the purchase pipeline gracefully.
  */
 
-import { db } from "@triggerr/core/database";
-import {
-  policy as policyTable,
-  quote as quoteTable,
-} from "@triggerr/core/database/schema";
+import { Database, Schema } from "@triggerr/core";
 import type { Logger } from "@triggerr/core";
 import { generateId, generatePolicyEscrowId } from "@triggerr/core/utils";
 import {
@@ -48,7 +44,7 @@ export interface PolicyPurchaseResponse {
 }
 
 // Type for a validated quote fetched from the database
-type ValidatedQuote = typeof quoteTable.$inferSelect;
+type ValidatedQuote = typeof Schema.quote.$inferSelect;
 
 // ============================================================================
 // Policy Engine Service
@@ -153,8 +149,8 @@ export class PolicyEngine {
     quoteId: string,
     requestId: string,
   ): Promise<ValidatedQuote> {
-    const quote = await db.query.quote.findFirst({
-      where: eq(quoteTable.id, quoteId),
+    const quote = await Database.db.query.quote.findFirst({
+      where: eq(Schema.quote.id, quoteId),
     });
 
     if (!quote) {
@@ -169,9 +165,10 @@ export class PolicyEngine {
         `[PolicyEngine] [${requestId}] Quote validation failed: Quote ${quoteId} has expired.`,
       );
       // Optionally, update the quote status to EXPIRED in the background
-      db.update(quoteTable)
+      Database.db
+        .update(Schema.quote)
         .set({ status: "EXPIRED" })
-        .where(eq(quoteTable.id, quoteId))
+        .where(eq(Schema.quote.id, quoteId))
         .catch();
       throw new Error("QuoteExpired");
     }
@@ -190,10 +187,12 @@ export class PolicyEngine {
    * Updates the quote's status to 'ACCEPTED' to prevent reuse.
    */
   private async lockQuote(quoteId: string, requestId: string): Promise<void> {
-    const [updatedQuote] = await db
-      .update(quoteTable)
+    const [updatedQuote] = await Database.db
+      .update(Schema.quote)
       .set({ status: "ACCEPTED" })
-      .where(and(eq(quoteTable.id, quoteId), eq(quoteTable.status, "PENDING")))
+      .where(
+        and(eq(Schema.quote.id, quoteId), eq(Schema.quote.status, "PENDING")),
+      )
       .returning();
 
     if (!updatedQuote) {
@@ -222,8 +221,8 @@ export class PolicyEngine {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 48);
 
-    const [newPolicy] = await db
-      .insert(policyTable)
+    const [newPolicy] = await Database.db
+      .insert(Schema.policy)
       .values({
         id: policyId,
         policyNumber,
@@ -321,8 +320,8 @@ export class PolicyEngine {
     transactionHash: string,
     requestId: string,
   ) {
-    const [updatedPolicy] = await db
-      .update(policyTable)
+    const [updatedPolicy] = await Database.db
+      .update(Schema.policy)
       .set({
         status: "ACTIVE",
         activatedAt: new Date(),
@@ -331,7 +330,7 @@ export class PolicyEngine {
           transactionHash,
         },
       })
-      .where(eq(policyTable.id, policyId))
+      .where(eq(Schema.policy.id, policyId))
       .returning();
 
     if (!updatedPolicy) {
@@ -349,10 +348,10 @@ export class PolicyEngine {
    */
   private async failPolicy(policyId: string, requestId: string): Promise<void> {
     try {
-      await db
-        .update(policyTable)
+      await Database.db
+        .update(Schema.policy)
         .set({ status: "FAILED" })
-        .where(eq(policyTable.id, policyId));
+        .where(eq(Schema.policy.id, policyId));
       this.logger.info(
         `[PolicyEngine] [${requestId}] Policy ${policyId} status set to FAILED.`,
       );

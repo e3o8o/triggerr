@@ -3,8 +3,7 @@ import { z } from "zod";
 import { PolicyEngine } from "@triggerr/policy-engine";
 import { EscrowManager, EscrowEngineFactory } from "@triggerr/escrow-engine";
 import { BlockchainServiceRegistry } from "@triggerr/service-registry";
-import { Logger, LogLevel } from "@triggerr/core";
-import { getAuthContext, setRLSContext } from "@triggerr/core";
+import { Logger, LogLevel, Auth } from "@triggerr/core";
 
 // Request validation schema
 const policyPurchaseRequestSchema = z.object({
@@ -54,7 +53,7 @@ export async function handleAnonymousPolicyPurchase(
 
   try {
     // Step 1: Authenticate user
-    const authContext = await getAuthContext(
+    const authContext = await Auth.getAuthContext(
       request.headers,
       request.headers.get("Cookie") || undefined,
     );
@@ -75,7 +74,7 @@ export async function handleAnonymousPolicyPurchase(
     }
 
     userId = authContext.user.id;
-    await setRLSContext(authContext);
+    await Auth.setRLSContext(authContext);
 
     console.log(
       `[API Policy Purchase] [${requestId}] Authenticated user: ${userId}`,

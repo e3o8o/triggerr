@@ -11,13 +11,12 @@ import PayGoClientService, {
   FulfillEscrow,
   ReleaseEscrow,
 } from "@triggerr/paygo-adapter";
-import { db } from "@triggerr/core/database";
-import { escrow as escrowSchema } from "@triggerr/core/database/schema";
+import { Database, Schema } from "@triggerr/core";
 import {
   generatePolicyEscrowId,
   generateUserEscrowId,
   type EscrowPurpose,
-} from "@triggerr/core/utils/escrow-id-generator";
+} from "@triggerr/core";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -600,8 +599,8 @@ export class EscrowManager {
     proof?: string,
   ): Promise<EscrowResult> {
     try {
-      const escrowRecord = await db.query.escrow.findFirst({
-        where: eq(escrowSchema.blockchainId, escrowId),
+      const escrowRecord = await Database.db.query.escrow.findFirst({
+        where: eq(Schema.escrow.blockchainId, escrowId),
       });
 
       if (!escrowRecord) {
@@ -637,8 +636,8 @@ export class EscrowManager {
       | "USER_RELEASE" = "EXPIRED",
   ): Promise<EscrowResult> {
     try {
-      const escrowRecord = await db.query.escrow.findFirst({
-        where: eq(escrowSchema.blockchainId, escrowId),
+      const escrowRecord = await Database.db.query.escrow.findFirst({
+        where: eq(Schema.escrow.blockchainId, escrowId),
       });
 
       if (!escrowRecord) {

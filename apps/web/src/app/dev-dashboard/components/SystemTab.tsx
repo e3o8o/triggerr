@@ -1,6 +1,7 @@
+import { createHttpClient } from "@triggerr/api-sdk";
+
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Image from "next/image";
-import { createHttpClient } from "@triggerr/api-sdk";
 
 interface ServiceStatus {
   status: string;

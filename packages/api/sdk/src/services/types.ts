@@ -10,22 +10,16 @@
  * by consumers of the SDK when needed.
  */
 
-// Common types
+// All types from API contracts
 import type {
   PaginationRequest,
   ErrorCode,
-} from "@triggerr/api-contracts/dtos/common";
-
-// Admin types
-import type { AdminGetUserRequest as AdminGetUserRequestDto } from "@triggerr/api-contracts/dtos/user";
-
-// Policy types
-import type {
-  GetPolicyDetailsRequest as GetPolicyDetailsRequestDto,
-  PolicySummary as PolicySummaryDto,
-  PolicyEvent as PolicyEventDto,
-  PolicyDocument as PolicyDocumentDto,
-} from "@triggerr/api-contracts/dtos/policy";
+  AdminGetUserRequest,
+  GetPolicyDetailsRequest,
+  PolicySummary,
+  PolicyEvent,
+  PolicyDocument,
+} from "@triggerr/api-contracts";
 
 // Re-export all types
 export type {
@@ -34,13 +28,13 @@ export type {
   ErrorCode,
 
   // Admin types
-  AdminGetUserRequestDto,
+  AdminGetUserRequest,
 
   // Policy types
-  GetPolicyDetailsRequestDto,
-  PolicySummaryDto,
-  PolicyEventDto,
-  PolicyDocumentDto,
+  GetPolicyDetailsRequest,
+  PolicySummary,
+  PolicyEvent,
+  PolicyDocument,
 };
 
 /**

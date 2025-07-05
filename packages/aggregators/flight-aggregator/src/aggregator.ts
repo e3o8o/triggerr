@@ -17,7 +17,7 @@ import { type IFlightApiClient } from "@triggerr/shared";
 import { ConflictResolver } from "./conflict-resolver";
 
 export interface FlightAggregatorConfig {
-  cacheManager?: CacheManager<CanonicalFlightData>;
+  cacheManager?: InstanceType<typeof CacheManager<CanonicalFlightData>>;
   sourceRouter?: SourceRouter;
   conflictResolver?: ConflictResolver;
   maxSources?: number;
@@ -39,7 +39,7 @@ export interface AggregationResult {
 }
 
 export class FlightAggregator {
-  private cacheManager: CacheManager<CanonicalFlightData>;
+  private cacheManager: InstanceType<typeof CacheManager<CanonicalFlightData>>;
   private sourceRouter: SourceRouter;
   private conflictResolver: ConflictResolver;
   private maxSources: number;

@@ -1,7 +1,5 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { userWallets } from "@triggerr/core/database/schema";
+import { Auth, Database, Schema } from "@triggerr/core";
 import { eq } from "drizzle-orm";
 import { WalletService } from "@triggerr/wallet-service";
 
@@ -35,7 +33,7 @@ export async function handleCreateWallet(request: Request): Promise<Response> {
   }
 
   // 2. Authentication check
-  const authContext = await getAuthContext(
+  const authContext = await Auth.getAuthContext(
     request.headers,
     request.headers.get("Cookie") || undefined,
   );
@@ -58,15 +56,15 @@ export async function handleCreateWallet(request: Request): Promise<Response> {
   );
 
   // Set RLS context for database operations
-  await setRLSContext(authContext);
+  await Auth.setRLSContext(authContext);
 
   try {
     // 3. Check if user already has a wallet
     console.log(
       `[API Create Wallet] [${requestId}] Checking for existing wallet...`,
     );
-    const existingWallet = await db.query.userWallets.findFirst({
-      where: eq(userWallets.userId, userId),
+    const existingWallet = await Database.db.query.userWallets.findFirst({
+      where: eq(Schema.userWalletsSchema.userId, userId),
     });
 
     if (existingWallet) {
@@ -122,9 +120,10 @@ export async function handleCreateWallet(request: Request): Promise<Response> {
           `[API Create Wallet] [${requestId}] Race condition detected - checking for wallet created by concurrent request...`,
         );
 
-        const raceConditionWallet = await db.query.userWallets.findFirst({
-          where: eq(userWallets.userId, userId),
-        });
+        const raceConditionWallet =
+          await Database.db.query.userWallets.findFirst({
+            where: eq(Schema.userWalletsSchema.userId, userId),
+          });
 
         if (raceConditionWallet) {
           console.log(

@@ -2,30 +2,25 @@
 // API SDK - USER SERVICE
 // ===========================================================================
 
-import type { ApiClient } from '../client';
-import type { ApiResponse } from '@triggerr/api-contracts';
-import { convertToQueryParams } from '../utils';
+import type { ApiClient } from "../client";
+import type { ApiResponse } from "@triggerr/api-contracts";
+import { convertToQueryParams } from "../utils";
 import type {
-  UserSignupCompletionRequest as UserSignupCompletionRequestDto,
-  UserSignupCompletionResponse as UserSignupCompletionResponseDto,
-  UserProfile as UserProfileDto,
-  UserProfileUpdateRequest as UserProfileUpdateRequestDto,
-  UserProfileUpdateResponse as UserProfileUpdateResponseDto,
-  UserPolicyListRequest as UserPolicyListRequestDto,
-  UserPolicyListResponse as UserPolicyListResponseDto,
-  UserDashboardRequest as UserDashboardRequestDto,
-  UserDashboardResponse as UserDashboardResponseDto,
-} from '@triggerr/api-contracts/dtos/wallet';
-import type {
-  GetUserActivityLogRequest as GetUserActivityLogRequestDto,
-  GetUserActivityLogResponse as GetUserActivityLogResponseDto,
-
-  GetUserConsentsResponse as GetUserConsentsResponseDto,
-  UpdateUserConsentRequest as UpdateUserConsentRequestDto,
-  UpdateUserConsentResponse as UpdateUserConsentResponseDto,
-} from '@triggerr/api-contracts/dtos/user';
-
-
+  UserSignupCompletionRequest,
+  UserSignupCompletionResponse,
+  UserProfile,
+  UserProfileUpdateRequest,
+  UserProfileUpdateResponse,
+  UserPolicyListRequest,
+  UserPolicyListResponse,
+  UserDashboardRequest,
+  UserDashboardResponse,
+  GetUserActivityLogRequest,
+  GetUserActivityLogResponse,
+  GetUserConsentsResponse,
+  UpdateUserConsentRequest,
+  UpdateUserConsentResponse,
+} from "@triggerr/api-contracts";
 
 /**
  * Service class for interacting with User-specific API endpoints.
@@ -35,7 +30,7 @@ import type {
 export class UserService {
   private apiClient: ApiClient;
   // Base path for user-specific endpoints, typically /user or /api/v1/user
-  private readonly basePath = '/user';
+  private readonly basePath = "/user";
 
   constructor(apiClient: ApiClient) {
     this.apiClient = apiClient;
@@ -50,11 +45,11 @@ export class UserService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async completeSignup(
-    request: UserSignupCompletionRequestDto,
-  ): Promise<ApiResponse<UserSignupCompletionResponseDto>> {
+    request: UserSignupCompletionRequest,
+  ): Promise<ApiResponse<UserSignupCompletionResponse>> {
     return this.apiClient.post<
-      UserSignupCompletionResponseDto,
-      UserSignupCompletionRequestDto
+      UserSignupCompletionResponse,
+      UserSignupCompletionRequest
     >(`${this.basePath}/auth/complete-signup`, request);
   }
 
@@ -64,8 +59,8 @@ export class UserService {
    * @returns A promise that resolves to the API response containing the user's profile.
    * @throws {ApiClientError} If the API request fails.
    */
-  public async getUserProfile(): Promise<ApiResponse<UserProfileDto>> {
-    return this.apiClient.get<UserProfileDto>(`${this.basePath}/profile`);
+  public async getUserProfile(): Promise<ApiResponse<UserProfile>> {
+    return this.apiClient.get<UserProfile>(`${this.basePath}/profile`);
   }
 
   /**
@@ -76,11 +71,11 @@ export class UserService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async updateUserProfile(
-    request: UserProfileUpdateRequestDto,
-  ): Promise<ApiResponse<UserProfileUpdateResponseDto>> {
+    request: UserProfileUpdateRequest,
+  ): Promise<ApiResponse<UserProfileUpdateResponse>> {
     return this.apiClient.put<
-      UserProfileUpdateResponseDto,
-      UserProfileUpdateRequestDto
+      UserProfileUpdateResponse,
+      UserProfileUpdateRequest
     >(`${this.basePath}/profile`, request);
   }
 
@@ -92,9 +87,9 @@ export class UserService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async listUserPolicies(
-    params?: UserPolicyListRequestDto,
-  ): Promise<ApiResponse<UserPolicyListResponseDto>> {
-    return this.apiClient.get<UserPolicyListResponseDto>(
+    params?: UserPolicyListRequest,
+  ): Promise<ApiResponse<UserPolicyListResponse>> {
+    return this.apiClient.get<UserPolicyListResponse>(
       `${this.basePath}/policies`,
       convertToQueryParams(params),
     );
@@ -108,9 +103,9 @@ export class UserService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async getUserDashboard(
-    params?: UserDashboardRequestDto,
-  ): Promise<ApiResponse<UserDashboardResponseDto>> {
-    return this.apiClient.get<UserDashboardResponseDto>(
+    params?: UserDashboardRequest,
+  ): Promise<ApiResponse<UserDashboardResponse>> {
+    return this.apiClient.get<UserDashboardResponse>(
       `${this.basePath}/dashboard`,
       convertToQueryParams(params),
     );
@@ -125,10 +120,10 @@ export class UserService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async getActivityLog(
-    params?: Omit<GetUserActivityLogRequestDto, 'userId'>, // Assuming userId is handled by backend
-  ): Promise<ApiResponse<GetUserActivityLogResponseDto>> {
+    params?: Omit<GetUserActivityLogRequest, "userId">, // Assuming userId is handled by backend
+  ): Promise<ApiResponse<GetUserActivityLogResponse>> {
     // Path needs to be confirmed from OpenAPI or actual API design
-    return this.apiClient.get<GetUserActivityLogResponseDto>(
+    return this.apiClient.get<GetUserActivityLogResponse>(
       `${this.basePath}/activity-log`,
       params,
     );
@@ -141,9 +136,9 @@ export class UserService {
    * @returns A promise that resolves to the API response containing user consents.
    * @throws {ApiClientError} If the API request fails.
    */
-  public async getConsents(): Promise<ApiResponse<GetUserConsentsResponseDto>> {
+  public async getConsents(): Promise<ApiResponse<GetUserConsentsResponse>> {
     // Path needs to be confirmed
-    return this.apiClient.get<GetUserConsentsResponseDto>(
+    return this.apiClient.get<GetUserConsentsResponse>(
       `${this.basePath}/consents`,
     );
   }
@@ -157,15 +152,15 @@ export class UserService {
    * @throws {ApiClientError} If the API request fails.
    */
   public async updateConsent(
-    request: Omit<UpdateUserConsentRequestDto, 'userId'>, // Assuming userId is handled by backend
-  ): Promise<ApiResponse<UpdateUserConsentResponseDto>> {
+    request: Omit<UpdateUserConsentRequest, "userId">, // Assuming userId is handled by backend
+  ): Promise<ApiResponse<UpdateUserConsentResponse>> {
     // Path needs to be confirmed, e.g., /user/consents/{consentId} or just /user/consents
     // For this example, assuming a general update endpoint.
     // If updating a specific consentId, the path might be /user/consents/${request.consentId}
     // For now, using a generic /user/consents path and sending consentId in body.
     return this.apiClient.put<
-      UpdateUserConsentResponseDto,
-      Omit<UpdateUserConsentRequestDto, 'userId'>
+      UpdateUserConsentResponse,
+      Omit<UpdateUserConsentRequest, "userId">
     >(`${this.basePath}/consents`, request); // Adjust path as per actual API design
   }
 

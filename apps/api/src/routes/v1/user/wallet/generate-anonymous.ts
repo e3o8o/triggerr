@@ -1,7 +1,7 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { generateAnonymousWalletRequestSchema } from "@triggerr/api-contracts/validators/wallet";
+import { Wallet } from "@triggerr/api-contracts";
 import { WalletService } from "@triggerr/wallet-service";
-import { getAnonymousSessionId } from "@triggerr/core/auth";
+import { Auth } from "@triggerr/core";
 import type { BlockchainProviderName } from "@triggerr/blockchain-interface";
 
 /**
@@ -25,7 +25,9 @@ export async function handleGenerateAnonymousWallet(
 
   try {
     // 1. Get anonymous session ID from headers
-    const anonymousSessionId = await getAnonymousSessionId(request.headers);
+    const anonymousSessionId = await Auth.getAnonymousSessionId(
+      request.headers,
+    );
     if (!anonymousSessionId) {
       console.warn(
         `[API Generate Anonymous Wallet] [${requestId}] Missing anonymous session ID.`,
@@ -43,7 +45,7 @@ export async function handleGenerateAnonymousWallet(
     // 2. Parse and validate request body
     const body = await request.json();
     const validationResult =
-      generateAnonymousWalletRequestSchema.safeParse(body);
+      Wallet.validators.generateAnonymousRequest.safeParse(body);
 
     if (!validationResult.success) {
       console.warn(

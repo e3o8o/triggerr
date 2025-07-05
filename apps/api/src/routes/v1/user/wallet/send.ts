@@ -1,14 +1,18 @@
 import { isAddress, type Hex } from "viem";
-import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { walletSendRequestSchema } from "@triggerr/api-contracts/validators/wallet";
+import {
+  createApiError,
+  createApiResponse,
+  Wallet,
+} from "@triggerr/api-contracts";
 import type {
   WalletSendRequest,
   WalletSendResponse,
-} from "@triggerr/api-contracts/dtos/wallet";
+} from "@triggerr/api-contracts";
+import { walletSendRequestSchema } from "@triggerr/api-contracts";
 import { WalletService } from "@triggerr/wallet-service";
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { userWallets } from "@triggerr/core/database/schema";
+import { Auth } from "@triggerr/core";
+import { Database } from "@triggerr/core";
+import { Schema } from "@triggerr/core";
 import { eq, and } from "drizzle-orm";
 
 /**
@@ -29,7 +33,7 @@ export async function handleSendFunds(
 
   try {
     // 1. Authenticate user and set RLS context
-    const authContext = await getAuthContext(
+    const authContext = await Auth.getAuthContext(
       request.headers,
       request.headers.get("Cookie") || undefined,
     );
@@ -50,7 +54,7 @@ export async function handleSendFunds(
     console.log(`[API Send] [${requestId}] Authenticated user: ${userId}`);
 
     // Set RLS context for database operations
-    await setRLSContext(authContext);
+    await Auth.setRLSContext(authContext);
 
     // 2. Parse and validate request body
     const body = await request.json();
@@ -99,14 +103,17 @@ export async function handleSendFunds(
     }
 
     // 4. Get user's primary wallet
-    const userWalletResult = await db
+    const userWalletResult = await Database.db
       .select({
-        id: userWallets.id,
-        address: userWallets.address,
+        id: Schema.userWalletsSchema.id,
+        address: Schema.userWalletsSchema.address,
       })
-      .from(userWallets)
+      .from(Schema.userWalletsSchema)
       .where(
-        and(eq(userWallets.userId, userId), eq(userWallets.isPrimary, true)),
+        and(
+          eq(Schema.userWalletsSchema.userId, userId),
+          eq(Schema.userWalletsSchema.isPrimary, true),
+        ),
       )
       .limit(1);
 

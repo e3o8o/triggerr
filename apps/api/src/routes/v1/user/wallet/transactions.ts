@@ -1,9 +1,9 @@
 import { isAddress, type Hex } from "viem";
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
 import { WalletService } from "@triggerr/wallet-service";
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { userWallets } from "@triggerr/core/database/schema";
+import { Auth } from "@triggerr/core";
+import { Database } from "@triggerr/core";
+import { Schema } from "@triggerr/core";
 import { eq, and } from "drizzle-orm";
 import { getPayGoClient } from "@triggerr/paygo-adapter";
 import { getTransactionHistory } from "@triggerr/paygo-adapter";
@@ -46,7 +46,7 @@ export async function handleGetTransactions(
   console.log(`[API Get Transactions] [${requestId}] Received request.`);
 
   // 1. Authenticate user and set RLS context
-  const authContext = await getAuthContext(
+  const authContext = await Auth.getAuthContext(
     req.headers,
     req.headers.get("Cookie") || undefined,
   );
@@ -69,7 +69,7 @@ export async function handleGetTransactions(
   );
 
   // Set RLS context for database operations
-  await setRLSContext(authContext);
+  await Auth.setRLSContext(authContext);
 
   try {
     const { searchParams } = new URL(req.url);
@@ -79,8 +79,8 @@ export async function handleGetTransactions(
 
     // If no address provided, get user's primary wallet address
     if (!walletAddress) {
-      const userWallet = await db.query.userWallets.findFirst({
-        where: eq(userWallets.userId, userId),
+      const userWallet = await Database.db.query.userWallets.findFirst({
+        where: eq(Schema.userWalletsSchema.userId, userId),
         columns: {
           address: true,
         },

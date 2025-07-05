@@ -1,14 +1,9 @@
 import { isAddress, type Hex } from "viem";
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { escrowCreateRequestSchema } from "@triggerr/api-contracts/validators/wallet";
-import {
-  generateUserEscrowId,
-  type EscrowPurpose,
-} from "@triggerr/core/utils/escrow-id-generator";
+import { Wallet } from "@triggerr/api-contracts";
 import { EscrowManager } from "@triggerr/escrow-engine";
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { userWallets } from "@triggerr/core/database/schema";
+import { Auth, Database, Schema, generateUserEscrowId } from "@triggerr/core";
+import type { EscrowPurpose } from "@triggerr/core"; // Import the type directly
 import { eq, and } from "drizzle-orm";
 
 /**
@@ -32,7 +27,7 @@ export async function handleCreateEscrowRequest(
 
   try {
     // 1. Authenticate user and set RLS context
-    const authContext = await getAuthContext(
+    const authContext = await Auth.getAuthContext(
       request.headers,
       request.headers.get("Cookie") || undefined,
     );
@@ -55,11 +50,12 @@ export async function handleCreateEscrowRequest(
     );
 
     // Set RLS context for database operations
-    await setRLSContext(authContext);
+    await Auth.setRLSContext(authContext);
 
     // 2. Parse and validate request body
     const body = await request.json();
-    const validationResult = escrowCreateRequestSchema.safeParse(body);
+    const validationResult =
+      Wallet.validators.escrowCreateRequest.safeParse(body);
 
     if (!validationResult.success) {
       console.warn(
@@ -96,14 +92,17 @@ export async function handleCreateEscrowRequest(
     }
 
     // 4. Get user's primary wallet
-    const userWalletResult = await db
+    const userWalletResult = await Database.db
       .select({
-        id: userWallets.id,
-        address: userWallets.address,
+        id: Schema.userWalletsSchema.id,
+        address: Schema.userWalletsSchema.address,
       })
-      .from(userWallets)
+      .from(Schema.userWalletsSchema)
       .where(
-        and(eq(userWallets.userId, userId), eq(userWallets.isPrimary, true)),
+        and(
+          eq(Schema.userWalletsSchema.userId, userId),
+          eq(Schema.userWalletsSchema.isPrimary, true),
+        ),
       )
       .limit(1);
 

@@ -81,6 +81,17 @@ export const productCategoryEnum = pgEnum("product_category_enum", [
   "GENERAL_INSURANCE", // A catch-all for other non-parametric products // Post-MVP
 ]);
 
+export const beneficiaryTypeEnum = pgEnum("beneficiary_type_enum", [
+  "PRIMARY",
+  "CONTINGENT",
+]);
+
+export const endorsementTypeEnum = pgEnum("endorsement_type_enum", [
+  "COVERAGE_ADJUSTMENT",
+  "INFO_CORRECTION",
+  "OTHER",
+]);
+
 // ---------------------------------------------------------------------------
 // POLICY & COVERAGE ENUMS
 // ---------------------------------------------------------------------------
@@ -716,6 +727,46 @@ export const policyVerificationCode = pgTable(
     unique("policy_verification_code_code_unique").on(table.code), // ENSURED table-level unique
     index("verification_code_idx").on(table.code),
     index("verification_policy_idx").on(table.policyId),
+  ],
+);
+
+export const beneficiaries = pgTable(
+  "beneficiaries",
+  {
+    id: text("id").primaryKey(),
+    policyId: text("policy_id")
+      .notNull()
+      .references(() => policy.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    email: text("email"),
+    relationship: text("relationship"),
+    percentage: integer("percentage").notNull(),
+    type: beneficiaryTypeEnum("type").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("beneficiaries_policy_idx").on(table.policyId),
+    index("beneficiaries_type_idx").on(table.type),
+  ],
+);
+
+export const endorsements = pgTable(
+  "endorsements",
+  {
+    id: text("id").primaryKey(),
+    policyId: text("policy_id")
+      .notNull()
+      .references(() => policy.id, { onDelete: "cascade" }),
+    type: endorsementTypeEnum("type").notNull(),
+    description: text("description").notNull(),
+    effectiveDate: timestamp("effective_date").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("endorsements_policy_idx").on(table.policyId),
+    index("endorsements_type_idx").on(table.type),
+    index("endorsements_effective_date_idx").on(table.effectiveDate),
   ],
 );
 
@@ -2079,16 +2130,17 @@ export const policyRelations = relations(policy, ({ one, many }) => ({
     references: [flight.id],
   }),
   quote: one(quote, {
-    // A policy is created from one quote
     fields: [policy.quoteId],
     references: [quote.id],
   }),
-  escrows: many(escrow), // A policy can have multiple associated escrows (e.g. user premium, provider collateral)
+  policyEvents: many(policyEvent),
+  revenue: many(revenue),
+  escrows: many(escrow),
   payouts: many(payout),
   verificationCodes: many(policyVerificationCode),
-  events: many(policyEvent),
+  beneficiaries: many(beneficiaries),
+  endorsements: many(endorsements),
   apiCallLogs: many(rawApiCallLogs, { relationName: "logsForPolicy" }),
-  revenues: many(revenue),
 }));
 
 export const policyVerificationCodeRelations = relations(
@@ -2100,6 +2152,20 @@ export const policyVerificationCodeRelations = relations(
     }),
   }),
 );
+
+export const beneficiariesRelations = relations(beneficiaries, ({ one }) => ({
+  policy: one(policy, {
+    fields: [beneficiaries.policyId],
+    references: [policy.id],
+  }),
+}));
+
+export const endorsementsRelations = relations(endorsements, ({ one }) => ({
+  policy: one(policy, {
+    fields: [endorsements.policyId],
+    references: [policy.id],
+  }),
+}));
 
 export const policyEventRelations = relations(policyEvent, ({ one }) => ({
   policy: one(policy, {

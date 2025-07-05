@@ -1,12 +1,11 @@
-import { db } from "@triggerr/core/database";
-import { userWallets } from "@triggerr/core/database/schema";
+import { Database, Schema } from "@triggerr/core";
 import { eq, and } from "drizzle-orm";
 import type { Hex } from "viem";
 
 // By defining this type, we can pass either the main `db` object or a transaction `tx`
 // to our repository methods, making them flexible and transaction-safe.
-type Database = typeof db;
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+type DatabaseType = typeof Database.db;
+type Transaction = Parameters<Parameters<typeof Database.db.transaction>[0]>[0];
 
 /**
  * The data required to create a new wallet entry in the database.
@@ -44,14 +43,14 @@ export class UserWalletRepository {
    */
   public async create(
     data: NewWalletRecord,
-    dbInstance: Transaction | Database = db,
+    dbInstance: Transaction | DatabaseType = Database.db,
   ): Promise<any> {
     console.log(
       `[UserWalletRepository] Inserting new wallet into DB for user: ${data.userId}`,
     );
 
     const [newWalletRecord] = await dbInstance
-      .insert(userWallets)
+      .insert(Schema.userWallets)
       .values({
         userId: data.userId,
         address: data.address,
@@ -88,7 +87,7 @@ export class UserWalletRepository {
   public async findByUserIdAndAddress(
     userId: string,
     walletAddress: Hex,
-    dbInstance: Transaction | Database = db,
+    dbInstance: Transaction | DatabaseType = Database.db,
   ): Promise<any | null> {
     console.log(
       `[UserWalletRepository] Finding wallet for user ${userId} with address ${walletAddress}`,
@@ -96,8 +95,8 @@ export class UserWalletRepository {
 
     const wallet = await dbInstance.query.userWallets.findFirst({
       where: and(
-        eq(userWallets.userId, userId),
-        eq(userWallets.address, walletAddress),
+        eq(Schema.userWallets.userId, userId),
+        eq(Schema.userWallets.address, walletAddress),
       ),
     });
 

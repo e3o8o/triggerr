@@ -1,9 +1,9 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
 import { z } from "zod";
 import { EscrowManager } from "@triggerr/escrow-engine";
-import { getAuthContext, setRLSContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { userWallets, escrow } from "@triggerr/core/database/schema";
+import { Auth } from "@triggerr/core";
+import { Database } from "@triggerr/core";
+import { Schema } from "@triggerr/core";
 import { eq, and } from "drizzle-orm";
 import type { Hex } from "viem";
 
@@ -36,7 +36,7 @@ export async function handleReleaseEscrowRequest(
 
   try {
     // 1. Authenticate user and set RLS context
-    const authContext = await getAuthContext(
+    const authContext = await Auth.getAuthContext(
       request.headers,
       request.headers.get("Cookie") || undefined,
     );
@@ -61,7 +61,7 @@ export async function handleReleaseEscrowRequest(
     );
 
     // Set RLS context for database operations
-    await setRLSContext(authContext);
+    await Auth.setRLSContext(authContext);
 
     // 2. Parse and validate request body
     const body = await request.json();
@@ -87,14 +87,17 @@ export async function handleReleaseEscrowRequest(
     const { escrowId, reason } = data;
 
     // 3. Get user's primary wallet to verify they can release the escrow
-    const userWalletResult = await db
+    const userWalletResult = await Database.db
       .select({
-        id: userWallets.id,
-        address: userWallets.address,
+        id: Schema.userWalletsSchema.id,
+        address: Schema.userWalletsSchema.address,
       })
-      .from(userWallets)
+      .from(Schema.userWalletsSchema)
       .where(
-        and(eq(userWallets.userId, userId), eq(userWallets.isPrimary, true)),
+        and(
+          eq(Schema.userWalletsSchema.userId, userId),
+          eq(Schema.userWalletsSchema.isPrimary, true),
+        ),
       )
       .limit(1);
 
@@ -125,8 +128,8 @@ export async function handleReleaseEscrowRequest(
     const creatorAddress = userWallet.address as Hex;
 
     // 4. Verify the escrow exists and user is authorized to release it
-    const escrowRecord = await db.query.escrow.findFirst({
-      where: eq(escrow.blockchainId, escrowId),
+    const escrowRecord = await Database.db.query.escrow.findFirst({
+      where: eq(Schema.escrowSchema.blockchainId, escrowId),
     });
 
     if (!escrowRecord) {

@@ -2,56 +2,32 @@
 // TRIGGERR API CONTRACTS - MAIN PACKAGE EXPORTS
 //
 // This file serves as the primary entry point for the @triggerr/api-contracts package.
+// It provides both domain-driven namespace imports and individual exports for maximum flexibility.
 //
-// To avoid namespace collisions and ensure clarity, this main index exports:
-// 1. All items from `./schemas/versioning.ts` (e.g., ApiVersionInfo, CURRENT_API_VERSION).
-// 2. The `API_CONTRACTS_PACKAGE_VERSION` constant.
-// 3. Utility functions and truly common, non-conflicting DTOs from `./dtos/common.ts`.
+// **RECOMMENDED USAGE (Domain-Driven Namespaces):**
 //
-// **IMPORTANT FOR CONSUMERS:**
+// import { Insurance, Policy, Wallet, Chat, User } from '@triggerr/api-contracts';
 //
-// For most DTO interfaces, Zod validation schemas, and Zod-inferred types,
-// you MUST import them from their specific sub-module paths to ensure clarity
-// and avoid ambiguity. This is because DTO interfaces (e.g., `interface Policy`)
-// and Zod-inferred types (e.g., `type Policy = z.infer<typeof policySchema>`)
-// often share the same name by design.
+// // Type usage
+// const quote: Insurance.InsuranceQuoteRequest = { ... };
+// const policy: Policy.PolicyPurchaseRequest = { ... };
+// const wallet: Wallet.WalletCreateRequest = { ... };
 //
-// **Recommended Import Paths:**
+// // Validation usage
+// const isValidQuote = Insurance.validators.quoteRequest.safeParse(quote);
+// const isValidPolicy = Policy.validators.cancelRequest.safeParse(policy);
 //
-// - **DTO Interfaces (Shape of data):**
-//   `import type { ChatMessage } from '@triggerr/api-contracts/dtos/chat';`
-//   `import type { InsuranceQuoteRequest } from '@triggerr/api-contracts/dtos/insurance';`
-//   `import type { Policy } from '@triggerr/api-contracts/dtos/policy';`
-//   `import type { UserProfile } from '@triggerr/api-contracts/dtos/wallet';` // (or user.ts if moved)
-//   `import type { AdminListUsersRequest } from '@triggerr/api-contracts/dtos/user';`
-//
-// - **Zod Schemas (For runtime validation):**
-//   `import { chatMessageRequestSchema } from '@triggerr/api-contracts/validators/chat';`
-//   `import { policySchema } from '@triggerr/api-contracts/validators/policy';`
-//   // Or from the validators aggregate index:
-//   `import { userProfileSchema } from '@triggerr/api-contracts/validators';`
-//
-// - **Zod-Inferred Types (For static typing with validated data):**
-//   `import type { ChatMessageRequest } from '@triggerr/api-contracts/validators/chat';`
-//   `import type { Policy } from '@triggerr/api-contracts/validators/policy';`
-//   // Or from the validators aggregate index:
-//   `import type { UserProfile } from '@triggerr/api-contracts/validators';`
-//
-// The `validators/index.ts` file re-exports all Zod schemas and their inferred types
-// from individual validator files (chat, common, insurance, policy, user, wallet),
-// so `import { someSchema } from '@triggerr/api-contracts/validators';` is a convenient way
-// to access any validation-related export.
+// // Utility usage
+// const formattedAmount = Wallet.utils.formatBalance(1000);
+// const policyNumber = Policy.utils.generatePolicyNumber();
 //
 // ===========================================================================
 
-// --- API Versioning Information & Strategy ---
+// === API VERSIONING INFORMATION & STRATEGY ===
 export * from "./schemas/versioning";
 
-// --- Common DTOs, Utility Functions, and Non-Conflicting Enums ---
-// Be cautious about re-exporting everything from common.ts if names might clash.
-// It's safer to export specific, non-conflicting items or guide users to import from './dtos/common'.
+// === COMMON TYPES & UTILITIES (FOUNDATION) ===
 export {
-  // Common Interfaces & Types that are less likely to clash or are fundamental
   type ApiResponse,
   type ApiError,
   type PaginatedResponse,
@@ -72,48 +48,384 @@ export {
   type AuditLogEntry,
   type SystemConfig,
   type FeatureFlag,
-  // Common Enums (exported directly, Zod enums are in validators)
-  // Note: ErrorCode is exported as an enum for runtime usage
-  // The Zod enum schemas (e.g., errorCodeSchema) are available via validators.
-  ErrorCode, // Direct export of the enum
+  ErrorCode,
   type HttpMethod as HttpMethodType,
   type HttpStatusCode as HttpStatusCodeType,
   type ContentType as ContentTypeType,
   type ApiStatus as ApiStatusType,
   type Environment as EnvironmentType,
   type LogLevel as LogLevelType,
-  // Utility Functions
   isApiError,
   isApiSuccess,
   createApiError,
   createApiResponse,
   createPaginatedResponse,
-  // Common Constants
   API_BASE_PATHS,
   PAGINATION_DEFAULTS,
   RATE_LIMIT_DEFAULTS,
   SUPPORTED_CURRENCIES,
-  CHAT_INTERFACES, // From dtos/common via dtos/chat
-  INSURANCE_PRODUCT_TYPES, // From dtos/common via dtos/insurance
-  WALLET_TYPES, // From dtos/common via dtos/wallet
-  TRANSACTION_TYPES, // From dtos/common via dtos/wallet
 } from "./dtos/common";
 
-// --- Specific Wallet DTOs (Non-conflicting) ---
-export type { AnonymousSession, AnonymousSessionData } from "./dtos/wallet";
+// === DOMAIN IMPORTS ===
+import {
+  InsuranceDomain,
+  type InsuranceDomainNamespace,
+} from "./domains/insurance";
 
-// NOTE: `export * from './dtos/chat';` etc. are NOT used here to prevent name collisions
-// with Zod-inferred types exported from `./validators`.
-// Consumers MUST import DTOs from their specific dtos/* path.
+import { PolicyDomain, type PolicyDomainNamespace } from "./domains/policy";
 
-// NOTE: `export * from './validators';` is NOT used here for the same reason.
-// Consumers MUST import Zod schemas and Zod-inferred types from
-// `'@triggerr/api-contracts/validators'` or specific `validators/*` path.
+import { WalletDomain, type WalletDomainNamespace } from "./domains/wallet";
 
-// ===========================================================================
-// API CONTRACTS PACKAGE VERSION
-// (This is the version of the @triggerr/api-contracts package itself,
-// not the version of the API endpoints it describes).
-// ===========================================================================
+import { ChatDomain, type ChatDomainNamespace } from "./domains/chat";
 
+import { UserDomain, type UserDomainNamespace } from "./domains/user";
+
+// === DOMAIN NAMESPACE EXPORTS (RECOMMENDED) ===
+export const Insurance = InsuranceDomain;
+export const Policy = PolicyDomain;
+export const Wallet = WalletDomain;
+export const Chat = ChatDomain;
+export const User = UserDomain;
+
+// === INTERNAL DOMAIN EXPORTS ===
+export * from "./domains/internal";
+
+// === INSURANCE DOMAIN INDIVIDUAL EXPORTS (BACKWARD COMPATIBILITY) ===
+export type {
+  InsuranceQuoteRequest,
+  InsuranceQuoteResponse,
+  InsuranceProduct,
+  InsuranceProductsResponse,
+  InsuranceProductType,
+  CoverageTier,
+  PolicyPurchaseRequest,
+  PolicyPurchaseResponse,
+  PolicyTrackingRequest,
+  PolicyTrackingResponse,
+  AddToCartRequest,
+  AddToCartResponse,
+  FlightDetailsForQuote,
+  CoverageRequest,
+  PremiumBreakdown,
+  FlightRiskAssessment,
+  ProviderInfo,
+  ClaimStatus,
+  PaymentMethod,
+  PayoutStructure,
+  PayoutTier,
+  CoverageTierDefinition,
+  QuoteCoverage,
+  PremiumComponent,
+  PolicyCoverage,
+  PaymentConfirmation,
+  EscrowInfo,
+  CustomerSummary,
+  ClaimSummary,
+  FlightStatus,
+  ProductCategory,
+  CartItem,
+  AnonymousCartResponse,
+  PassengerDetails,
+  CustomerInfo,
+  EmergencyContact,
+  TravelPreferences,
+  NotificationPreferences,
+  CommunicationPreferences,
+  PaymentDetails,
+} from "./domains/insurance";
+
+export {
+  insuranceQuoteRequestSchema,
+  insuranceQuoteResponseSchema,
+  insuranceProductSchema,
+  insuranceProductsResponseSchema,
+  policyPurchaseRequestSchema,
+  policyPurchaseResponseSchema,
+  policyTrackingRequestSchema,
+  policyTrackingResponseSchema,
+  addToCartRequestSchema,
+  addToCartResponseSchema,
+  flightDetailsForQuoteSchema,
+  coverageRequestSchema,
+  premiumBreakdownSchema,
+  flightRiskAssessmentSchema,
+  providerInfoSchema,
+  validateInsuranceQuoteRequest,
+  validatePolicyPurchaseRequest,
+  validatePolicyTrackingRequest,
+  validateAddToCartRequest,
+  safeValidateInsuranceQuoteRequest,
+  safeValidatePolicyPurchaseRequest,
+  insuranceProductTypeSchema,
+  coverageTierSchema,
+  claimStatusSchema,
+  paymentMethodSchema,
+  payoutTypeSchema,
+  quoteCoverageSchema,
+  passengerDetailsSchema,
+  payoutTierSchema,
+  payoutStructureSchema,
+  premiumComponentSchema,
+  insuranceProductsListRequestSchema,
+} from "./domains/insurance";
+
+// === POLICY DOMAIN INDIVIDUAL EXPORTS (BACKWARD COMPATIBILITY) ===
+export type {
+  PolicyStatus,
+  AutomatedPayoutStatus,
+  PolicyEventType,
+  DocumentType,
+  BeneficiaryType,
+  EndorsementType,
+  PolicyCoverageDetails,
+  FlightPolicyDetails,
+  Policy as PolicyType,
+  PolicySummary,
+  AutomatedPayoutRecord,
+  PolicyEvent,
+  PolicyDocument,
+  Beneficiary,
+  Endorsement,
+  GetPolicyDetailsRequest,
+  GetPolicyDetailsResponse,
+  ListUserPoliciesRequest,
+  ListUserPoliciesResponse,
+  GetAutomatedPayoutRecordRequest,
+  GetAutomatedPayoutRecordResponse,
+  ListPolicyAutomatedPayoutsRequest,
+  ListPolicyAutomatedPayoutsResponse,
+  CancelPolicyRequest,
+  CancelPolicyResponse,
+  AddPolicyDocumentRequest,
+  AddPolicyDocumentResponse,
+  GetPolicyTimelineRequest,
+  GetPolicyTimelineResponse,
+  ManuallyReviewPayoutRequest,
+  ManuallyReviewPayoutResponse,
+} from "./domains/policy";
+
+export {
+  policySchema,
+  policySummarySchema,
+  policyEventSchema,
+  policyDocumentSchema,
+  policyCoverageDetailsSchema,
+  flightPolicyDetailsSchema,
+  automatedPayoutRecordSchema,
+  getPolicyDetailsRequestSchema,
+  getPolicyDetailsResponseSchema,
+  listUserPoliciesRequestSchema,
+  listUserPoliciesResponseSchema,
+  getAutomatedPayoutRecordRequestSchema,
+  getAutomatedPayoutRecordResponseSchema,
+  listPolicyAutomatedPayoutsRequestSchema,
+  listPolicyAutomatedPayoutsResponseSchema,
+  cancelPolicyRequestSchema,
+  cancelPolicyResponseSchema,
+  addPolicyDocumentRequestSchema,
+  addPolicyDocumentResponseSchema,
+  getPolicyTimelineRequestSchema,
+  getPolicyTimelineResponseSchema,
+  manuallyReviewPayoutRequestSchema,
+  manuallyReviewPayoutResponseSchema,
+  automatedPayoutStatusSchema,
+  policyEventTypeSchema,
+  documentTypeSchema,
+  policyStatusSchema,
+  beneficiaryTypeSchema,
+  endorsementTypeSchema,
+  beneficiarySchema,
+  endorsementSchema,
+} from "./domains/policy";
+
+// === WALLET DOMAIN INDIVIDUAL EXPORTS (BACKWARD COMPATIBILITY) ===
+export type {
+  WalletType,
+  WalletStatus,
+  TransactionType,
+  TransactionStatus,
+  UserStatus,
+  UserWallet,
+  UserWalletInfoResponse,
+  WalletTransaction,
+  EscrowSummary,
+  PendingOperation,
+  WalletSendRequest,
+  WalletSendResponse,
+  WalletReceiveRequest,
+  WalletReceiveResponse,
+  FaucetRequest,
+  UserFaucetResponse,
+  UserProfile,
+  UserPreferences,
+  AnonymousSession,
+  AnonymousSessionData,
+  UserSignupCompletionRequest,
+  UserSignupCompletionResponse,
+  UserProfileUpdateRequest,
+  UserProfileUpdateResponse,
+  UserPolicyListRequest,
+  UserPolicyListResponse,
+  UserDashboardRequest,
+  UserDashboardResponse,
+  TransactionHistoryRequest,
+  TransactionHistoryResponse,
+} from "./domains/wallet";
+
+export {
+  walletSendRequestSchema,
+  walletSendResponseSchema,
+  walletReceiveRequestSchema,
+  walletReceiveResponseSchema,
+  userWalletInfoResponseSchema,
+  generateAnonymousWalletRequestSchema,
+  linkExistingWalletRequestSchema,
+  faucetRequestSchema,
+  userFaucetResponseSchema,
+  userWalletSchema,
+  walletTransactionSchema,
+  escrowSummarySchema,
+  pendingOperationSchema,
+  userProfileSchema,
+  userPreferencesSchema,
+  anonymousSessionSchema,
+  anonymousSessionDataSchema,
+  userSignupCompletionRequestSchema,
+  userSignupCompletionResponseSchema,
+  userProfileUpdateRequestSchema,
+  userProfileUpdateResponseSchema,
+  userPolicyListRequestSchema,
+  userPolicyListResponseSchema,
+  userDashboardRequestSchema,
+  userDashboardResponseSchema,
+  walletTypeSchema,
+  walletStatusSchema,
+  transactionTypeSchema,
+  transactionStatusSchema,
+  userStatusSchema,
+  escrowCreateRequestSchema,
+  transactionHistoryRequestSchema,
+  transactionHistoryResponseSchema,
+} from "./domains/wallet";
+
+// === CHAT DOMAIN INDIVIDUAL EXPORTS (BACKWARD COMPATIBILITY) ===
+export type {
+  ChatMessageRole,
+  ChatMessageContentType,
+  ChatInterface,
+  ChatMessage,
+  ChatMessageRequest,
+  ChatMessageResponse,
+  ChatContext,
+  FlightSearchContext,
+  QuoteRequestContext,
+  PolicyInquiryContext,
+  ChatAction,
+  Conversation,
+  ConversationListRequest,
+  ConversationListResponse,
+  ConversationMessagesRequest,
+  ConversationMessagesResponse,
+  SyncAnonymousConversationRequest,
+  SyncAnonymousConversationResponse,
+  ChatInterfaceConfig,
+} from "./domains/chat";
+
+export {
+  chatMessageRequestSchema,
+  chatMessageSchema,
+  chatMessageResponseSchema,
+  conversationListRequestSchema,
+  conversationListResponseSchema,
+  conversationMessagesRequestSchema,
+  conversationMessagesResponseSchema,
+  syncAnonymousConversationRequestSchema,
+  syncAnonymousConversationResponseSchema,
+  chatContextSchema,
+  chatActionSchema,
+  conversationIdSchema,
+  chatMessageRoleSchema,
+  chatMessageContentTypeSchema,
+  chatInterfaceSchema,
+  conversationStatusSchema,
+  conversationSchema,
+  chatInterfaceConfigSchema,
+} from "./domains/chat";
+
+// === USER DOMAIN INDIVIDUAL EXPORTS (BACKWARD COMPATIBILITY) ===
+export type {
+  AdminUserActionType,
+  AdminListUsersRequest,
+  AdminListUsersResponse,
+  AdminGetUserRequest,
+  AdminGetUserResponse,
+  AdminUpdateUserRequest,
+  AdminUpdateUserResponse,
+  AdminPerformUserActionRequest,
+  AdminPerformUserActionResponse,
+  UserActivityLog,
+  GetUserActivityLogRequest,
+  GetUserActivityLogResponse,
+  UserConsent,
+  GetUserConsentsRequest,
+  GetUserConsentsResponse,
+  UpdateUserConsentRequest,
+  UpdateUserConsentResponse,
+} from "./domains/user";
+
+export {
+  adminUserActionTypeSchema,
+  adminListUsersRequestSchema,
+  adminListUsersResponseSchema,
+  adminGetUserRequestSchema,
+  adminGetUserResponseSchema,
+  adminUpdateUserRequestSchema,
+  adminUpdateUserResponseSchema,
+  adminPerformUserActionRequestSchema,
+  adminPerformUserActionResponseSchema,
+  userActivityLogSchema,
+  getUserActivityLogRequestSchema,
+  getUserActivityLogResponseSchema,
+  userConsentSchema,
+  getUserConsentsRequestSchema,
+  getUserConsentsResponseSchema,
+  updateUserConsentRequestSchema,
+  updateUserConsentResponseSchema,
+} from "./domains/user";
+
+// === COMBINED NAMESPACE EXPORTS FOR ADVANCED USAGE ===
+export const Domains = {
+  Insurance,
+  Policy,
+  Wallet,
+  Chat,
+  User,
+} as const;
+
+// === TYPE DEFINITIONS FOR NAMESPACE EXPORTS ===
+export type DomainsNamespace = typeof Domains;
+
+// Domain-specific namespace types
+export type InsuranceNamespace = typeof Insurance;
+export type PolicyNamespace = typeof Policy;
+export type WalletNamespace = typeof Wallet;
+export type ChatNamespace = typeof Chat;
+export type UserNamespace = typeof User;
+
+// === PACKAGE VERSION & BUILD INFO ===
 export const API_CONTRACTS_PACKAGE_VERSION = "0.1.0";
+export const API_CONTRACTS_BUILD_DATE = new Date().toISOString();
+
+// === DEFAULT EXPORT FOR ES MODULE COMPATIBILITY ===
+const apiContracts = {
+  Insurance,
+  Policy,
+  Wallet,
+  Chat,
+  User,
+  Domains,
+  version: API_CONTRACTS_PACKAGE_VERSION,
+  buildDate: API_CONTRACTS_BUILD_DATE,
+};
+
+export default apiContracts;

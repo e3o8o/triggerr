@@ -14,7 +14,7 @@ import {
   EscrowModelType,
   PremiumReturnPolicy,
 } from "../escrow-engine";
-import { db } from "@triggerr/core/database";
+import { Database, Schema } from "@triggerr/core";
 import type { Hex } from "viem";
 import type { PayGoClientService } from "@triggerr/paygo-adapter";
 import { BlockchainServiceRegistry } from "@triggerr/service-registry";
@@ -60,23 +60,21 @@ const mockDbQuery = {
   update: mockDbUpdate,
 };
 
-// Mock the entire database module
-mock.module("@triggerr/core/database", () => ({
-  db: mockDbQuery,
-}));
-
 // Mock generateInsureinnieEscrowId to return predictable values
 const mockGenerateEscrowId = mock(() => ({
   internalId: "INS-escrow-123",
   blockchainId: "0x_mock_blockchain_id_123",
 }));
 
-mock.module("@triggerr/core/utils/escrow-id-generator", () => ({
-  generateInsureinnieEscrowId: mockGenerateEscrowId,
-}));
-
-mock.module("@triggerr/core/database/schema", () => ({
-  escrow: "mocked_escrow_table",
+// Mock the entire @triggerr/core module
+mock.module("@triggerr/core", () => ({
+  Database: {
+    db: mockDbQuery,
+  },
+  Schema: {
+    escrow: "mocked_escrow_table",
+  },
+  generateUserEscrowId: mockGenerateEscrowId,
 }));
 
 mock.module("drizzle-orm", () => ({

@@ -85,6 +85,7 @@
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.44.2",
     "eslint": "^8.57.0",
+    "glob": "^11.0.3",
     "nanoid": "^5.1.5",
     "picocolors": "^1.1.1",
     "postcss": "^8.5.4",

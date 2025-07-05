@@ -14,6 +14,7 @@
     "bun-types": "latest",
     "better-auth": "^1.2.10",
     "@triggerr/api-contracts": "workspace:*",
+    "@triggerr/blockchain": "workspace:*",
     "@triggerr/core": "workspace:*",
     "@triggerr/shared": "workspace:*",
     "@triggerr/paygo-adapter": "workspace:*",

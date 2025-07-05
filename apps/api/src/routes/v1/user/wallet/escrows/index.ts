@@ -1,7 +1,7 @@
 import { createApiError, createApiResponse } from "@triggerr/api-contracts";
-import { getAuthContext } from "@triggerr/core/auth";
-import { db } from "@triggerr/core/database";
-import { escrow, userWallets } from "@triggerr/core/database/schema";
+import { Auth } from "@triggerr/core";
+import { Database } from "@triggerr/core";
+import { Schema } from "@triggerr/core";
 import { eq, or } from "drizzle-orm";
 
 /**
@@ -46,7 +46,7 @@ export async function handleGetUserEscrows(
 
   try {
     // Get authentication context, passing the request headers
-    const authContext = await getAuthContext(
+    const authContext = await Auth.getAuthContext(
       request.headers,
       request.headers.get("Cookie") || undefined,
     );
@@ -66,18 +66,20 @@ export async function handleGetUserEscrows(
     console.log(`[API Escrows List] Fetching escrows for user: ${userId}`);
 
     // Get user's wallet addresses to match against fulfiller addresses
-    const userWalletAddresses = await db.query.userWallets.findMany({
-      where: eq(userWallets.userId, userId),
+    const userWalletAddresses = await Database.db.query.userWallets.findMany({
+      where: eq(Schema.userWalletsSchema.userId, userId),
       columns: {
         address: true,
       },
     });
 
-    const walletAddresses = userWalletAddresses.map((wallet) => wallet.address);
+    const walletAddresses = userWalletAddresses.map(
+      (wallet: any) => wallet.address,
+    );
 
     // Fetch escrows created by the user
-    const createdEscrows = await db.query.escrow.findMany({
-      where: eq(escrow.userId, userId),
+    const createdEscrows = await Database.db.query.escrow.findMany({
+      where: eq(Schema.escrowSchema.userId, userId),
       columns: {
         id: true,
         blockchainId: true,
@@ -88,16 +90,16 @@ export async function handleGetUserEscrows(
         fulfillerAddress: true,
         purpose: true,
       },
-      orderBy: (escrow, { desc }) => [desc(escrow.createdAt)],
+      orderBy: (escrow: any, { desc }: any) => [desc(escrow.createdAt)],
     });
 
     // Fetch escrows assigned to the user (where user's wallet is the fulfiller)
     let assignedEscrows: any[] = [];
     if (walletAddresses.length > 0) {
-      assignedEscrows = await db.query.escrow.findMany({
+      assignedEscrows = await Database.db.query.escrow.findMany({
         where: or(
-          ...walletAddresses.map((address) =>
-            eq(escrow.fulfillerAddress, address),
+          ...walletAddresses.map((address: string) =>
+            eq(Schema.escrowSchema.fulfillerAddress, address),
           ),
         ),
         columns: {
@@ -110,15 +112,15 @@ export async function handleGetUserEscrows(
           userId: true,
           purpose: true,
         },
-        orderBy: (escrow, { desc }) => [desc(escrow.createdAt)],
+        orderBy: (escrow: any, { desc }: any) => [desc(escrow.createdAt)],
       });
     }
 
     // Format the response
     const response: UserEscrowsResponse = {
       created: createdEscrows
-        .filter((escrowItem) => escrowItem.blockchainId) // Filter out null blockchainIds
-        .map((escrowItem) => ({
+        .filter((escrowItem: any) => escrowItem.blockchainId) // Filter out null blockchainIds
+        .map((escrowItem: any) => ({
           id: escrowItem.id,
           blockchainId: escrowItem.blockchainId!,
           amount: escrowItem.amount,

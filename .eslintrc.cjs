@@ -8,9 +8,17 @@ module.exports = {
   ignorePatterns: [
     "node_modules/",
     "dist/",
+    "**/dist/**",
+    "build/",
+    "**/build/**",
     ".next/",
     ".turbo/",
     "coverage/",
+    "**/*.tsbuildinfo",
+    "**/dist/**/*.d.ts",
+    "**/dist/**/*.js",
+    "**/dist/**/*.js.map",
+    "**/dist/**/*.d.ts.map",
     // By default, all .d.ts files are ignored. We negate the pattern for our custom
     // types directory to ensure our hand-crafted declaration files are linted.
     "!**/types/**/*.d.ts",

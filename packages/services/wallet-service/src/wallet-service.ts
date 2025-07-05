@@ -5,14 +5,14 @@ import {
 import { BlockchainServiceRegistry } from "@triggerr/service-registry";
 import { UserWalletClientService } from "./user-wallet-client";
 import type { Hex } from "viem";
-import { db } from "@triggerr/core/database";
+import { Database } from "@triggerr/core";
 import { UserWalletRepository } from "./repository";
 import { EncryptionService } from "./encryption-service";
 
 // Define the type for a Drizzle transaction object.
 // This allows us to pass either the main `db` instance or a transaction `tx`
 // to methods that need to be transaction-aware.
-type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+type Transaction = Parameters<Parameters<typeof Database.db.transaction>[0]>[0];
 
 /**
  * Main service for handling wallet-related business logic.
