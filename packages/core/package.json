@@ -54,7 +54,7 @@
   },
   "dependencies": {
     "drizzle-orm": "^0.44.2",
-    "better-auth": "^1.2.7",
+    "better-auth": "^1.2.10",
     "zod": "^3.24.4",
     "@neondatabase/serverless": "^1.0.0",
     "pg": "^8.16.0"

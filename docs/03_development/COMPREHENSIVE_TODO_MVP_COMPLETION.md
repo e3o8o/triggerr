@@ -10,15 +10,7 @@
 ## 🚨 **CRITICAL ERRORS IDENTIFIED**
 
 ### **Build System Failures:**
-1. **Turbo Workspace Resolution Error**: Missing `name` field at line 65 in package.json (likely a malformed package.json)
-2. **TypeScript Compilation Errors**: 18+ critical type errors blocking build
-3. **Drizzle ORM Version Conflicts**: Multiple incompatible SQL type definitions
-4. **Service Integration Mismatches**: API routes cannot instantiate required services
-
-### **Service Integration Failures:**
-1. **DataRouter Constructor Mismatch**: API expects `new DataRouter(logger)` but constructor requires `(flightAggregator, weatherAggregator)`
-2. **Quote Request Type Mismatch**: Service expects `coverageType` (string) but API provides `coverageTypes` (array)
-3. **Policy Engine Dependencies**: Missing proper dependency injection setup
+1. **Critical Module Resolution Error**: `cannot find package better auth from core/dist/auth/auth.js` when running `bun dev` for `@triggerr/api`. This indicates a core dependency linking issue after deep import refactoring.
 
 ---
 
