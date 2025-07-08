@@ -80,31 +80,58 @@ export async function handleInsuranceQuote(req: Request): Promise<Response> {
   try {
     // Step 2: Initialize services
     const logger = new Logger(LogLevel.INFO, "QuoteAPI");
-    // Initialize API clients only when API keys are available
+
+    // Check if we should use real APIs or fallback mode
+    const useRealApis = process.env.TRIGGERR_USE_REAL_APIS === "true";
+    const hasFlightApiKeys = !!(
+      process.env.FLIGHTAWARE_API_KEY ||
+      process.env.AVIATIONSTACK_API_KEY ||
+      (process.env.OPENSKY_USERNAME && process.env.OPENSKY_PASSWORD)
+    );
+    const hasWeatherApiKeys = !!process.env.GOOGLE_WEATHER_API_KEY;
+
+    // Initialize API clients only when API keys are available and real APIs are enabled
     const flightApiClients = [];
-    if (process.env.FLIGHTAWARE_API_KEY) {
-      flightApiClients.push(
-        new FlightAwareClient(process.env.FLIGHTAWARE_API_KEY),
-      );
-    }
-    if (process.env.AVIATIONSTACK_API_KEY) {
-      flightApiClients.push(
-        new AviationStackClient(process.env.AVIATIONSTACK_API_KEY),
-      );
-    }
-    if (process.env.OPENSKY_USERNAME && process.env.OPENSKY_PASSWORD) {
-      flightApiClients.push(
-        new OpenSkyClient(
-          process.env.OPENSKY_USERNAME,
-          process.env.OPENSKY_PASSWORD,
-        ),
+    const weatherApiClients = [];
+
+    if (useRealApis && hasFlightApiKeys) {
+      logger.info(`[QuoteAPI] [${requestId}] Using real flight data APIs`);
+
+      if (process.env.FLIGHTAWARE_API_KEY) {
+        flightApiClients.push(
+          new FlightAwareClient(process.env.FLIGHTAWARE_API_KEY),
+        );
+      }
+      if (process.env.AVIATIONSTACK_API_KEY) {
+        flightApiClients.push(
+          new AviationStackClient(process.env.AVIATIONSTACK_API_KEY),
+        );
+      }
+      if (process.env.OPENSKY_USERNAME && process.env.OPENSKY_PASSWORD) {
+        flightApiClients.push(
+          new OpenSkyClient(
+            process.env.OPENSKY_USERNAME,
+            process.env.OPENSKY_PASSWORD,
+          ),
+        );
+      }
+    } else {
+      logger.info(
+        `[QuoteAPI] [${requestId}] Using fallback flight data (real APIs: ${useRealApis ? "enabled" : "disabled"}, keys available: ${hasFlightApiKeys})`,
       );
     }
 
-    const weatherApiClients = [];
-    if (process.env.GOOGLE_WEATHER_API_KEY) {
-      weatherApiClients.push(
-        new GoogleWeatherClient(process.env.GOOGLE_WEATHER_API_KEY),
+    if (useRealApis && hasWeatherApiKeys) {
+      logger.info(`[QuoteAPI] [${requestId}] Using real weather data APIs`);
+
+      if (process.env.GOOGLE_WEATHER_API_KEY) {
+        weatherApiClients.push(
+          new GoogleWeatherClient(process.env.GOOGLE_WEATHER_API_KEY),
+        );
+      }
+    } else {
+      logger.info(
+        `[QuoteAPI] [${requestId}] Using fallback weather data (real APIs: ${useRealApis ? "enabled" : "disabled"}, keys available: ${hasWeatherApiKeys})`,
       );
     }
 
@@ -136,7 +163,9 @@ export async function handleInsuranceQuote(req: Request): Promise<Response> {
       flightNumber: body.flightNumber,
       flightDate: body.flightDate,
       coverageType: mapCoverageType(body.coverageTypes?.[0] || "DELAY"),
-      coverageAmount: body.coverageAmounts?.DELAY?.toString() || "50000", // Default $500.00 coverage as string
+      coverageAmount: body.coverageAmounts?.DELAY
+        ? (body.coverageAmounts.DELAY / 100).toString()
+        : "500.00", // Convert cents to dollars
       airports: body.airports || [body.originAirport, body.destinationAirport],
       productType: "BASIC" as const,
     };

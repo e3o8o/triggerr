@@ -1,6 +1,11 @@
+import { config } from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import * as schema from "./schema";
+
+// Load environment variables first - this ensures DATABASE_URL is available
+// regardless of how this module is imported
+config({ path: ".env" });
 
 // Environment variable validation
 const DATABASE_URL = process.env.DATABASE_URL;

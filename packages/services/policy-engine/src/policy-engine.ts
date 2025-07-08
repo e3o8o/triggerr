@@ -25,8 +25,9 @@ import { and, eq } from "drizzle-orm";
 
 export interface PolicyPurchaseRequest {
   quoteId: string;
-  // This would typically come from the authenticated user's context
-  userId: string;
+  // Either userId (for authenticated users) or anonymousSessionId (for anonymous users)
+  userId?: string;
+  anonymousSessionId?: string;
   // The wallet from which the premium will be paid
   buyerWalletAddress: string;
   // The private key for the buyer's wallet to sign the transaction
@@ -87,6 +88,7 @@ export class PolicyEngine {
     const policy = await this.createPolicyRecordInDB(
       quote,
       request.userId,
+      request.anonymousSessionId,
       request.chain,
       requestId,
     );
@@ -208,10 +210,18 @@ export class PolicyEngine {
    */
   private async createPolicyRecordInDB(
     quote: ValidatedQuote,
-    userId: string,
+    userId: string | undefined,
+    anonymousSessionId: string | undefined,
     chain: string,
     requestId: string,
   ) {
+    // Validate that exactly one of userId or anonymousSessionId is provided
+    if ((!userId && !anonymousSessionId) || (userId && anonymousSessionId)) {
+      this.logger.error(
+        `[PolicyEngine] [${requestId}] Invalid user identification: exactly one of userId or anonymousSessionId must be provided`,
+      );
+      throw new Error("InvalidUserIdentification");
+    }
     const policyId = generateId("pol");
     const policyNumber = `TRG-${new Date().getFullYear()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 
@@ -226,7 +236,8 @@ export class PolicyEngine {
       .values({
         id: policyId,
         policyNumber,
-        userId,
+        userId: userId || null,
+        anonymousSessionId: anonymousSessionId || null,
         providerId: quote.providerId,
         flightId: quote.flightId,
         quoteId: quote.id,
