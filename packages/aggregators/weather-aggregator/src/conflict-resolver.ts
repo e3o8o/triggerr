@@ -268,6 +268,9 @@ export class WeatherConflictResolver {
       (acc, contrib) => acc + contrib.confidence * 0.1,
       0,
     );
+    if (totalWeight === 0) {
+      return 0; // No valid fields, quality is 0
+    }
     return Math.min(1.0, score / totalWeight + sourceScore);
   }
 

@@ -45,7 +45,7 @@ export class SourceRouter {
     console.log(
       `[SourceRouter] Determining source priority for flight: ${flightNumber}`,
     );
-
+    /*
     // Check health status of all sources
     await this.updateHealthStatus();
 
@@ -57,6 +57,19 @@ export class SourceRouter {
       }
       return isHealthy;
     });
+    */
+    // TODO: Re-enable health checks when upgrading to paid API subscriptions
+    // This will improve performance by pre-filtering unavailable sources
+    // await this.updateHealthStatus();
+
+    // TEMPORARY: Skip health checks for free-tier API compatibility
+    // Free-tier APIs often reject generic health check queries (query=*)
+    // The FlightAggregator will handle individual source failures gracefully
+    const availableSources = this.sources;
+
+    console.log(
+      `[SourceRouter] Optimistically providing all ${availableSources.length} sources`,
+    );
 
     // Apply airline-specific routing logic (future enhancement)
     const routedSources = this.applyAirlineRouting(
@@ -94,8 +107,21 @@ export class SourceRouter {
 
   /**
    * Update health status of all data sources.
+   *
+   * TEMPORARILY DISABLED for free-tier API compatibility.
+   * Re-enable when upgrading to paid subscriptions.
    */
   private async updateHealthStatus(): Promise<void> {
+    // TODO: Re-enable for paid API subscriptions
+    // Free-tier APIs often reject generic health queries, causing all sources
+    // to be marked as unhealthy. The FlightAggregator handles failures gracefully.
+
+    console.log(
+      "[SourceRouter] Health checks disabled for free-tier API compatibility",
+    );
+    return;
+
+    /* PRESERVED FOR FUTURE USE - UNCOMMENT WHEN UPGRADING TO PAID SUBSCRIPTIONS
     const now = Date.now();
 
     for (const source of this.sources) {
@@ -123,6 +149,7 @@ export class SourceRouter {
         }
       }
     }
+    */
   }
 
   /**

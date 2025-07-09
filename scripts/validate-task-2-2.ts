@@ -20,6 +20,10 @@
 import { QuoteService } from "@triggerr/quote-engine";
 import { DataRouter } from "@triggerr/data-router";
 import { Logger, LogLevel } from "@triggerr/core";
+import { FlightAwareClient } from "@triggerr/flightaware-adapter";
+import { AviationStackClient } from "@triggerr/aviationstack-adapter";
+import { OpenSkyClient } from "@triggerr/opensky-adapter";
+import { GoogleWeatherClient } from "@triggerr/google-weather-adapter";
 
 interface ValidationResult {
   testName: string;
@@ -30,11 +34,65 @@ interface ValidationResult {
 }
 
 class Task22Validator {
-  private results: ValidationResult[] = [];
   private logger: Logger;
 
   constructor() {
     this.logger = new Logger(LogLevel.INFO, "Task22Validator");
+  }
+
+  /**
+   * Initialize API clients based on environment configuration
+   */
+  private initializeApiClients(): {
+    flightApiClients: any[];
+    weatherApiClients: any[];
+  } {
+    const useRealApis = process.env.TRIGGERR_USE_REAL_APIS === "true";
+    const flightApiClients = [];
+    const weatherApiClients = [];
+
+    if (useRealApis) {
+      this.logger.info("Initializing real API clients for Phase 3 testing");
+
+      // Initialize flight API clients
+      if (process.env.FLIGHTAWARE_API_KEY) {
+        flightApiClients.push(
+          new FlightAwareClient(process.env.FLIGHTAWARE_API_KEY),
+        );
+        this.logger.info("✅ FlightAware client initialized");
+      }
+      if (process.env.AVIATIONSTACK_API_KEY) {
+        flightApiClients.push(
+          new AviationStackClient(process.env.AVIATIONSTACK_API_KEY),
+        );
+        this.logger.info("✅ AviationStack client initialized");
+      }
+      if (process.env.OPENSKY_USERNAME && process.env.OPENSKY_PASSWORD) {
+        flightApiClients.push(
+          new OpenSkyClient(
+            process.env.OPENSKY_USERNAME,
+            process.env.OPENSKY_PASSWORD,
+          ),
+        );
+        this.logger.info("✅ OpenSky client initialized");
+      }
+
+      // Initialize weather API clients
+      if (process.env.GOOGLE_WEATHER_API_KEY) {
+        weatherApiClients.push(
+          new GoogleWeatherClient(process.env.GOOGLE_WEATHER_API_KEY),
+        );
+        this.logger.info("✅ Google Weather client initialized");
+      }
+
+      this.logger.info(
+        `Real API clients initialized: ${flightApiClients.length} flight, ${weatherApiClients.length} weather`,
+      );
+    } else {
+      this.logger.info("Using fallback mode (TRIGGERR_USE_REAL_APIS=false)");
+    }
+
+    return { flightApiClients, weatherApiClients };
   }
 
   async runValidation(): Promise<void> {
@@ -56,12 +114,14 @@ class Task22Validator {
   private async testDirectQuoteService(): Promise<void> {
     console.log("📋 Testing Direct QuoteService Functionality...\n");
 
-    // Test 1: Basic Quote Generation with Fallback Data
-    await this.runTest("Basic Quote Generation (Fallback Mode)", async () => {
+    // Test 1: Basic Quote Generation
+    await this.runTest("Basic Quote Generation", async () => {
+      const { flightApiClients, weatherApiClients } =
+        this.initializeApiClients();
       const dataRouter = new DataRouter({
         logger: this.logger,
-        flightApiClients: [], // Empty - triggers fallback
-        weatherApiClients: [], // Empty - triggers fallback
+        flightApiClients,
+        weatherApiClients,
       });
 
       const quoteService = new QuoteService(dataRouter, this.logger);
@@ -96,10 +156,12 @@ class Task22Validator {
 
     // Test 2: Multiple Coverage Types
     await this.runTest("Multiple Coverage Types Support", async () => {
+      const { flightApiClients, weatherApiClients } =
+        this.initializeApiClients();
       const dataRouter = new DataRouter({
         logger: this.logger,
-        flightApiClients: [],
-        weatherApiClients: [],
+        flightApiClients,
+        weatherApiClients,
       });
 
       const quoteService = new QuoteService(dataRouter, this.logger);
@@ -351,11 +413,14 @@ class Task22Validator {
     console.log("📊 Testing Data Quality Assessment...\n");
 
     // Test 8: Data Quality Metrics
-    await this.runTest("Data Quality Metrics", async () => {
+    // Test 2: Data Quality Assessment
+    await this.runTest("Data Quality Assessment", async () => {
+      const { flightApiClients, weatherApiClients } =
+        this.initializeApiClients();
       const dataRouter = new DataRouter({
         logger: this.logger,
-        flightApiClients: [],
-        weatherApiClients: [],
+        flightApiClients,
+        weatherApiClients,
       });
 
       const quoteService = new QuoteService(dataRouter, this.logger);
