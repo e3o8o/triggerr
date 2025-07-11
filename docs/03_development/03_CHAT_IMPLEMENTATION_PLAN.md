@@ -5,6 +5,8 @@
 **Status**: Strategic Technical Blueprint
 **Objective**: To provide a definitive technical plan for implementing the "Chat-to-Quote" feature. This document details the agnostic LLM architecture, the conversational flow, the structured UI fallback, and the critical dependencies on the data aggregation layer.
 
+> **Legal Framework**: Comprehensive regulatory compliance strategy and entity structure documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)
+
 ---
 
 ## 1. **Executive Summary & Core Principles**
@@ -21,6 +23,8 @@ The "Chat-First" interface is a core pillar of the Triggerr user experience. Thi
 
 ## 2. **Phase 1: The Agnostic LLM Abstraction Layer**
 **Goal**: To create a "socket-and-plugs" architecture for LLM providers, mirroring our successful blockchain abstraction.
+
+**Business Context**: Implemented under Triggerr Direct LLC as first-party provider, leveraging Nevada's innovation-friendly regulatory environment for AI/LLM integration.
 
 *   **Task 1.1: Create the `llm-interface` Package**
     *   **Action**: Create `packages/llm/llm-interface/`.
@@ -70,13 +74,25 @@ The "Chat-First" interface is a core pillar of the Triggerr user experience. Thi
     *   **Action**: The main method, `processUserMessage`, will orchestrate the full flow as designed:
         1.  **Entity Extraction**: Make a first call to `this.llmClient` with a system prompt designed to extract structured data (flight number, date, locations) from the user's raw text.
         2.  **Quote Generation**: Pass the extracted entities to `this.quoteEngine.generateQuote()` to get a quote.
-        3.  **Response Generation**: Make a second call to `this.llmClient` with a system prompt designed to generate a friendly, human-readable response that presents the quote to the user.
-        4.  **Return**: Send back a structured response to the frontend containing the AI's message, the `conversationId`, and the `quoteId` in the context object.
+        *   **Response Generation**: Make a second call to `this.llmClient` with a system prompt designed to generate a friendly, human-readable response that presents the quote to the user.
+        *   **Return**: Send back a structured response to the frontend containing the AI's message, the `conversationId`, the `quoteId` in the context object, and provider information for regulatory compliance.
 
 ---
 
 ## 5. **Phase 4: API and Frontend Implementation**
-**Goal**: To expose the new services via the API and build the resilient UI.
+**Goal**: To expose the new services via the API and build the resilient UI with entity-aware responses.
+
+### Enhanced Response Structure for Entity Compliance
+
+```typescript
+interface ChatMessageResponse {
+  // ... existing fields
+  provider: "Triggerr Direct" | "Third-Party Marketplace";
+  entity: "triggerr-direct-llc" | "parametrigger-inc";
+  jurisdiction: "nevada" | "multi-state";
+  complianceFramework: "insurance-sandbox" | "surplus-lines";
+}
+```
 
 *   **Task 5.1: Implement API Endpoints**
     *   **`POST /api/v1/chat/message`**: This handler will receive the user's text, inject the `ChatService`, and call the `processUserMessage` method.
@@ -90,4 +106,6 @@ The "Chat-First" interface is a core pillar of the Triggerr user experience. Thi
         *   A structured form view with fields for airports, date, etc., which calls the `/insurance/quote` endpoint.
     *   **Resilience**: The frontend will include logic to detect if the `/chat/message` endpoint fails (e.g., due to an LLM service outage) and will prompt the user to use the structured form as a fallback.
 
-This comprehensive plan ensures that our chat feature is not only powerful and intuitive but also robust, scalable, and perfectly aligned with our modular, interface-driven architecture.
+This comprehensive plan ensures that our chat feature is not only powerful and intuitive but also robust, scalable, and perfectly aligned with our modular, interface-driven architecture while maintaining compliance with our Nevada-based entity structure and regulatory arbitrage strategy.
+
+> **Legal Framework**: Detailed entity responsibilities, AI/LLM compliance requirements, and regulatory considerations documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)

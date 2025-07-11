@@ -13,6 +13,8 @@ The `QuoteEngine` is the primary "brain" of our insurance platform's pricing mec
 
 It is fundamentally decoupled from all external data sources and all blockchain-specific logic.
 
+> **Legal Framework**: Comprehensive regulatory compliance strategy and entity structure documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)
+
 ```mermaid
 flowchart TD
     A[DataRouter] --> B[QuoteEngine];
@@ -233,23 +235,66 @@ The `QuoteEngine` persists every generated quote to ensure price integrity and p
 
 ---
 
-## 5. **Implementation Status & Performance** ✅ **COMPLETE**
+## 5. **Platform Strategy & Business Model** ✅ **IMPLEMENTED**
 
-### **5.1. Production Readiness**
+### **5.1. Entity Structure & Revenue Flow**
+```mermaid
+flowchart LR
+    A[Quote Engine] --> B[Triggerr Direct LLC]
+    A --> C[Platform Marketplace]
+    
+    B --> B1[85% Revenue Retention]
+    B --> B2[First-Party Products]
+    
+    C --> C1[15% Platform Fee]
+    C --> C2[Third-Party Providers]
+    C --> C3[20% DeFi Yield Share]
+    
+    subgraph "Nevada Entities"
+        B
+        D[Preterag Financial Solutions]
+    end
+    
+    subgraph "Revenue Streams"
+        B1
+        C1
+        C3
+    end
+```
+
+### **5.2. Parametric Risk Marketplace Integration**
+*   **Primary Provider**: Triggerr Direct LLC retains 85% of premium revenue for first-party products
+*   **Platform Operations**: 15% platform fee on third-party insurance products
+*   **DeFi Integration**: 20% yield sharing from escrowed premiums through automated triggers
+*   **Risk Analysis**: Preterag Financial Solutions Inc. provides risk modeling and data analysis services
+
+### **5.3. Regulatory Advantages**
+*   **Nevada Incorporation**: Benefits from insurance innovation sandbox and business-friendly regulations
+*   **Entity Separation**: Quote Engine operates under optimal regulatory framework for each function
+*   **Parametric Classification**: Algorithmic pricing freedom without traditional rate approval requirements
+*   **Multi-Jurisdictional**: Supports both US operations and EU market access through entity structure
+
+> **Detailed Legal Framework**: Entity responsibilities, regulatory arbitrage strategy, and compliance requirements documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)
+
+---
+
+## 6. **Implementation Status & Performance** ✅ **COMPLETE**
+
+### **6.1. Production Readiness**
 *   **✅ API Integration**: `/api/v1/insurance/quote` endpoint fully functional
 *   **✅ Environment Configuration**: Supports both real APIs and fallback testing mode
 *   **✅ Error Handling**: Comprehensive validation and graceful degradation
 *   **✅ Performance**: Sub-1000ms average response times
 *   **✅ Testing**: 12 comprehensive validation tests covering all functionality
 
-### **5.2. Key Features Delivered**
+### **6.2. Key Features Delivered**
 *   **✅ Multi-Factor Risk Assessment**: Sophisticated flight and weather risk modeling
 *   **✅ Dynamic Premium Calculation**: Risk-adjusted pricing with confidence scoring
 *   **✅ Data Quality Assessment**: Comprehensive quality metrics and fallback handling
 *   **✅ Database Integration**: Robust quote persistence with expiration management
 *   **✅ API Response Compliance**: Matches vision document specifications exactly
 
-### **5.3. Configuration Options**
+### **6.3. Configuration Options**
 *   **Production Mode**: Set `TRIGGERR_USE_REAL_APIS=true` with API keys
 *   **Testing Mode**: Works immediately with intelligent fallback data
 *   **Supported APIs**: FlightAware, AviationStack, OpenSky, Google Weather

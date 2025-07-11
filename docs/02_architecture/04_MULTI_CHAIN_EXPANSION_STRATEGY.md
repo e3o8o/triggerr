@@ -5,6 +5,8 @@
 **Status**: Strategic Architectural Blueprint
 **Objective**: To provide a definitive technical strategy for expanding the platform's blockchain support beyond the initial PayGo MVP to include Ethereum, Base, and Solana.
 
+> **Legal Framework**: Comprehensive regulatory compliance strategy and multi-chain legal considerations documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)
+
 ---
 
 ## 1. **Executive Summary**
@@ -13,7 +15,7 @@ With the foundational architecture now supporting a generic `IBlockchainService`
 
 Our strategy is predicated on a crucial understanding: **supporting a new, non-native blockchain requires us to replicate the on-chain business logic (escrow, delegation) that is provided out-of-the-box by the PayGo network.** This involves developing, deploying, and maintaining our own set of smart contracts for each new ecosystem we enter.
 
-This document details the on-chain requirements and the corresponding off-chain "adapter" implementation needed for each target blockchain.
+This document details the on-chain requirements and the corresponding off-chain "adapter" implementation needed for each target blockchain, while considering the regulatory advantages of our Nevada-based entity structure.
 
 ---
 
@@ -129,20 +131,84 @@ For each new chain, we will create a new package within `packages/blockchain/`.
 
 ---
 
-## 6. **Implementation Phasing**
+## 6. **Regulatory Considerations & Chain Selection**
+
+### **6.1. Jurisdictional Mapping**
+
+```mermaid
+graph TD
+    A[Multi-Chain Strategy] --> B[Nevada Entity Benefits]
+    A --> C[Chain Selection Criteria]
+    A --> D[Regulatory Arbitrage]
+    
+    B --> B1[Business-Friendly Regulations]
+    B --> B2[Blockchain-Friendly Laws]
+    B --> B3[Innovation Sandbox]
+    
+    C --> C1[Ethereum - Established DeFi]
+    C --> C2[Base - L2 Efficiency]
+    C --> C3[Solana - Performance]
+    
+    D --> D1[Reduced Compliance Costs]
+    D --> D2[Faster Innovation Cycles]
+    D --> D3[Multi-Chain Flexibility]
+```
+
+### **6.2. Chain-Specific Regulatory Advantages**
+
+| Blockchain | Regulatory Benefits | Nevada Entity Advantage | Strategic Value |
+|------------|-------------------|------------------------|-----------------|
+| **Ethereum** | Established DeFi regulations | Nevada blockchain laws (NRS 719) | High liquidity, mature ecosystem |
+| **Base** | L2 regulatory clarity | Reduced gas costs for compliance | Cost-efficient operations |
+| **Solana** | Performance-focused regulation | Innovation-friendly jurisdiction | High-throughput applications |
+
+### **6.3. Compliance Strategy Per Chain**
+
+**Entity Structure Benefits**:
+- **Parametrigger Inc.**: Technology platform development across all chains
+- **Triggerr Direct LLC**: Insurance risk bearing with multi-chain escrow support
+- **Preterag Financial Solutions Inc.**: Cross-chain risk analysis and DeFi integration
+
+**Regulatory Arbitrage**:
+- Nevada's blockchain-friendly legislation supports multi-chain operations
+- Entity separation isolates smart contract risks from insurance operations
+- DeFi integration benefits from Nevada's crypto-friendly regulatory environment
+
+> **Detailed Legal Framework**: Multi-chain regulatory strategy, smart contract compliance, and cross-chain legal considerations documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)
+
+---
+
+## 7. **Implementation Phasing**
 
 This expansion will be tackled sequentially after the PayGo MVP is launched and stable.
 
 1.  **Phase A: Ethereum & Base Integration**
-    *   Develop and audit the Solidity smart contracts.
-    *   Deploy contracts to Sepolia (for Ethereum) and Base Goerli (for Base) testnets.
-    *   Build and test the `@triggerr/ethereum-adapter` package.
-    *   Update the `BlockchainServiceRegistry` to include the new `EthereumClientService` and `BaseClientService` (which may be the same class, just configured with a different RPC endpoint).
+    *   Develop and audit the Solidity smart contracts under Nevada entity structure
+    *   Deploy contracts to Sepolia (for Ethereum) and Base Goerli (for Base) testnets
+    *   Build and test the `@triggerr/ethereum-adapter` package
+    *   Update the `BlockchainServiceRegistry` to include the new `EthereumClientService` and `BaseClientService`
+    *   Implement regulatory compliance monitoring for multi-chain operations
 
 2.  **Phase B: Solana Integration**
-    *   Develop and audit the Rust-based on-chain escrow program.
-    *   Deploy the program to the Solana Devnet.
-    *   Build and test the `@triggerr/solana-adapter` package.
-    *   Update the `BlockchainServiceRegistry` to include the new `SolanaClientService`.
+    *   Develop and audit the Rust-based on-chain escrow program
+    *   Deploy the program to the Solana Devnet
+    *   Build and test the `@triggerr/solana-adapter` package
+    *   Update the `BlockchainServiceRegistry` to include the new `SolanaClientService`
+    *   Establish cross-chain compliance framework
 
-This document provides the strategic clarity needed to guide our multi-chain development efforts. It ensures that as we expand, we do so in a way that is consistent, scalable, and true to our core architectural principles.
+3.  **Phase C: Regulatory Optimization**
+    *   Leverage Nevada's blockchain-friendly regulations across all chains
+    *   Implement entity-specific compliance monitoring
+    *   Optimize cross-chain operations for regulatory arbitrage benefits
+    *   Establish multi-chain audit and reporting infrastructure
+
+This document provides the strategic clarity needed to guide our multi-chain development efforts. It ensures that as we expand, we do so in a way that is consistent, scalable, and true to our core architectural principles while maximizing regulatory advantages through our Nevada-based entity structure.
+
+**Key Success Factors**:
+1. **Regulatory Arbitrage**: Leverage Nevada's blockchain-friendly regulations across all chains
+2. **Entity Optimization**: Utilize appropriate entities for each blockchain function
+3. **Compliance Efficiency**: Minimize regulatory burden through strategic implementation
+4. **Cross-Chain Coordination**: Maintain consistent legal framework across all blockchains
+5. **Innovation Flexibility**: Preserve ability to adapt to regulatory changes
+
+> **Legal Framework**: Comprehensive multi-chain regulatory strategy, entity coordination, and compliance requirements documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)

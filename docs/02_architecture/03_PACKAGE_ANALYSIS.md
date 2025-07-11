@@ -2,9 +2,16 @@
 
 ## Overview
 
-This document provides a detailed analysis of the key packages used in the triggerr API development. Understanding these packages is essential for implementing APIs correctly and avoiding TypeScript errors and build failures.
+This document provides a detailed analysis of the key packages used in the triggerr API development. Understanding these packages is essential for implementing APIs correctly and avoiding TypeScript errors and build failures while maintaining compliance with our multi-jurisdictional regulatory framework.
+
+> **Legal Framework**: Comprehensive regulatory compliance strategy and package-specific legal considerations documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)
 
 ## Key Packages
+
+### Compliance Package Reference
+- `@triggerr/compliance-reference`: Future package for regulatory compliance utilities and validation
+- Entity-aware API patterns support our Nevada-based regulatory arbitrage strategy
+- Cross-jurisdictional data handling utilities for US and EU operations
 
 ### 1. @triggerr/api-contracts
 
@@ -136,7 +143,23 @@ const anonymousSessionId = await getAnonymousSessionId();
 
 ## Common Patterns and Best Practices
 
-### 1. Request Validation
+### 1. Entity-Aware Development
+Always consider entity boundaries and regulatory context when developing APIs:
+
+```typescript
+// Entity-aware API responses
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  metadata: {
+    entity: 'parametrigger-inc' | 'triggerr-direct-llc' | 'preterag-financial-solutions';
+    jurisdiction: 'nevada' | 'estonia' | 'multi-state';
+    complianceFramework: 'insurance-sandbox' | 'surplus-lines' | 'gdpr';
+  };
+}
+```
+
+### 2. Request Validation
 
 Always validate incoming requests using Zod schemas from `@triggerr/api-contracts/validators`:
 
@@ -152,7 +175,7 @@ if (!validationResult.success) {
 }
 ```
 
-### 2. Response Formatting
+### 3. Response Formatting
 
 Always use the `createApiResponse` and `createApiError` utilities for consistent response formatting:
 
@@ -167,7 +190,7 @@ return NextResponse.json(
 );
 ```
 
-### 3. Database Access
+### 4. Database Access
 
 Use the appropriate database client based on the execution environment:
 
@@ -179,7 +202,7 @@ import { edgeDb } from '@triggerr/core/database/edge';
 import { db } from '@triggerr/core/database/server';
 ```
 
-### 4. Authentication
+### 5. Authentication
 
 Always check authentication status and set the RLS context before performing database operations:
 
@@ -275,3 +298,6 @@ export async function HTTP_METHOD(request: NextRequest): Promise<NextResponse> {
 2. Study the database schema to understand the relationships between tables
 3. Implement APIs one by one, following the template and best practices
 4. Add comprehensive tests for each API to catch issues early
+5. Ensure all API implementations align with our entity structure and regulatory framework
+
+> **Legal Framework**: Detailed entity responsibilities, API compliance requirements, and regulatory considerations documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)

@@ -12,4 +12,5 @@ export {
   PayoutEngine,
   type InternalProcessPayoutsResponse,
 } from "./payout-engine";
+export { PolicyMonitor } from "./policy-monitor";
 export { PayoutEngine as default } from "./payout-engine";
