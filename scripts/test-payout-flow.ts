@@ -187,7 +187,7 @@ class PayoutFlowTester {
       this.testPolicyId = `pol_test_${Date.now()}_mock`;
 
       console.log(
-        `   📋 Quote generated: ${quote.quoteId} (Premium: $${quote.premium})`,
+        `   📋 Quote generated: ${quote.quoteId} (Premium: $${quote.quotes[0].premium})`,
       );
       console.log(
         `   🏛️ Using mock policy ID for offline testing: ${this.testPolicyId}`,
@@ -200,7 +200,7 @@ class PayoutFlowTester {
           policyId: this.testPolicyId,
           policyNumber: `TRG-TEST-${Date.now()}`,
           coverageType: quoteRequest.coverageType,
-          premium: quote.premium,
+          premium: quote.quotes[0].premium,
           quoteId: quote.quoteId,
         },
         timing: Date.now() - startTime,
@@ -601,8 +601,8 @@ class PayoutFlowTester {
       if (this.testQuoteId) {
         // Clean up quote record
         await Database.db
-          .delete(Schema.quotes)
-          .where(eq(Schema.quotes.id, this.testQuoteId));
+          .delete(Schema.quote)
+          .where(eq(Schema.quote.id, this.testQuoteId));
       }
     } catch (error) {
       console.log(
