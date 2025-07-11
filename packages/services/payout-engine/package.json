@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@triggerr/core": "workspace:*",
+    "@triggerr/data-router": "workspace:*",
     "@triggerr/escrow-engine": "workspace:*",
     "@triggerr/service-registry": "workspace:*",
     "@triggerr/paygo-adapter": "workspace:*",
