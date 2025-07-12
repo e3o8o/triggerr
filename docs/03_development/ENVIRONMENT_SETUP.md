@@ -87,6 +87,222 @@ LOG_LEVEL="debug"
 DEBUG="triggerr:*"
 ```
 
+## Database Setup & Migration Guide
+
+### PostgreSQL Version Requirements
+
+**Important**: This project requires PostgreSQL 15+ for the following features:
+- `UNIQUE NULLS NOT DISTINCT` syntax (introduced in PostgreSQL 15)
+- Advanced JSONB operations
+- Modern indexing features
+
+### Local Development Setup
+
+#### 1. Install/Upgrade PostgreSQL
+
+**macOS (Homebrew)**:
+```bash
+# Stop existing PostgreSQL service
+brew services stop postgresql
+
+# Uninstall old version (if needed)
+brew uninstall postgresql@14
+
+# Install PostgreSQL 16
+brew install postgresql@16
+
+# Start the service
+brew services start postgresql@16
+
+# Add to PATH (add to ~/.zshrc)
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+```
+
+**Linux (Ubuntu/Debian)**:
+```bash
+# Add PostgreSQL 16 repository
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+sudo apt-get update
+
+# Install PostgreSQL 16
+sudo apt-get install postgresql-16
+
+# Start service
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+```
+
+#### 2. Create Database and User
+
+```bash
+# Create database
+createdb triggerr_local
+
+# Create user (if needed)
+createuser -s postgres
+
+# Set password (optional)
+psql -d triggerr_local -c "ALTER USER postgres PASSWORD 'your_password';"
+```
+
+#### 3. Verify PostgreSQL Version
+
+```bash
+psql -h localhost -p 5432 -U postgres -d triggerr_local -c "SELECT version();"
+```
+
+**Expected output**: `PostgreSQL 16.x` or higher
+
+### Migration Process
+
+#### 1. Enhanced Migration Script
+
+The project includes an enhanced migration script (`packages/core/src/database/migrate.ts`) that automatically:
+
+- ✅ Checks PostgreSQL version compatibility (requires 15+)
+- ✅ Creates `pgcrypto` extension
+- ✅ Creates `generate_ulid()` function
+- ✅ Runs Drizzle migrations with proper error handling
+
+#### 2. Running Migrations
+
+```bash
+# Set environment variable
+export DATABASE_URL="postgresql://postgres@localhost:5432/triggerr_local"
+
+# Run migration from project root
+bun run --cwd=packages/core src/database/migrate.ts
+```
+
+**Expected output**:
+```
+[timestamp] Starting database migration for triggerr...
+[timestamp] 🔍 Checking PostgreSQL version...
+[timestamp] 📊 Connected DB Version: PostgreSQL 16.9...
+[timestamp] ✅ PostgreSQL version 16.9 is compatible
+[timestamp] 🔧 Setting up required extensions and functions...
+[timestamp] ✅ pgcrypto extension ready
+[timestamp] ✅ generate_ulid function ready
+[timestamp] ✅ Migration completed successfully in X.XXs
+[timestamp] 🎯 Database schema is now ready for triggerr marketplace
+```
+
+#### 3. Alternative: Using Drizzle Kit
+
+```bash
+# Generate migrations
+bunx drizzle-kit generate
+
+# Apply migrations
+bunx drizzle-kit migrate
+```
+
+### Troubleshooting Common Issues
+
+#### Issue 1: "function generate_ulid() does not exist"
+
+**Cause**: The function wasn't created before running migrations.
+
+**Solution**: The enhanced migration script automatically creates this function. If using Drizzle Kit directly, manually create the function:
+
+```sql
+-- Create pgcrypto extension
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+-- Create generate_ulid function
+CREATE OR REPLACE FUNCTION generate_ulid()
+RETURNS text AS $$
+DECLARE
+  millis bigint;
+  encoded_time text;
+  random_bytes bytea;
+  encoded_random text;
+  time_bytes bytea;
+BEGIN
+  -- Get current time in milliseconds since Unix epoch
+  millis := FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000);
+  -- Create time bytes manually
+  time_bytes := set_byte(set_byte(set_byte(set_byte(set_byte(set_byte(
+    decode('000000000000', 'hex'),
+    0, (millis >> 40) & 255), 1, (millis >> 32) & 255), 2, (millis >> 24) & 255), 
+    3, (millis >> 16) & 255), 4, (millis >> 8) & 255), 5, millis & 255);
+  -- Encode time part (48 bits = 6 bytes)
+  encoded_time := encode(time_bytes, 'base32');
+  -- Generate 10 random bytes (80 bits)
+  random_bytes := gen_random_bytes(10);
+  encoded_random := encode(random_bytes, 'base32');
+  -- Concatenate and return
+  RETURN lower(encoded_time || encoded_random);
+END;
+$$ LANGUAGE plpgsql;
+```
+
+#### Issue 2: "syntax error at or near 'NULLS'"
+
+**Cause**: Using PostgreSQL version < 15.
+
+**Solution**: Upgrade to PostgreSQL 15+ as described above.
+
+#### Issue 3: "Can't find meta/_journal.json file"
+
+**Cause**: Migration files were deleted or corrupted.
+
+**Solution**: Regenerate migration files:
+```bash
+# Delete existing migrations
+rm -rf drizzle/migrations/*
+
+# Generate new migrations
+bunx drizzle-kit generate
+
+# Run migration
+bunx drizzle-kit migrate
+```
+
+#### Issue 4: Connection to wrong PostgreSQL instance
+
+**Cause**: Multiple PostgreSQL instances running (local + Docker).
+
+**Solution**: 
+1. Check what's running on port 5432: `lsof -i :5432`
+2. Stop conflicting services: `brew services stop postgresql`
+3. Ensure only one PostgreSQL instance is running
+
+### Database Schema Overview
+
+After successful migration, you should have:
+
+- **44 application tables** in `public` schema
+- **1 migration tracking table** (`drizzle.__drizzle_migrations`)
+- **4 PostgreSQL system tables** (TOAST tables, etc.)
+
+**Total**: 49 tables
+
+### Verification Commands
+
+```bash
+# Check all tables
+psql -h localhost -p 5432 -U postgres -d triggerr_local -c "\dt"
+
+# Count application tables
+psql -h localhost -p 5432 -U postgres -d triggerr_local -c "SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public';"
+
+# Check migration status
+psql -h localhost -p 5432 -U postgres -d triggerr_local -c "SELECT * FROM drizzle.__drizzle_migrations;"
+
+# Test generate_ulid function
+psql -h localhost -p 5432 -U postgres -d triggerr_local -c "SELECT generate_ulid();"
+```
+
+### Production Considerations
+
+1. **Connection Pooling**: Use `?pgbouncer=true` in DATABASE_URL
+2. **SSL**: Enable SSL connections in production
+3. **Backup Strategy**: Implement regular database backups
+4. **Monitoring**: Set up PostgreSQL monitoring and alerting
+5. **Version Management**: Ensure production PostgreSQL is 15+
+
 ## Setup Instructions
 
 ### 1. Create Environment Files
@@ -144,12 +360,12 @@ brew install postgresql
 brew services start postgresql
 
 # Create database
-createdb triggerr_dev
+createdb triggerr_local
 
 # Set up user (optional)
-psql triggerr_dev
+psql triggerr_local
 CREATE USER triggerr_user WITH PASSWORD 'your_password';
-GRANT ALL PRIVILEGES ON DATABASE triggerr_dev TO triggerr_user;
+GRANT ALL PRIVILEGES ON DATABASE triggerr_local TO triggerr_user;
 ```
 
 ## Environment File Templates
@@ -158,7 +374,7 @@ GRANT ALL PRIVILEGES ON DATABASE triggerr_dev TO triggerr_user;
 
 ```bash
 # Database
-DATABASE_URL="postgresql://postgres:password@localhost:5432/triggerr_dev"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/triggerr_local"
 
 # Authentication
 BETTER_AUTH_SECRET="generated-secret-key-here"

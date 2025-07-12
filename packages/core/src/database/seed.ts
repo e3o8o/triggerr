@@ -90,13 +90,13 @@ async function fileExists(filePath: string): Promise<boolean> {
 // ============================================================================
 
 // --- Provider IDs (Hardcoded for Seed Stability) ---
-const INSUREINNIE_DIRECT_PROVIDER_ID = "PROV_IIDR";
+const TRIGGERR_DIRECT_PROVIDER_ID = "PROV_TRDR";
 const PRETERAG_FINANCIAL_PROVIDER_ID = "PROV_PRTF";
 const AEROASSURE_PROVIDER_ID = "PROV_AASP";
 
 // --- Product IDs (Hardcoded for Seed Stability) ---
-const IIDR_FLIGHT_DELAY_60_PRODUCT_ID = "PROD_IIDR001";
-const IIDR_FLIGHT_DELAY_120_PRODUCT_ID = "PROD_IIDR002";
+const TRDR_FLIGHT_DELAY_60_PRODUCT_ID = "PROD_TRDR001";
+const TRDR_FLIGHT_DELAY_120_PRODUCT_ID = "PROD_TRDR002";
 const PRETERAG_REINSURANCE_A_PRODUCT_ID = "PROD_PRTF001";
 const AEROASSURE_COMPREHENSIVE_PRODUCT_ID = "PROD_AASP001";
 
@@ -110,7 +110,7 @@ const ADMIN_USER_ID = "USER_ADMIN001";
 // --- Providers ---
 const providerSetupData = [
   {
-    id: INSUREINNIE_DIRECT_PROVIDER_ID,
+    id: TRIGGERR_DIRECT_PROVIDER_ID,
     name: "triggerr Direct",
     slug: "triggerr-direct",
     category: "FIRST_PARTY_INSURER" as const,
@@ -122,7 +122,7 @@ const providerSetupData = [
     websiteUrl: "https://direct.triggerr.com",
     supportEmail: "direct.support@triggerr.com",
     walletAddress:
-      process.env.PROVIDER_INSUREINNIE_DIRECT_WALLET_ADDRESS ||
+      process.env.PROVIDER_TRIGGERR_DIRECT_WALLET_ADDRESS ||
       "placeholder_triggerr_direct_wallet_address",
     walletPrivateKey: null, // Populated from ENV post-setup
     apiEndpoint: "https://api.direct.triggerr.com", // Example
@@ -241,8 +241,8 @@ const providerSetupData = [
 const providerProductSetupData = [
   // Products for triggerr Direct
   {
-    id: IIDR_FLIGHT_DELAY_60_PRODUCT_ID,
-    providerId: INSUREINNIE_DIRECT_PROVIDER_ID,
+    id: TRDR_FLIGHT_DELAY_60_PRODUCT_ID,
+    providerId: TRIGGERR_DIRECT_PROVIDER_ID,
     name: "triggerr Direct: Flight Delay 60+ Min",
     description:
       "Coverage for flight delays of 60 minutes or more from triggerr Direct. Automatic payout when delay conditions are met.",
@@ -255,8 +255,8 @@ const providerProductSetupData = [
     isActive: true,
   },
   {
-    id: IIDR_FLIGHT_DELAY_120_PRODUCT_ID,
-    providerId: INSUREINNIE_DIRECT_PROVIDER_ID,
+    id: TRDR_FLIGHT_DELAY_120_PRODUCT_ID,
+    providerId: TRIGGERR_DIRECT_PROVIDER_ID,
     name: "triggerr Direct: Flight Delay 120+ Min",
     description:
       "Coverage for flight delays of 120 minutes or more from triggerr Direct. Lower premium for higher delay threshold.",

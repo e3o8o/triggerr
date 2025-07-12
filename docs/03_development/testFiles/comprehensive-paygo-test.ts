@@ -147,3 +147,6 @@ async function paygoCompleteDemo() {
 		}
 	}
 }
+
+// Execute the demo
+paygoCompleteDemo().catch(console.error);

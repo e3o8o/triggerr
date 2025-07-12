@@ -16,7 +16,7 @@ interface FlightDataDto {
 }
 
 /**
- * This example demonstrates the basic setup and usage of the InsureInnie API SDK.
+ * This example demonstrates the basic setup and usage of the Triggerr API SDK.
  * It covers:
  * - Configuring the SDK with features like retry, caching, and logging.
  * - Making simple, type-safe API calls.

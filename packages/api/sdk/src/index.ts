@@ -10,18 +10,18 @@
 // ===========================================================================
 
 // --- Core Client & Configuration ---
-export { ApiClient } from './client';
-export type { ApiClientConfig } from './client'; // Re-exporting the type for configuration
+export { ApiClient } from "./client";
+export type { ApiClientConfig } from "./client"; // Re-exporting the type for configuration
 
 // --- HTTP Client & Advanced Configuration ---
-export { HttpClient, createHttpClient } from './client/http-client';
-export type { HttpClientConfig } from './client/http-client';
+export { HttpClient, createHttpClient } from "./client/http-client";
+export type { HttpClientConfig } from "./client/http-client";
 
 // --- Error Handling ---
-export { ApiClientError } from './client'; // Custom error class for SDK-specific errors
+export { ApiClientError } from "./client"; // Custom error class for SDK-specific errors
 
 // --- Authentication ---
-export type { AuthHeaderProvider } from './auth'; // Core interface for providing auth headers
+export type { AuthHeaderProvider } from "./auth"; // Core interface for providing auth headers
 export {
   AnonymousSessionManager,
   createAnonymousSessionManager,
@@ -31,18 +31,18 @@ export {
   ANONYMOUS_SESSION_HEADER_KEY,
   API_KEY_HEADER_KEY,
   AUTHORIZATION_HEADER_KEY,
-} from './auth';
+} from "./auth";
 
 // --- Service Exports ---
-export { ChatService } from './services/chat';
-export { InsuranceService } from './services/insurance';
-export { PolicyService } from './services/policy';
-export { WalletService } from './services/wallet';
-export { UserService } from './services/user';
-export { AdminService } from './services/admin';
+export { ChatService } from "./services/chat";
+export { InsuranceService } from "./services/insurance";
+export { PolicyService } from "./services/policy";
+export { WalletService } from "./services/wallet";
+export { UserService } from "./services/user";
+export { AdminService } from "./services/admin";
 
 // --- Service Types ---
-export * from './services/types';
+export * from "./services/types";
 
 // --- Convenience Re-exports from @triggerr/api-contracts ---
 // We re-export commonly used DTOs and enum types from api-contracts through
@@ -56,10 +56,9 @@ export * from './services/types';
 //
 // See './services/types.ts' for the complete list of re-exported types
 
-
 // --- SDK Version ---
 // This can be hardcoded or dynamically injected during the build process.
-export const API_SDK_VERSION = '0.1.0';
+export const API_SDK_VERSION = "0.1.0";
 
 // ===========================================================================
 // Usage Example (Illustrative - typically in consuming application code):
@@ -73,7 +72,7 @@ import {
   // (If re-exported from api-contracts)
   // type ChatMessageRequest,
   // type ChatMessageResponse,
-  // InsureinnieErrorCode
+  // TriggerrErrorCode
 } from '@triggerr/api-sdk';
 
 // Implement the AuthHeaderProvider in the consuming application
@@ -120,7 +119,7 @@ async function sendMessage() {
     //   console.log('Assistant:', response.data.message);
     // } else if (response.error) {
     //   console.error('API Error:', response.error.code, response.error.message);
-    //   if (response.error.code === InsureinnieErrorCode.VALIDATION_ERROR) {
+    //   if (response.error.code === TriggerrErrorCode.VALIDATION_ERROR) {
     //     // Handle validation error details
     //   }
     // }

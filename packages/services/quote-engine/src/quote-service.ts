@@ -685,7 +685,7 @@ export class QuoteService {
       await Database.db.insert(Schema.quote).values({
         id: quoteId,
         userId: request.userId || null,
-        providerId: "PROV_IIDR", // Use existing provider: ïnsureinnie Direct
+        providerId: "PROV_TRDR", // Use existing provider: Triggerr Direct
         flightId: policyData.flight.id,
         coverageType: mapCoverageTypeToDbEnum(
           request.coverageType,

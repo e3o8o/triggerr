@@ -1,16 +1,16 @@
 // MVP Insurance Products (matching seed data)
 export const INSURANCE_PRODUCTS = {
-  FLIGHT_DELAY_60: 'PROD_IIDR001',
-  FLIGHT_DELAY_120: 'PROD_IIDR002',
-  PRETERAG_REINSURANCE_A: 'PROD_PRTF001',
-  AEROASSURE_COMPREHENSIVE: 'PROD_AASP001',
+  FLIGHT_DELAY_60: "PROD_TRDR001",
+  FLIGHT_DELAY_120: "PROD_TRDR002",
+  PRETERAG_REINSURANCE_A: "PROD_PRTF001",
+  AEROASSURE_COMPREHENSIVE: "PROD_AASP001",
 } as const;
 
 // Providers (matching seed data)
 export const PROVIDERS = {
-  INSUREINNIE_DIRECT: 'PROV_IIDR001',
-  PRETERAG_FINANCIAL: 'PROV_PRTF001',
-  AEROASSURE_PARTNERS: 'PROV_AASP001',
+  TRIGGERR_DIRECT: "PROV_TRDR",
+  PRETERAG_FINANCIAL: "PROV_PRTF",
+  AEROASSURE_PARTNERS: "PROV_AASP",
 } as const;
 
 // API Rate Limits for anonymous vs authenticated users
@@ -90,29 +90,31 @@ export const API_TIMEOUTS = {
 
 // Error codes
 export const ERROR_CODES = {
-  INVALID_FLIGHT_NUMBER: 'INVALID_FLIGHT_NUMBER',
-  FLIGHT_NOT_FOUND: 'FLIGHT_NOT_FOUND',
-  QUOTE_EXPIRED: 'QUOTE_EXPIRED',
-  INSUFFICIENT_BALANCE: 'INSUFFICIENT_BALANCE',
-  POLICY_NOT_FOUND: 'POLICY_NOT_FOUND',
-  PAYMENT_FAILED: 'PAYMENT_FAILED',
-  WALLET_ERROR: 'WALLET_ERROR',
-  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
-  ANONYMOUS_SESSION_EXPIRED: 'ANONYMOUS_SESSION_EXPIRED',
+  INVALID_FLIGHT_NUMBER: "INVALID_FLIGHT_NUMBER",
+  FLIGHT_NOT_FOUND: "FLIGHT_NOT_FOUND",
+  QUOTE_EXPIRED: "QUOTE_EXPIRED",
+  INSUFFICIENT_BALANCE: "INSUFFICIENT_BALANCE",
+  POLICY_NOT_FOUND: "POLICY_NOT_FOUND",
+  PAYMENT_FAILED: "PAYMENT_FAILED",
+  WALLET_ERROR: "WALLET_ERROR",
+  RATE_LIMIT_EXCEEDED: "RATE_LIMIT_EXCEEDED",
+  ANONYMOUS_SESSION_EXPIRED: "ANONYMOUS_SESSION_EXPIRED",
 } as const;
 
 // Success messages
 export const SUCCESS_MESSAGES = {
-  POLICY_CREATED: 'Policy created successfully',
-  PAYMENT_PROCESSED: 'Payment processed successfully',
-  PAYOUT_SENT: 'Payout sent to your wallet',
-  QUOTE_GENERATED: 'Quote generated successfully',
-  CART_UPDATED: 'Cart updated successfully',
-  WALLET_CREATED: 'Wallet created successfully',
+  POLICY_CREATED: "Policy created successfully",
+  PAYMENT_PROCESSED: "Payment processed successfully",
+  PAYOUT_SENT: "Payout sent to your wallet",
+  QUOTE_GENERATED: "Quote generated successfully",
+  CART_UPDATED: "Cart updated successfully",
+  WALLET_CREATED: "Wallet created successfully",
 } as const;
 
 // Type helpers for constants
-export type InsuranceProductId = typeof INSURANCE_PRODUCTS[keyof typeof INSURANCE_PRODUCTS];
-export type ProviderId = typeof PROVIDERS[keyof typeof PROVIDERS];
-export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
-export type SuccessMessage = typeof SUCCESS_MESSAGES[keyof typeof SUCCESS_MESSAGES];
+export type InsuranceProductId =
+  (typeof INSURANCE_PRODUCTS)[keyof typeof INSURANCE_PRODUCTS];
+export type ProviderId = (typeof PROVIDERS)[keyof typeof PROVIDERS];
+export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
+export type SuccessMessage =
+  (typeof SUCCESS_MESSAGES)[keyof typeof SUCCESS_MESSAGES];

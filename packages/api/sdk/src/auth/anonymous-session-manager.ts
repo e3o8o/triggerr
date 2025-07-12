@@ -97,7 +97,7 @@ export interface AnonymousSessionManagerConfig {
 }
 
 /**
- * Manages anonymous user sessions for the InsureInnie API SDK.
+ * Manages anonymous user sessions for the Triggerr API SDK.
  *
  * This class handles:
  * - Creating and storing anonymous session IDs

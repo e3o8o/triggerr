@@ -45,7 +45,7 @@ export type EscrowPurpose =
 // ============================================================================
 
 const ESCROW_ID_CONFIG = {
-  POLICY_PREFIX: "INS",
+  POLICY_PREFIX: "TRG",
   USER_PREFIX: "USR",
   SEPARATOR: "-",
   PROVIDER_SHORT_LENGTH: 8,
@@ -137,7 +137,7 @@ function formatTimestamp(timestamp: number): string {
 
 /**
  * Generate escrow ID pair for policy-related escrows
- * Format: INS-{PROVIDER_SHORT}-{POLICY_SHORT}-{TIMESTAMP}-{RANDOM}-{CHECKSUM}
+ * Format: TRG-{PROVIDER_SHORT}-{POLICY_SHORT}-{TIMESTAMP}-{RANDOM}-{CHECKSUM}
  *
  * @param providerId - Full provider ID (e.g., "provider_triggerr_co_001")
  * @param policyId - Full policy ID (e.g., "policy_flight_delay_abc123")
@@ -467,7 +467,7 @@ export function generateBatchEscrowIds(
 /*
 // Policy Escrow Example:
 const policyEscrow = generatePolicyEscrowId('provider_triggerr_co_001', 'policy_flight_delay_abc123');
-console.log(policyEscrow.internalId);  // "INS-INSUREIN-FLIGHTDELAY-1706288400000-XYZ789-AB12"
+console.log(policyEscrow.internalId);  // "TRG-TRIGGERR-FLIGHTDELAY-1706288400000-XYZ789-AB12"
 console.log(policyEscrow.blockchainId); // "0x123...abc" (hashed)
 
 // User Escrow Example:
@@ -476,15 +476,15 @@ console.log(userEscrow.internalId);     // "USR-JOHNDOE1-DEPOSIT-1706288400000-A
 console.log(userEscrow.blockchainId);   // "0x456...def" (hashed)
 
 // Parsing Example:
-const info = parseEscrowId('INS-INSUREIN-FLIGHTDELAY-1706288400000-XYZ789-AB12');
+const info = parseEscrowId('TRG-TRIGGERR-FLIGHTDELAY-1706288400000-XYZ789-AB12');
 console.log(info.type);                 // "POLICY"
 console.log(info.timestamp);            // 1706288400000
 
 // Validation Example:
-const isValid = validateEscrowId('INS-INSUREIN-FLIGHTDELAY-1706288400000-XYZ789-AB12');
+const isValid = validateEscrowId('TRG-TRIGGERR-FLIGHTDELAY-1706288400000-XYZ789-AB12');
 console.log(isValid);                   // true
 
 // Provider Check Example:
-const belongsToProvider = isProviderEscrow('INS-INSUREIN-...', 'provider_triggerr_co_001');
+const belongsToProvider = isProviderEscrow('TRG-TRIGGERR-...', 'provider_triggerr_co_001');
 console.log(belongsToProvider);         // true
 */

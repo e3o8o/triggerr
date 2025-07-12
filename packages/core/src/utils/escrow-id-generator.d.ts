@@ -1,34 +1,46 @@
 export interface EscrowIdPair {
-    internalId: string;
-    blockchainId: string;
+  internalId: string;
+  blockchainId: string;
 }
 export interface PolicyEscrowInfo {
-    type: 'POLICY';
-    providerId: string;
-    policyId: string;
-    timestamp: number;
-    randomSuffix: string;
-    checksum: string;
+  type: "POLICY";
+  providerId: string;
+  policyId: string;
+  timestamp: number;
+  randomSuffix: string;
+  checksum: string;
 }
 export interface UserEscrowInfo {
-    type: 'USER';
-    userId: string;
-    purpose: string;
-    timestamp: number;
-    randomSuffix: string;
-    checksum: string;
+  type: "USER";
+  userId: string;
+  purpose: string;
+  timestamp: number;
+  randomSuffix: string;
+  checksum: string;
 }
 export type EscrowInfo = PolicyEscrowInfo | UserEscrowInfo;
-export type EscrowPurpose = 'DEPOSIT' | 'WITHDRAW' | 'STAKE' | 'BOND' | 'COLLATERAL' | 'INVESTMENT' | 'RESERVE' | 'POOL' | 'CUSTOM';
+export type EscrowPurpose =
+  | "DEPOSIT"
+  | "WITHDRAW"
+  | "STAKE"
+  | "BOND"
+  | "COLLATERAL"
+  | "INVESTMENT"
+  | "RESERVE"
+  | "POOL"
+  | "CUSTOM";
 /**
  * Generate escrow ID pair for policy-related escrows
- * Format: INS-{PROVIDER_SHORT}-{POLICY_SHORT}-{TIMESTAMP}-{RANDOM}-{CHECKSUM}
+ * Format: TRG-{PROVIDER_SHORT}-{POLICY_SHORT}-{TIMESTAMP}-{RANDOM}-{CHECKSUM}
  *
  * @param providerId - Full provider ID (e.g., "provider_triggerr_co_001")
  * @param policyId - Full policy ID (e.g., "policy_flight_delay_abc123")
  * @returns Object with internal and blockchain IDs
  */
-export declare function generatePolicyEscrowId(providerId: string, policyId: string): EscrowIdPair;
+export declare function generatePolicyEscrowId(
+  providerId: string,
+  policyId: string,
+): EscrowIdPair;
 /**
  * Generate escrow ID for user-initiated escrows
  * Format: USR-{USER_SHORT}-{PURPOSE}-{TIMESTAMP}-{RANDOM}-{CHECKSUM}
@@ -37,7 +49,10 @@ export declare function generatePolicyEscrowId(providerId: string, policyId: str
  * @param purpose - Purpose of the escrow (e.g., "DEPOSIT", "STAKE")
  * @returns Internal escrow ID (blockchain ID generated separately)
  */
-export declare function generateUserEscrowId(userId: string, purpose: EscrowPurpose): EscrowIdPair;
+export declare function generateUserEscrowId(
+  userId: string,
+  purpose: EscrowPurpose,
+): EscrowIdPair;
 /**
  * Parse an internal escrow ID to extract information
  *
@@ -58,7 +73,9 @@ export declare function validateEscrowId(internalId: string): boolean;
  * @param internalId - Internal escrow ID
  * @returns 'POLICY', 'USER', or null if invalid
  */
-export declare function getEscrowType(internalId: string): 'POLICY' | 'USER' | null;
+export declare function getEscrowType(
+  internalId: string,
+): "POLICY" | "USER" | null;
 /**
  * Extract timestamp from internal escrow ID
  *
@@ -73,7 +90,10 @@ export declare function getEscrowTimestamp(internalId: string): number | null;
  * @param providerId - Provider ID to check against
  * @returns True if belongs to provider, false otherwise
  */
-export declare function isProviderEscrow(internalId: string, providerId: string): boolean;
+export declare function isProviderEscrow(
+  internalId: string,
+  providerId: string,
+): boolean;
 /**
  * Check if escrow ID belongs to a specific user (for user escrows)
  *
@@ -81,7 +101,10 @@ export declare function isProviderEscrow(internalId: string, providerId: string)
  * @param userId - User ID to check against
  * @returns True if belongs to user, false otherwise
  */
-export declare function isUserEscrow(internalId: string, userId: string): boolean;
+export declare function isUserEscrow(
+  internalId: string,
+  userId: string,
+): boolean;
 /**
  * Get human-readable description of escrow ID
  *
@@ -96,5 +119,9 @@ export declare function getEscrowDescription(internalId: string): string;
  * @param type - Type of escrows to generate
  * @returns Array of escrow ID pairs
  */
-export declare function generateBatchEscrowIds(count: number, type: 'POLICY' | 'USER', baseId?: string): EscrowIdPair[];
+export declare function generateBatchEscrowIds(
+  count: number,
+  type: "POLICY" | "USER",
+  baseId?: string,
+): EscrowIdPair[];
 //# sourceMappingURL=escrow-id-generator.d.ts.map

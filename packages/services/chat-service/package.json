@@ -1,0 +1,51 @@
+{
+  "name": "@triggerr/chat-service",
+  "version": "0.1.0",
+  "description": "Conversational AI service for insurance quoting and customer support",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "bun test",
+    "lint": "eslint src/**/*.ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@triggerr/core": "workspace:*",
+    "@triggerr/shared": "workspace:*",
+    "@triggerr/quote-engine": "workspace:*",
+    "@triggerr/llm-interface": "workspace:*",
+    "@triggerr/deepseek-adapter": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.30",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "bun-types": "latest"
+  },
+  "keywords": [
+    "chat",
+    "conversational-ai",
+    "llm",
+    "insurance-quoting",
+    "customer-support"
+  ],
+  "author": "Triggerr Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/triggerr/triggerr.git",
+    "directory": "packages/services/chat-service"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+} 

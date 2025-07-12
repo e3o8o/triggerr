@@ -1,5 +1,5 @@
 {
-  "id": "43807139-329b-4b6f-807a-37273c9e5a5a",
+  "id": "73508cbc-d421-42cb-99db-ffae0ab7804b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -1031,6 +1031,121 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.beneficiaries": {
+      "name": "beneficiaries",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "policy_id": {
+          "name": "policy_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relationship": {
+          "name": "relationship",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "percentage": {
+          "name": "percentage",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "beneficiary_type_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "beneficiaries_policy_idx": {
+          "name": "beneficiaries_policy_idx",
+          "columns": [
+            {
+              "expression": "policy_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "beneficiaries_type_idx": {
+          "name": "beneficiaries_type_idx",
+          "columns": [
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "beneficiaries_policy_id_policy_id_fk": {
+          "name": "beneficiaries_policy_id_policy_id_fk",
+          "tableFrom": "beneficiaries",
+          "tableTo": "policy",
+          "columnsFrom": [
+            "policy_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.cache_entry": {
       "name": "cache_entry",
       "schema": "",
@@ -1444,6 +1559,117 @@
       },
       "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.endorsements": {
+      "name": "endorsements",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "policy_id": {
+          "name": "policy_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "endorsement_type_enum",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "effective_date": {
+          "name": "effective_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "endorsements_policy_idx": {
+          "name": "endorsements_policy_idx",
+          "columns": [
+            {
+              "expression": "policy_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "endorsements_type_idx": {
+          "name": "endorsements_type_idx",
+          "columns": [
+            {
+              "expression": "type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "endorsements_effective_date_idx": {
+          "name": "endorsements_effective_date_idx",
+          "columns": [
+            {
+              "expression": "effective_date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "endorsements_policy_id_policy_id_fk": {
+          "name": "endorsements_policy_id_policy_id_fk",
+          "tableFrom": "endorsements",
+          "tableTo": "policy",
+          "columnsFrom": [
+            "policy_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -4508,6 +4734,14 @@
           "notNull": true,
           "default": "'0.8500'"
         },
+        "status": {
+          "name": "status",
+          "type": "quote_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PENDING'"
+        },
         "valid_until": {
           "name": "valid_until",
           "type": "timestamp",
@@ -4716,7 +4950,7 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,
-          "default": "'ACTIVE'"
+          "default": "'PENDING'"
         },
         "expires_at": {
           "name": "expires_at",
@@ -7130,6 +7364,14 @@
         "WEBHOOK"
       ]
     },
+    "public.beneficiary_type_enum": {
+      "name": "beneficiary_type_enum",
+      "schema": "public",
+      "values": [
+        "PRIMARY",
+        "CONTINGENT"
+      ]
+    },
     "public.continent_enum": {
       "name": "continent_enum",
       "schema": "public",
@@ -7162,6 +7404,15 @@
         "BAGGAGE",
         "COMPREHENSIVE",
         "CUSTOM"
+      ]
+    },
+    "public.endorsement_type_enum": {
+      "name": "endorsement_type_enum",
+      "schema": "public",
+      "values": [
+        "COVERAGE_ADJUSTMENT",
+        "INFO_CORRECTION",
+        "OTHER"
       ]
     },
     "public.escrow_model_type": {
@@ -7280,7 +7531,8 @@
         "ACTIVE",
         "EXPIRED",
         "CLAIMED",
-        "CANCELLED"
+        "CANCELLED",
+        "FAILED"
       ]
     },
     "public.premium_return_policy": {
@@ -7350,10 +7602,20 @@
       "name": "quote_cart_item_status",
       "schema": "public",
       "values": [
-        "ACTIVE",
+        "PENDING",
         "PURCHASED",
         "EXPIRED",
         "REMOVED"
+      ]
+    },
+    "public.quote_status": {
+      "name": "quote_status",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "ACCEPTED",
+        "EXPIRED",
+        "REJECTED"
       ]
     },
     "public.revenue_type_enum": {

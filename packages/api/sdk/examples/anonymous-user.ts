@@ -39,7 +39,7 @@ interface PolicyDto {
 }
 
 /**
- * This example demonstrates using the InsureInnie API SDK as an anonymous (unauthenticated) user.
+ * This example demonstrates using the Triggerr API SDK as an anonymous (unauthenticated) user.
  * It covers:
  * - Using the built-in AnonymousSessionManager to handle session IDs.
  * - Configuring the SDK to send the anonymous session header.

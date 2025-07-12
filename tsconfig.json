@@ -113,6 +113,9 @@
       "path": "./packages/services/payout-engine"
     },
     {
+      "path": "./packages/services/chat-service"
+    },
+    {
       "path": "./packages/llm/llm-interface"
     },
     {

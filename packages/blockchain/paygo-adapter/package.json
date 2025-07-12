@@ -29,7 +29,7 @@
   "homepage": "https://github.com/triggerr/triggerr#readme",
   "dependencies": {
     "@triggerr/blockchain-interface": "*",
-    "@witnessco/paygo-ts-client": "^0.1.1",
+    "@witnessco/paygo-ts-client": "^0.2.1",
     "viem": "^2.0.0"
   },
   "devDependencies": {

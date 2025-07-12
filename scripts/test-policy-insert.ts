@@ -31,7 +31,6 @@ class PolicyInsertTester {
       // Step 3: Test with different field combinations
       console.log("\n🔄 Step 3: Testing different field combinations...");
       await this.testFieldCombinations();
-
     } catch (error) {
       console.error("❌ Test failed:", error);
     } finally {
@@ -43,7 +42,7 @@ class PolicyInsertTester {
   async createTestQuote(): Promise<void> {
     // Use existing test data from previous successful tests
     this.testFlightId = "flight_AA1234_2025-12-15";
-    this.testProviderId = "PROV_IIDR";
+    this.testProviderId = "PROV_TRDR";
     this.testQuoteId = generateId("quote");
 
     const quoteData = {
@@ -56,9 +55,9 @@ class PolicyInsertTester {
       premium: "20.74",
       riskFactors: {
         flightRisk: 0.315,
-        weatherRisk: 0.120,
+        weatherRisk: 0.12,
         overallRisk: 0.257,
-        confidence: 0.785
+        confidence: 0.785,
       },
       confidence: "0.7850",
       status: "PENDING" as const,
@@ -120,10 +119,7 @@ class PolicyInsertTester {
       console.log(`   Coverage Type: ${result.coverageType}`);
 
       // Clean up this test policy
-      await Database.db
-        .delete(Schema.policy)
-        .where(sql`id = ${result.id}`);
-
+      await Database.db.delete(Schema.policy).where(sql`id = ${result.id}`);
     } catch (error) {
       console.error("   ❌ Policy insertion failed:", error);
 
@@ -198,10 +194,7 @@ class PolicyInsertTester {
       console.log(`   Policy ID: ${result.id}`);
 
       // Clean up
-      await Database.db
-        .delete(Schema.policy)
-        .where(sql`id = ${result.id}`);
-
+      await Database.db.delete(Schema.policy).where(sql`id = ${result.id}`);
     } catch (error) {
       console.error("   ❌ Anonymous session policy insertion failed:", error);
     }
@@ -230,7 +223,9 @@ class PolicyInsertTester {
       const result = await Database.db.execute(constraintsQuery);
       console.log("   Constraints on policy table:");
       result.rows.forEach((row: any) => {
-        console.log(`   - ${row.constraint_name} (${row.constraint_type}): ${row.column_name || row.check_clause}`);
+        console.log(
+          `   - ${row.constraint_name} (${row.constraint_type}): ${row.column_name || row.check_clause}`,
+        );
       });
     } catch (error) {
       console.error("   Failed to check constraints:", error);
@@ -268,7 +263,6 @@ class PolicyInsertTester {
       statusResult.rows.forEach((row: any) => {
         console.log(`   - ${row.enumlabel}`);
       });
-
     } catch (error) {
       console.error("   Failed to check enums:", error);
     }
@@ -282,20 +276,25 @@ class PolicyInsertTester {
       const providerCheck = await Database.db.query.provider.findFirst({
         where: sql`id = ${this.testProviderId}`,
       });
-      console.log(`   Provider ${this.testProviderId}: ${providerCheck ? "✅ EXISTS" : "❌ NOT FOUND"}`);
+      console.log(
+        `   Provider ${this.testProviderId}: ${providerCheck ? "✅ EXISTS" : "❌ NOT FOUND"}`,
+      );
 
       // Check if flight exists
       const flightCheck = await Database.db.query.flight.findFirst({
         where: sql`id = ${this.testFlightId}`,
       });
-      console.log(`   Flight ${this.testFlightId}: ${flightCheck ? "✅ EXISTS" : "❌ NOT FOUND"}`);
+      console.log(
+        `   Flight ${this.testFlightId}: ${flightCheck ? "✅ EXISTS" : "❌ NOT FOUND"}`,
+      );
 
       // Check if quote exists
       const quoteCheck = await Database.db.query.quote.findFirst({
         where: sql`id = ${this.testQuoteId}`,
       });
-      console.log(`   Quote ${this.testQuoteId}: ${quoteCheck ? "✅ EXISTS" : "❌ NOT FOUND"}`);
-
+      console.log(
+        `   Quote ${this.testQuoteId}: ${quoteCheck ? "✅ EXISTS" : "❌ NOT FOUND"}`,
+      );
     } catch (error) {
       console.error("   Failed to check foreign keys:", error);
     }

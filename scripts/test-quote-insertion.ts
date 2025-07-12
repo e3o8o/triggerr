@@ -7,6 +7,7 @@
 
 import { Database, Schema } from "@triggerr/core";
 import { generateId } from "@triggerr/core";
+import { inArray } from "drizzle-orm";
 
 interface QuoteInsertionTest {
   success: boolean;
@@ -121,7 +122,7 @@ class QuoteInsertionTester {
       const quoteId = generateId("quote");
 
       // Use existing provider and flight
-      const providerId = "PROV_IIDR";
+      const providerId = "PROV_TRDR";
       const flightId = "flight_AA1234_2025-12-15";
 
       // Create quote data
@@ -237,7 +238,7 @@ class QuoteInsertionTester {
 
         await Database.db
           .delete(Schema.quote)
-          .where((quote, { inArray }) => inArray(quote.id, this.createdQuotes));
+          .where(inArray(Schema.quote.id, this.createdQuotes));
 
         console.log("   ✅ Cleanup completed");
       }

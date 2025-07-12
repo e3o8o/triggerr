@@ -60,9 +60,9 @@ const mockDbQuery = {
   update: mockDbUpdate,
 };
 
-// Mock generateInsureinnieEscrowId to return predictable values
+// Mock generateTriggerrEscrowId to return predictable values
 const mockGenerateEscrowId = mock(() => ({
-  internalId: "INS-escrow-123",
+  internalId: "TRG-escrow-123",
   blockchainId: "0x_mock_blockchain_id_123",
 }));
 
@@ -128,7 +128,7 @@ describe("Escrow Engine", () => {
     it("should create an escrow successfully", async () => {
       // Override the mock implementation just for this test to ensure consistent results
       mockGenerateEscrowId.mockImplementationOnce(() => ({
-        internalId: "INS-escrow-123",
+        internalId: "TRG-escrow-123",
         blockchainId: "0x_mock_blockchain_id_123",
       }));
 

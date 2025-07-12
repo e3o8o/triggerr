@@ -13,8 +13,12 @@ export interface InsuranceProvider {
   id: string;
   name: string;
   slug: string;
-  category: 'FIRST_PARTY_INSURER' | 'THIRD_PARTY_INSURER' | 'B2B_FINANCIAL_SERVICES' | 'OTA_PROVIDER';
-  status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED';
+  category:
+    | "FIRST_PARTY_INSURER"
+    | "THIRD_PARTY_INSURER"
+    | "B2B_FINANCIAL_SERVICES"
+    | "OTA_PROVIDER";
+  status: "ACTIVE" | "INACTIVE" | "PENDING" | "SUSPENDED";
   description?: string;
   logoUrl?: string;
   websiteUrl?: string;
@@ -46,9 +50,13 @@ export interface InsuranceProduct {
   providerId: string;
   name: string;
   description: string;
-  category: 'FLIGHT_DELAY' | 'WEATHER' | 'COMPREHENSIVE' | 'CANCELLATION';
-  coverageType: 'DELAY_COMPENSATION' | 'CANCELLATION_REFUND' | 'WEATHER_PROTECTION' | 'COMPREHENSIVE';
-  status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'ARCHIVED';
+  category: "FLIGHT_DELAY" | "WEATHER" | "COMPREHENSIVE" | "CANCELLATION";
+  coverageType:
+    | "DELAY_COMPENSATION"
+    | "CANCELLATION_REFUND"
+    | "WEATHER_PROTECTION"
+    | "COMPREHENSIVE";
+  status: "ACTIVE" | "INACTIVE" | "PENDING" | "ARCHIVED";
   pricing: {
     baseRate: number; // Base premium rate as decimal (e.g., 0.015 = 1.5%)
     maxCoverage: number; // Maximum coverage amount in cents
@@ -72,7 +80,12 @@ export interface InsuranceProduct {
 
 // Risk assessment factors
 export interface RiskMultiplier {
-  factor: 'AIRLINE_PUNCTUALITY' | 'ROUTE_HISTORY' | 'WEATHER_SEASON' | 'AIRCRAFT_TYPE' | 'TIME_OF_DAY';
+  factor:
+    | "AIRLINE_PUNCTUALITY"
+    | "ROUTE_HISTORY"
+    | "WEATHER_SEASON"
+    | "AIRCRAFT_TYPE"
+    | "TIME_OF_DAY";
   multiplier: number; // 1.0 = no change, >1.0 = higher risk, <1.0 = lower risk
   description: string;
   dataSource?: string;
@@ -80,7 +93,7 @@ export interface RiskMultiplier {
 
 // Seasonal pricing factors
 export interface SeasonalFactor {
-  season: 'WINTER' | 'SPRING' | 'SUMMER' | 'FALL';
+  season: "WINTER" | "SPRING" | "SUMMER" | "FALL";
   regions: string[];
   multiplier: number;
   effectivePeriod: {
@@ -97,7 +110,7 @@ export interface SeasonalFactor {
 export interface InsurancePolicy {
   id: string;
   policyNumber: string;
-  status: 'DRAFT' | 'ACTIVE' | 'EXPIRED' | 'CLAIMED' | 'CANCELLED';
+  status: "DRAFT" | "ACTIVE" | "EXPIRED" | "CLAIMED" | "CANCELLED";
 
   // Parties involved
   policyholder: PolicyHolder;
@@ -142,7 +155,7 @@ export interface InsurancePolicy {
     escrowAmount: number;
     escrowAddress?: string;
     payoutAmount?: number;
-    payoutStatus?: 'PENDING' | 'PROCESSED' | 'FAILED';
+    payoutStatus?: "PENDING" | "PROCESSED" | "FAILED";
   };
 
   // Claim information
@@ -167,7 +180,7 @@ export interface PolicyHolder {
     postalCode?: string;
   };
   preferences?: {
-    communicationMethod: 'EMAIL' | 'SMS' | 'BOTH';
+    communicationMethod: "EMAIL" | "SMS" | "BOTH";
     language: string;
     timezone: string;
   };
@@ -195,7 +208,7 @@ export interface PolicyTerms {
 export interface PolicyClaim {
   id: string;
   policyId: string;
-  status: 'SUBMITTED' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'PAID';
+  status: "SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "REJECTED" | "PAID";
   claimAmount: number; // Cents
   approvedAmount?: number; // Cents
   submittedAt: string;
@@ -207,11 +220,16 @@ export interface PolicyClaim {
 
 // Claim evidence
 export interface ClaimEvidence {
-  type: 'FLIGHT_STATUS' | 'DELAY_CONFIRMATION' | 'BOARDING_PASS' | 'RECEIPT' | 'OTHER';
+  type:
+    | "FLIGHT_STATUS"
+    | "DELAY_CONFIRMATION"
+    | "BOARDING_PASS"
+    | "RECEIPT"
+    | "OTHER";
   description: string;
   fileUrl?: string;
-  verificationStatus: 'PENDING' | 'VERIFIED' | 'REJECTED';
-  source?: 'USER_UPLOADED' | 'AUTOMATED_VERIFICATION' | 'THIRD_PARTY';
+  verificationStatus: "PENDING" | "VERIFIED" | "REJECTED";
+  source?: "USER_UPLOADED" | "AUTOMATED_VERIFICATION" | "THIRD_PARTY";
 }
 
 // ============================================================================
@@ -221,7 +239,7 @@ export interface ClaimEvidence {
 // Revenue tracking and sharing
 export interface RevenueRecord {
   id: string;
-  type: 'PREMIUM' | 'COMMISSION' | 'FEE' | 'REFUND' | 'PAYOUT';
+  type: "PREMIUM" | "COMMISSION" | "FEE" | "REFUND" | "PAYOUT";
   amount: number; // Cents
   currency: string;
 
@@ -245,20 +263,20 @@ export interface RevenueRecord {
 
 // Revenue distribution among parties
 export interface RevenueDistribution {
-  party: 'INSUREINNIE' | 'PROVIDER' | 'REINSURER' | 'AFFILIATE';
+  party: "TRIGGERR" | "PROVIDER" | "REINSURER" | "AFFILIATE";
   partyId?: string;
   percentage: number; // 0.0 to 1.0
   amount: number; // Cents
   walletAddress?: string;
-  paymentStatus: 'PENDING' | 'PAID' | 'FAILED';
+  paymentStatus: "PENDING" | "PAID" | "FAILED";
   paidAt?: string;
 }
 
 // Escrow management
 export interface EscrowAccount {
   id: string;
-  type: 'POLICY_PREMIUM' | 'PROVIDER_RESERVE' | 'CLAIM_PAYOUT';
-  status: 'CREATED' | 'FUNDED' | 'ACTIVE' | 'RELEASED' | 'DISPUTED';
+  type: "POLICY_PREMIUM" | "PROVIDER_RESERVE" | "CLAIM_PAYOUT";
+  status: "CREATED" | "FUNDED" | "ACTIVE" | "RELEASED" | "DISPUTED";
 
   // Financial details
   totalAmount: number; // Cents
@@ -287,10 +305,10 @@ export interface EscrowAccount {
 
 // Escrow release conditions
 export interface EscrowCondition {
-  type: 'TIME_BASED' | 'EVENT_BASED' | 'MANUAL_APPROVAL' | 'ORACLE_TRIGGER';
+  type: "TIME_BASED" | "EVENT_BASED" | "MANUAL_APPROVAL" | "ORACLE_TRIGGER";
   description: string;
   parameter?: any; // Condition-specific data
-  status: 'PENDING' | 'MET' | 'FAILED';
+  status: "PENDING" | "MET" | "FAILED";
   verifiedAt?: string;
 }
 
@@ -311,7 +329,7 @@ export interface MarketRates {
 // Risk assessment data
 export interface RiskAssessment {
   flightId: string;
-  overallRisk: 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
+  overallRisk: "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
   riskScore: number; // 0.0 to 1.0
   factors: {
     historicalDelays: {
@@ -354,7 +372,7 @@ export interface RiskAssessment {
 // Competitive pricing analysis
 export interface CompetitivePricing {
   productId: string;
-  marketPosition: 'PREMIUM' | 'COMPETITIVE' | 'BUDGET';
+  marketPosition: "PREMIUM" | "COMPETITIVE" | "BUDGET";
   benchmarks: {
     providerId: string;
     providerName: string;
@@ -435,7 +453,7 @@ export interface ProviderPerformance {
   ranking: {
     overall: number;
     category: number;
-    trend: 'IMPROVING' | 'STABLE' | 'DECLINING';
+    trend: "IMPROVING" | "STABLE" | "DECLINING";
   };
 }
 
@@ -444,7 +462,7 @@ export interface ComplianceRecord {
   providerId: string;
   jurisdiction: string;
   requirements: {
-    licenseStatus: 'ACTIVE' | 'EXPIRED' | 'SUSPENDED' | 'PENDING';
+    licenseStatus: "ACTIVE" | "EXPIRED" | "SUSPENDED" | "PENDING";
     capitalRequirement: {
       required: number;
       current: number;
@@ -458,7 +476,7 @@ export interface ComplianceRecord {
     reportingCompliance: {
       lastReport: string;
       nextDue: string;
-      status: 'CURRENT' | 'OVERDUE' | 'SUBMITTED';
+      status: "CURRENT" | "OVERDUE" | "SUBMITTED";
     };
   };
   auditHistory: {
@@ -475,23 +493,55 @@ export interface ComplianceRecord {
 // ============================================================================
 
 // Union types for common enums
-export type PolicyStatus = 'DRAFT' | 'ACTIVE' | 'EXPIRED' | 'CLAIMED' | 'CANCELLED';
-export type ClaimStatus = 'SUBMITTED' | 'UNDER_REVIEW' | 'APPROVED' | 'REJECTED' | 'PAID';
-export type ProviderCategory = 'FIRST_PARTY_INSURER' | 'THIRD_PARTY_INSURER' | 'B2B_FINANCIAL_SERVICES' | 'OTA_PROVIDER';
-export type CoverageType = 'DELAY_COMPENSATION' | 'CANCELLATION_REFUND' | 'WEATHER_PROTECTION' | 'COMPREHENSIVE';
-export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH';
-export type RevenueType = 'PREMIUM' | 'COMMISSION' | 'FEE' | 'REFUND' | 'PAYOUT';
-export type EscrowStatus = 'CREATED' | 'FUNDED' | 'ACTIVE' | 'RELEASED' | 'DISPUTED';
+export type PolicyStatus =
+  | "DRAFT"
+  | "ACTIVE"
+  | "EXPIRED"
+  | "CLAIMED"
+  | "CANCELLED";
+export type ClaimStatus =
+  | "SUBMITTED"
+  | "UNDER_REVIEW"
+  | "APPROVED"
+  | "REJECTED"
+  | "PAID";
+export type ProviderCategory =
+  | "FIRST_PARTY_INSURER"
+  | "THIRD_PARTY_INSURER"
+  | "B2B_FINANCIAL_SERVICES"
+  | "OTA_PROVIDER";
+export type CoverageType =
+  | "DELAY_COMPENSATION"
+  | "CANCELLATION_REFUND"
+  | "WEATHER_PROTECTION"
+  | "COMPREHENSIVE";
+export type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "VERY_HIGH";
+export type RevenueType =
+  | "PREMIUM"
+  | "COMMISSION"
+  | "FEE"
+  | "REFUND"
+  | "PAYOUT";
+export type EscrowStatus =
+  | "CREATED"
+  | "FUNDED"
+  | "ACTIVE"
+  | "RELEASED"
+  | "DISPUTED";
 
 // Type guards for business entities
 export function isInsuranceProvider(obj: any): obj is InsuranceProvider {
-  return obj && typeof obj.id === 'string' && obj.category && obj.businessInfo;
+  return obj && typeof obj.id === "string" && obj.category && obj.businessInfo;
 }
 
 export function isInsurancePolicy(obj: any): obj is InsurancePolicy {
-  return obj && typeof obj.id === 'string' && obj.policyNumber && obj.policyholder;
+  return (
+    obj && typeof obj.id === "string" && obj.policyNumber && obj.policyholder
+  );
 }
 
 export function isEscrowAccount(obj: any): obj is EscrowAccount {
-  return obj && typeof obj.id === 'string' && obj.contractAddress && obj.totalAmount;
+  return (
+    obj && typeof obj.id === "string" && obj.contractAddress && obj.totalAmount
+  );
 }
