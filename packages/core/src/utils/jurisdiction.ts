@@ -3,8 +3,8 @@
  *
  * Provides jurisdiction detection for Triggerr's multi-entity structure:
  * - Triggerr Direct LLC (Nevada, US operations)
- * - Preterag OÜ (Estonia, EU operations)
- * - Preterag Financial Solutions Inc. (Nevada, financial services)
+ * - Parametrigger OÜ (Estonia, EU operations)
+ * - Parametrigger Financial Solutions Inc. (Nevada, financial services)
  *
  * Supports regulatory arbitrage strategy and GDPR compliance.
  */
@@ -149,7 +149,7 @@ export function getJurisdictionInfo(
         locale: getEuropeanLocale(country),
         currency: "EUR",
         entity: {
-          legal: "Preterag OÜ",
+          legal: "Parametrigger OÜ",
           brand: "Triggerr",
           jurisdiction: "estonia",
           compliance: "gdpr",
@@ -345,7 +345,7 @@ export function isEstonianBusinessHours(timestamp?: Date): boolean {
 export function getComplianceNotice(jurisdiction: Jurisdiction): string {
   switch (jurisdiction) {
     case "EU":
-      return "This service is provided by Preterag OÜ, Estonia. Your data is processed in accordance with GDPR.";
+      return "This service is provided by Parametrigger OÜ, Estonia. Your data is processed in accordance with GDPR.";
     case "US":
       return "This service is provided by Triggerr Direct LLC, Nevada. Insurance services subject to state regulations.";
     case "GLOBAL":

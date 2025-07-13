@@ -74,7 +74,7 @@ graph TD
 
 ### Step 5: Offer Letter & Employment Agreement
 - The official offer letter is generated using the template specific to the hiring entity (e.g., `Triggerr Direct LLC Offer Letter.docx`).
-- The employment agreement is specific to the entity and its jurisdiction (e.g., Nevada employment law for US entities, Estonian law for Preterag OÜ).
+- The employment agreement is specific to the entity and its jurisdiction (e.g., Nevada employment law for US entities, Estonian law for Parametrigger OÜ).
 
 ### Step 6: Onboarding
 - The new hire is onboarded into the systems (HRIS, payroll) associated with their specific legal entity.
@@ -93,10 +93,10 @@ This guide is the source of truth for assigning roles. Exceptions require writte
 | **Chief Compliance Officer** | **Parametrigger Inc.** | A corporate function that sets policy for all subsidiaries but is employed by the parent to maintain independence. |
 | **Product Marketing Manager (US)** | **Triggerr Direct LLC** | Directly responsible for acquiring customers for the `Triggerr` consumer insurance product in the US market. |
 | **US Customer Support Rep** | **Triggerr Direct LLC** | Interacts directly with US insurance policyholders, handling their PII under US regulations. |
-| **Data Scientist (Risk Modeling)** | **Preterag Financial Solutions Inc.** | Analyzes sensitive risk and flight data. This function is firewalled from the consumer business to act as a B2B service provider. |
-| **External API Integration Engineer** | **Preterag Financial Solutions Inc.**| Works on the data aggregation layer, a core function of the internal risk-analysis service provider. |
-| **EU Sales Director / Manager** | **Preterag OÜ** | Operates within the EU jurisdiction and is responsible for EU market growth under EU regulations. |
-| **EU Customer Support Rep**| **Preterag OÜ** | Handles PII for EU customers under GDPR, employed by the EU-based legal entity. |
+| **Data Scientist (Risk Modeling)** | **Parametrigger Financial Solutions Inc.** | Analyzes sensitive risk and flight data. This function is firewalled from the consumer business to act as a B2B service provider. |
+| **External API Integration Engineer** | **Parametrigger Financial Solutions Inc.**| Works on the data aggregation layer, a core function of the internal risk-analysis service provider. |
+| **EU Sales Director / Manager** | **Parametrigger OÜ** | Operates within the EU jurisdiction and is responsible for EU market growth under EU regulations. |
+| **EU Customer Support Rep**| **Parametrigger OÜ** | Handles PII for EU customers under GDPR, employed by the EU-based legal entity. |
 | **Travel Partnership Manager**| **FlightHub Connect LLC**| Role is dedicated to the non-insurance travel vertical, isolating its operations and liabilities. |
 
 ---

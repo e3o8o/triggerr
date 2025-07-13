@@ -164,7 +164,7 @@ triggerr aims to revolutionize parametric insurance by launching `triggerr.com` 
   - **Platform Commission**: 15-25% on third-party insurer premiums.
   - **Direct Insurance**: 100% of `triggerr Direct` premiums minus reinsurance costs.
   - **Data Licensing**: Anonymized risk data to airlines/airports.
-  - **API Access**: B2B parametric insurance APIs via Preterag Financial Solutions.
+  - **API Access**: B2B parametric insurance APIs via Parametrigger Financial Solutions.
   - **B2B Financial Services**: SaaS, consulting, white-label platforms.
   - **Flight Bookings (Phase 3)**: Booking fees and insurance cross-selling via `FlightHub Connect`.
 
@@ -179,7 +179,7 @@ triggerr aims to revolutionize parametric insurance by launching `triggerr.com` 
    - Manages risk models, compliance, and operational PayGo wallet.
    - Revenue: Premiums minus reinsurance/operational costs.
    - Domain: `direct.triggerr.com` (B2B/regulatory interface).
-3. **Preterag Financial Solutions (B2B Financial Services)**:
+3. **Parametrigger Financial Solutions (B2B Financial Services)**:
    - Offers API-as-a-Service, white-label platforms, risk analytics, compliance consulting.
    - Targets: Travel agencies, airlines, corporate travel firms.
    - Revenue: SaaS fees, revenue sharing, analytics subscriptions.
@@ -826,7 +826,7 @@ CREATE TYPE flight_api_source AS ENUM ('DUFFEL', 'AMADEUS');
 
 ### Reference Data & Seeding Strategy
 - **Phase 1**:
-  - **Providers**: `triggerr Direct` (`FIRST_PARTY_INSURER`), `Preterag Financial Solutions` (`B2B_FINANCIAL_SERVICES`).
+  - **Providers**: `triggerr Direct` (`FIRST_PARTY_INSURER`), `Parametrigger Financial Solutions` (`B2B_FINANCIAL_SERVICES`).
   - **Products**: `flight-delay-basic`, `flight-delay-premium`.
   - **Flight Data**: Airports, airlines, routes, delay statistics (`airports`, `airlines` tables).
   - **System Config**: Admin user, countries, currencies.

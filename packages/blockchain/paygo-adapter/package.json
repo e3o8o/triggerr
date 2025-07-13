@@ -1,7 +1,7 @@
 {
   "name": "@triggerr/paygo-adapter",
   "version": "0.1.0",
-  "description": "PayGo client adapter for InsureInnie - Provides a clean interface for interacting with the PayGo blockchain network.",
+  "description": "PayGo client adapter for Triggerr - Provides a clean interface for interacting with the PayGo blockchain network.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -17,7 +17,7 @@
     "adapter",
     "triggerr"
   ],
-  "author": "InsureInnie Team",
+  "author": "Triggerr Team",
   "license": "MIT",
   "repository": {
     "type": "git",

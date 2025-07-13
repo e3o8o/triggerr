@@ -252,7 +252,7 @@ flowchart LR
     
     subgraph "Nevada Entities"
         B
-        D[Preterag Financial Solutions]
+        D[Parametrigger Financial Solutions]
     end
     
     subgraph "Revenue Streams"
@@ -266,7 +266,7 @@ flowchart LR
 *   **Primary Provider**: Triggerr Direct LLC retains 85% of premium revenue for first-party products
 *   **Platform Operations**: 15% platform fee on third-party insurance products
 *   **DeFi Integration**: 20% yield sharing from escrowed premiums through automated triggers
-*   **Risk Analysis**: Preterag Financial Solutions Inc. provides risk modeling and data analysis services
+*   **Risk Analysis**: Parametrigger Financial Solutions Inc. provides risk modeling and data analysis services
 
 ### **5.3. Regulatory Advantages**
 *   **Nevada Incorporation**: Benefits from insurance innovation sandbox and business-friendly regulations

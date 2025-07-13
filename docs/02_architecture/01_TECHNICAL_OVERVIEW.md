@@ -78,7 +78,7 @@ APIs are organized into versioned paths (`/api/v1/`) and categorized by function
 graph TD
     A[API Layer] --> B[Parametrigger Inc.<br/>Platform APIs]
     A --> C[Triggerr Direct LLC<br/>Insurance APIs]
-    A --> D[Preterag Financial Solutions<br/>Risk Analysis APIs]
+    A --> D[Parametrigger Financial Solutions<br/>Risk Analysis APIs]
     
     B --> B1[Technology Platform]
     B --> B2[Escrow Infrastructure]

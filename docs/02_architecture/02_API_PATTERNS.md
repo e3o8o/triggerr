@@ -78,7 +78,7 @@ return NextResponse.json(
 );
 
 // ✅ JURISDICTION-SPECIFIC - Handles EU vs US requirements
-const errorResponse = isEUUser(authContext) 
+const errorResponse = isEUUser(authContext)
   ? createApiError('GDPR_VALIDATION_ERROR', 'Data processing consent required', {
       gdprArticle: '6.1.a',
       consentRequired: true
@@ -100,7 +100,7 @@ interface ApiResponse<T> {
   data?: T;
   error?: string;
   metadata: {
-    entity: 'parametrigger-inc' | 'triggerr-direct-llc' | 'preterag-financial-solutions';
+    entity: 'parametrigger-inc' | 'triggerr-direct-llc' | 'parametrigger-financial-solutions';
     jurisdiction: 'nevada' | 'estonia' | 'multi-state';
     complianceFramework: 'insurance-sandbox' | 'surplus-lines' | 'gdpr';
     timestamp: string;

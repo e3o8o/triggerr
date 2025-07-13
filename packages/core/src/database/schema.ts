@@ -52,7 +52,7 @@ export const providerStatusEnum = pgEnum("provider_status", [
 export const providerCategoryEnum = pgEnum("provider_category", [
   "FIRST_PARTY_INSURER", // triggerr Direct
   "THIRD_PARTY_INSURER", // AeroAssure Partners
-  "B2B_FINANCIAL_SERVICES", // Preterag Financial Solutions
+  "B2B_FINANCIAL_SERVICES", // parametrigger Financial Solutions
   "OTA_PROVIDER", // FlightHub Connect (Phase 3)
 ]);
 export const providerTierEnum = pgEnum("provider_tier_enum", [
@@ -129,7 +129,7 @@ export const coverageTypeEnum = pgEnum("coverage_type", [
   "CANCELLATION",
   "BAGGAGE",
   "COMPREHENSIVE", // For AeroAssure's product
-  "CUSTOM", // For Preterag's B2B/reinsurance product
+  "CUSTOM", // For parametrigger's B2B/reinsurance product
 ]);
 
 // ---------------------------------------------------------------------------

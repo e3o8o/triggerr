@@ -19,7 +19,7 @@
     *   `triggerr` (Insurance Platform & Brand)
     *   `triggerr Direct` (First-Party Parametric Insurer - MVP Focus)
     *   `FlightHub Connect` (Independent OTA Entity - Phase 3)
-    *   `Preterag Financial Solutions` (B2B Financial Services Provider)
+    *   `Parametrigger Financial Solutions` (B2B Financial Services Provider)
 3.  **Technical Architecture**
     *   Overall Technology Stack
     *   API-First, Modular Design & Project Structure
@@ -153,7 +153,7 @@ triggerr will launch and grow in distinct, strategically planned phases to ensur
     *   **Platform Integration**: Onboarded onto `triggerr.com` as a strategic partner or an integrated service. Users on `triggerr.com` looking for flights will interact with `FlightHub Connect`'s services, potentially through a dedicated UI section or a seamless API integration. A revenue sharing or referral fee model will be established with the `triggerr` platform for flight bookings generated.
     *   **Domain**: To be determined (e.g., `flighthubconnect.com`, or potentially a subdomain like `fly.triggerr.com` which clearly presents `FlightHub Connect` services).
 
-4.  **`Preterag Financial Solutions` (B2B Financial Services Provider)**
+4.  **`Parametrigger Financial Solutions` (B2B Financial Services Provider)**
     *   **Role**: A specialized B2B provider that can be onboarded to the `triggerr` platform in Phase 2 or later.
     *   **Functions**: Offers financial products and services such as reinsurance to other insurance providers on the platform (including `triggerr Direct`), risk assessment tools, or specialized data products related to travel risk.
 
@@ -358,7 +358,7 @@ triggerr will launch and grow in distinct, strategically planned phases to ensur
     *   `flightApiSourceEnum`: `DUFFEL`, `AMADEUS`.
 *   **Seeding Strategy (`seed.ts`)**:
     *   **MVP (Phase 1)**:
-        *   Providers: `triggerr Direct` (ID: `INSUREINNIE_DIRECT_PROVIDER_ID`, category: `FIRST_PARTY_INSURER`), `Preterag Financial Solutions` (category: `B2B_FINANCIAL_SERVICES`).
+        *   Providers: `triggerr Direct` (ID: `INSUREINNIE_DIRECT_PROVIDER_ID`, category: `FIRST_PARTY_INSURER`), `Parametrigger Financial Solutions` (category: `B2B_FINANCIAL_SERVICES`).
         *   Products: Parametric flight delay insurance products offered by `triggerr Direct`, linked to its provider ID.
         *   Flight Data Sources: Seed `AviationStack`, `FlightAware`, `OpenSky` records into the `flightDataSource` table.
         *   Admin User and basic System Configuration. Core reference data (countries, regions, airlines, airports, aircraft_types, runways, routes) must be comprehensively seeded.

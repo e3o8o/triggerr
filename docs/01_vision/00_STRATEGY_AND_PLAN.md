@@ -33,7 +33,7 @@ graph TD
 
     subgraph Estonia Advantages
         direction TB
-        EU1[EU Market Access via Preterag OÜ]
+        EU1[EU Market Access via Parametrigger OÜ]
         EU2[Digital-First Operations]
         EU3[Crypto-Friendly Jurisdiction]
         EU4[GDPR Compliance Foundation]
@@ -46,7 +46,7 @@ graph TD
 ### **Market: Where We Compete**
 We compete in the **global parametric insurance market**, with an **Estonia-centric, EU-first approach**:
 1.  **Phase 1 (Foundation)**: Establish technology platform and regulatory framework with **Nevada incorporation** for optimal regulatory arbitrage.
-2.  **Phase 2 (EU Launch)**: Launch in **European Union** market via `Preterag OÜ` (Estonia), leveraging digital-first operations and crypto-friendly jurisdiction.
+2.  **Phase 2 (EU Launch)**: Launch in **European Union** market via `Parametrigger OÜ` (Estonia), leveraging digital-first operations and crypto-friendly jurisdiction.
 3.  **Phase 3 (US Expansion)**: Enter **United States** market through `Triggerr Direct LLC`, targeting crypto-industry professionals and tech-savvy travelers.
 4.  **Phase 4 (Global Marketplace)**: Evolve into a **B2B Parametric Risk Marketplace**, enabling third-party providers across multiple jurisdictions.
 
@@ -136,10 +136,10 @@ gantt
 - **Estonia Focus**: Local PostgreSQL setup, timezone considerations
 
 #### **Phase 1: Branding Migration (PENDING ⏳)**
-- **Objective**: Complete systematic removal of "InsureInnie" legacy branding and implement Estonia-compliant entity structure
+- **Objective**: Complete systematic removal of legacy branding (formerly "InsureInnie") and implement Triggerr as the unified brand with Parametrigger as the Estonia-compliant business entity structure
 - **Status**: ⏳ **PENDING** - Blocks API testing
 - **Timeline**: 3 days
-- **Estonia Focus**: Preterag OÜ integration, EU compliance headers
+- **Estonia Focus**: Parametrigger OÜ integration, EU compliance headers
 
 #### **Phase 2: API Testing Framework (PENDING ⏳)**
 - **Objective**: Create comprehensive API validation using Postman + automated tests, including PayGo blockchain operations
@@ -167,7 +167,7 @@ gantt
 
 ### **📋 EXECUTION METHODOLOGY**
 - **API-First Strategy**: Complete backend validation before UI development
-- **Estonia-Centric**: Preterag OÜ entity integration throughout
+- **Estonia-Centric**: Parametrigger OÜ entity integration throughout
 - **Dual Database**: Local testing + Supabase production
 - **Comprehensive Testing**: Postman collections + automated test suites
 - **Blockchain Integration**: Full PayGo testnet validation
@@ -180,7 +180,7 @@ gantt
 - **Core Platform**: ✅ **OPERATIONAL** - All fundamental services completed and validated
 - **Technical Debt**: ✅ **RESOLVED** - Enterprise-grade TypeScript build system implemented
 - **Regulatory Framework**: ✅ **ESTABLISHED** - Multi-jurisdiction entity structure documented
-- **Estonia Operations**: 🚀 **ACTIVATING** - Preterag OÜ integration in progress
+- **Estonia Operations**: 🚀 **ACTIVATING** - Parametrigger OÜ integration in progress
 - **Production Readiness**: ⏳ **21 DAYS** - Architect mode execution plan active
 
 ### **Key Achievements to Date**
@@ -188,11 +188,11 @@ gantt
 2. **Service Integration**: Complete quote-to-policy-to-payout workflow operational
 3. **Data Pipeline**: Multi-source aggregation with 90%+ confidence scores
 4. **Regulatory Arbitrage**: $1.05M-$4.5M annual value framework established
-5. **Estonia Foundation**: Preterag OÜ entity ready for EU market operations
+5. **Estonia Foundation**: Parametrigger OÜ entity ready for EU market operations
 
 ### **Immediate Strategic Focus**
 - **API Validation**: Complete backend testing before UI development
-- **Estonia Integration**: Preterag OÜ entity awareness throughout platform
+- **Estonia Integration**: Parametrigger OÜ entity awareness throughout platform
 - **Blockchain Operations**: PayGo testnet integration and validation
 - **Production Launch**: 21-day architect mode execution to market readiness
 

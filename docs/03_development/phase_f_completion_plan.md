@@ -406,7 +406,7 @@ export class AnonymousSessionManager {
 #### **F.5.2: SDK Integration in Web App**
 ```typescript
 // triggerr/apps/web/src/lib/api.ts
-export const apiClient = new InsureInnieSDK({
+export const apiClient = new TriggerrSDK({
   baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
   authProvider: async () => {
     const { user, anonymousSessionId } = useAuth();

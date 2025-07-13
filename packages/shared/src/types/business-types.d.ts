@@ -184,7 +184,7 @@ export interface RevenueRecord {
     recordedAt: string;
 }
 export interface RevenueDistribution {
-    party: 'INSUREINNIE' | 'PROVIDER' | 'REINSURER' | 'AFFILIATE';
+    party: 'TRIGGERR' | 'PROVIDER' | 'REINSURER' | 'AFFILIATE';
     partyId?: string;
     percentage: number;
     amount: number;

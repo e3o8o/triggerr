@@ -161,7 +161,7 @@ export const INSURANCE_PRODUCTS = {
 // Providers (matching seed data)
 export const PROVIDERS = {
   INSUREINNIE_DIRECT: 'PROV_IIDR001',
-  PRETERAG_FINANCIAL: 'PROV_PRTF001',
+  PARAMETRIGGER_FINANCIAL: 'PROV_PRTF001',
   AEROASSURE_PARTNERS: 'PROV_AASP001',
 } as const;
 
@@ -320,7 +320,7 @@ export const paymentProviderEnum = pgEnum("payment_provider", [
 export const providerCategoryEnum = pgEnum("provider_category", [
   "FIRST_PARTY_INSURER",     // triggerr Direct
   "THIRD_PARTY_INSURER",     // AeroAssure Partners
-  "B2B_FINANCIAL_SERVICES",  // Preterag Financial Solutions
+  "B2B_FINANCIAL_SERVICES",  // Parametrigger Financial Solutions
   "OTA_PROVIDER",            // FlightHub Connect (Phase 3)
 ]);
 ```
@@ -1301,7 +1301,7 @@ GET  /api/v1/user/conversations
 - **✅ Shared Packages**: Type-safe foundation with canonical models
 - **✅ Better-Auth Integration**: Middleware and RLS policies working
 - **✅ Anonymous Sessions**: Client-side session management implemented
-- **✅ Provider Data**: Updated categories for triggerr Direct, Preterag, AeroAssure
+- **✅ Provider Data**: Updated categories for triggerr Direct, Parametrigger, AeroAssure
 
 ### 🚀 READY FOR IMPLEMENTATION
 **Next Priority Order:**
@@ -1358,7 +1358,7 @@ SELECT id, name, category FROM provider ORDER BY id;
 
 -- Should show:
 -- PROV_IIDR001 | triggerr Direct | FIRST_PARTY_INSURER
--- PROV_PRTF001 | Preterag Financial Solutions | B2B_FINANCIAL_SERVICES
+-- PROV_PRTF001 | Parametrigger Financial Solutions | B2B_FINANCIAL_SERVICES
 -- PROV_AASP001 | AeroAssure Partners | THIRD_PARTY_INSURER
 ```
 

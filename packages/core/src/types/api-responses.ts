@@ -3,8 +3,8 @@
  *
  * Supports Triggerr's multi-entity structure and regulatory compliance:
  * - Triggerr Direct LLC (Nevada, US operations)
- * - Preterag OÜ (Estonia, EU operations)
- * - Preterag Financial Solutions Inc. (Nevada, financial services)
+ * - Parametrigger OÜ (Estonia, EU operations)
+ * - Parametrigger Financial Solutions Inc. (Nevada, financial services)
  *
  * Ensures proper jurisdiction attribution and GDPR compliance.
  */
@@ -16,7 +16,7 @@ import type { Jurisdiction } from "../utils/jurisdiction";
 // ============================================================================
 
 export interface EntityInfo {
-  /** Legal entity name (e.g., "Preterag OÜ") */
+  /** Legal entity name (e.g., "Parametrigger OÜ") */
   legal: string;
   /** Brand name (e.g., "Triggerr") */
   brand: string;
@@ -140,11 +140,11 @@ export type ApiResponse<T = any> =
 // ============================================================================
 
 /**
- * EU/Estonia-specific response (Preterag OÜ)
+ * EU/Estonia-specific response (Parametrigger OÜ)
  */
 export interface EUEntityResponse<T = any> extends EntityAwareResponse<T> {
   entity: {
-    legal: "Preterag OÜ";
+    legal: "Parametrigger OÜ";
     brand: "Triggerr";
     jurisdiction: "estonia";
     compliance: "gdpr";
@@ -179,12 +179,12 @@ export interface USEntityResponse<T = any> extends EntityAwareResponse<T> {
 }
 
 /**
- * Financial services response (Preterag Financial Solutions Inc.)
+ * Financial services response (Parametrigger Financial Solutions Inc.)
  */
 export interface FinancialEntityResponse<T = any>
   extends EntityAwareResponse<T> {
   entity: {
-    legal: "Preterag Financial Solutions Inc.";
+    legal: "Parametrigger Financial Solutions Inc.";
     brand: "Triggerr";
     jurisdiction: "nevada";
     compliance: "financial-services";
@@ -404,7 +404,7 @@ export function getDataRetentionDays(
  * Standard compliance notices by jurisdiction
  */
 export const COMPLIANCE_NOTICES = {
-  EU: "This service is provided by Preterag OÜ, Estonia. Your data is processed in accordance with GDPR.",
+  EU: "This service is provided by Parametrigger OÜ, Estonia. Your data is processed in accordance with GDPR.",
   US: "This service is provided by Triggerr Direct LLC, Nevada. Insurance services subject to state regulations.",
   GLOBAL:
     "This service is provided by Parametrigger Inc., Nevada. Global data protection standards apply.",

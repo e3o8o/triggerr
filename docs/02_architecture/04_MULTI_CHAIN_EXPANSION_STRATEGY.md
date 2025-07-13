@@ -167,7 +167,7 @@ graph TD
 **Entity Structure Benefits**:
 - **Parametrigger Inc.**: Technology platform development across all chains
 - **Triggerr Direct LLC**: Insurance risk bearing with multi-chain escrow support
-- **Preterag Financial Solutions Inc.**: Cross-chain risk analysis and DeFi integration
+- **Parametrigger Financial Solutions Inc.**: Cross-chain risk analysis and DeFi integration
 
 **Regulatory Arbitrage**:
 - Nevada's blockchain-friendly legislation supports multi-chain operations

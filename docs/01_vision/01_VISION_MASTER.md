@@ -308,7 +308,7 @@ Our multi-chain, API-first architecture directly enables three distinct business
   - **Platform Commissions (Phase 2+):** Fees (e.g., 15-25%) on premiums from third-party insurers utilizing the `triggerr.com` marketplace.
   - **x402 Protocol API Revenue (Phase 2.5+):** Micropayments for API access via x402 protocol - $0.001-0.05 per API call, targeting AI agents and programmatic access. Projected $60,000+ annual revenue with potential for 10x growth as AI agent adoption increases. See [x402 Integration Architecture](03_X402_INTEGRATION_ARCHITECTURE.md) for detailed analysis.
   - **Flight Booking Revenue (`FlightHub Connect` - Phase 3):** Commissions/markups on flight tickets, fees for ancillary services.
-  - **B2B Financial Services (`Preterag Financial Solutions` - Phase 2+):** SaaS fees for white-label platforms, API access fees, revenue from risk analytics products, consulting.
+  - **B2B Financial Services (`Parametrigger Financial Solutions` - Phase 2+):** SaaS fees for white-label platforms, API access fees, revenue from risk analytics products, consulting.
   - **Data Licensing (Future):** Monetization of anonymized, aggregated risk data and travel trends (with strict adherence to privacy).
 
 ### Entity Structure & Cross-Reference Matrix
@@ -316,9 +316,9 @@ Our multi-chain, API-first architecture directly enables three distinct business
 ```mermaid
 graph TD
     A[Parametrigger Inc.<br/>Nevada Parent Company] --> B[Triggerr Direct LLC<br/>Nevada First-Party Provider]
-    A --> C[Preterag Financial Solutions Inc.<br/>Nevada Risk Solutions]
+    A --> C[Parametrigger Financial Solutions Inc.<br/>Nevada Risk Solutions]
     A --> D[FlightHub Connect LLC<br/>Nevada OTA Entity]
-    A --> E[Preterag OÜ<br/>Estonia EU Operations]
+    A --> E[Parametrigger OÜ<br/>Estonia EU Operations]
     
     B --> B1[Insurance Risk Bearer]
     C --> C1[Financial Services Provider]
@@ -329,9 +329,9 @@ graph TD
 #### Entity Responsibilities:
 - **Parametrigger Inc.**: Parent company managing platform infrastructure and open-source protocol
 - **Triggerr Direct LLC**: First-party insurance provider offering parametric flight insurance  
-- **Preterag Financial Solutions Inc.**: Financial services provider handling risk solutions and data aggregation
+- **Parametrigger Financial Solutions Inc.**: Financial services provider handling risk solutions and data aggregation
 - **FlightHub Connect LLC**: OTA entity for flight bookings and travel services (Phase 3)
-- **Preterag OÜ**: EU market operations and compliance entity (existing Estonia entity)
+- **Parametrigger OÜ**: EU market operations and compliance entity (existing Estonia entity)
 
 > **Compliance Reference**: Detailed legal framework and regulatory arbitrage strategy documented in [Legal Reference](../../docs/04_compliance/LEGAL_REFERENCE.md)
 1.  **`triggerr` (Insurance Platform & Technology Parent)**:
@@ -350,7 +350,7 @@ graph TD
     *   Operates as an independent Online Travel Agency, likely under its own brand (e.g., "FlightHub Connect, an triggerr partner") and domain (e.g., `flighthubconnect.com`).
     *   Manages flight search/booking (Duffel, Amadeus), airline/GDS relationships, payment processing for flights, and OTA-specific compliance (IATA, seller of travel).
     *   Integrates its services into `triggerr.com` for a unified user experience (e.g., flight search results on `triggerr.com` are powered by `FlightHub Connect`).
-4.  **`Preterag Financial Solutions` (B2B Financial Services - Phase 2+)**:
+4.  **`Parametrigger Financial Solutions` (B2B Financial Services - Phase 2+)**:
     *   Offers specialized B2B services: API-as-a-Service for parametric insurance, white-label insurance platforms, risk analytics, compliance consulting to other travel businesses.
 
 ### Regulatory Compliance & Risk Management
@@ -363,7 +363,7 @@ graph TD
 
 **Multi-Jurisdictional Approach**: 
 - Nevada entities for core operations and regulatory arbitrage
-- Estonia entity (Preterag OÜ) for EU market access and compliance
+- Estonia entity (Parametrigger OÜ) for EU market access and compliance
 - Entity separation for liability isolation and regulatory optimization
 
 > **Detailed Legal Framework**: Comprehensive regulatory strategy, arbitrage analysis, and compliance requirements documented in [Legal Reference](../../docs/04_compliance/LEGAL_REFERENCE.md)
@@ -1166,7 +1166,7 @@ CREATE TABLE IF NOT EXISTS api_logs (
 export const providerCategoryEnum = pgEnum('provider_category', [
   'FIRST_PARTY_INSURER',        // e.g., triggerr Direct
   'THIRD_PARTY_INSURER',        // Other insurance companies on the platform
-  'B2B_FINANCIAL_SERVICES',   // e.g., Preterag
+  'B2B_FINANCIAL_SERVICES',   // e.g., Parametrigger
   'OTA_PROVIDER',               // e.g., FlightHub Connect (as an entity offering flight services)
   'FLIGHT_AGGREGATOR'           // e.g., Duffel, Amadeus (as sources of flight data/booking)
 ]);
@@ -1200,7 +1200,7 @@ export const quoteCartItemStatusEnum = pgEnum('quote_cart_item_status', ['ACTIVE
 
 ### Reference Data & Seeding Strategy
 - **Phase 1 (MVP)**:
-    - **Providers**: `triggerr Direct` (category: `FIRST_PARTY_INSURER`), `Preterag Financial Solutions` (category: `B2B_FINANCIAL_SERVICES`). Seed corresponding API keys if they have programmatic access.
+    - **Providers**: `triggerr Direct` (category: `FIRST_PARTY_INSURER`), `Parametrigger Financial Solutions` (category: `B2B_FINANCIAL_SERVICES`). Seed corresponding API keys if they have programmatic access.
     - **Products**: Parametric flight delay insurance products (e.g., "Flight Delay Shield 60+", "Flight Delay Shield 120+") offered by `triggerr Direct`.
     - **Flight Data Sources**: Records in `flightDataSource` for `AviationStack`, `FlightAware`, `OpenSky`.
     - **System Config**: Admin user for Better-Auth, default countries, currencies, system parameters.

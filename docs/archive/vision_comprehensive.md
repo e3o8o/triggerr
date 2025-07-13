@@ -565,7 +565,7 @@ interface PolicyListResponse {
 2. **Direct Insurance**: 100% of premium minus reinsurance costs on triggerr Direct policies
 3. **Data Licensing**: Anonymous risk assessment data to airlines and airports
 4. **API Access**: B2B access to parametric insurance APIs
-5. **B2B Financial Services**: Revenue from Preterag Financial Solutions
+5. **B2B Financial Services**: Revenue from Parametrigger Financial Solutions
 
 ### Entity Structure & Business Operations
 
@@ -582,7 +582,7 @@ interface PolicyListResponse {
   - **Stripe (Fiat Gateway)**: User pays premium with credit/debit card. triggerr Direct receives fiat, then uses its operational PayGo wallet to fund the policy-specific PayGo escrow
   - **Custodial PayGo Wallet**: User authorizes payment directly from their triggerr-managed custodial PayGo wallet. Backend temporarily decrypts the user's private key for this specific transaction, signs, and funds the policy escrow
 
-#### Preterag Financial Solutions (B2B Financial Services Provider)
+#### Parametrigger Financial Solutions (B2B Financial Services Provider)
 - **Role**: Provides B2B financial infrastructure and white-label solutions
 - **Functions**: 
   - API-as-a-Service for parametric insurance

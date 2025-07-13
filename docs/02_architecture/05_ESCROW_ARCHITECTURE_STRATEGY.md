@@ -109,7 +109,7 @@ graph TD
 |--------|----------------|---------------------|-------------------|
 | **Parametrigger Inc.** | Platform escrow infrastructure | Nevada corporate law | Technology platform treatment |
 | **Triggerr Direct LLC** | Insurance premium escrows | Nevada insurance + sandbox | Reduced capital requirements |
-| **Preterag Financial Solutions Inc.** | Risk-based escrow management | Nevada financial services | Flexible risk modeling |
+| **Parametrigger Financial Solutions Inc.** | Risk-based escrow management | Nevada financial services | Flexible risk modeling |
 
 ### **4.3. Cross-Chain Compliance Strategy**
 *   **Unified Legal Framework**: All escrow operations governed by Nevada law regardless of underlying blockchain

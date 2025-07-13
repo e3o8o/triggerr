@@ -83,7 +83,7 @@ const WalletTab: React.FC<WalletTabProps> = ({
       createHttpClient({
         baseURL:
           process.env.NODE_ENV === "production"
-            ? "https://insureinnie.com"
+            ? "https://triggerr.co"
             : "http://localhost:3000",
       }),
     [],

@@ -30,7 +30,7 @@ Successfully integrated the new business structure and regulatory arbitrage stra
   - Jurisdictional advantages matrix (Nevada/Estonia)
   - Regulatory arbitrage strategy ($1.05M-4.5M annual value)
   - Product compliance framework
-  - European strategy with Preterag OÜ integration
+  - European strategy with Parametrigger OÜ integration
   - Cross-reference matrix between entities and technical components
   - Future-state compliance roadmap
   - Risk mitigation and contingency planning
@@ -68,7 +68,7 @@ Successfully integrated the new business structure and regulatory arbitrage stra
 - 85% first-party revenue retention
 - 20% DeFi yield sharing
 - Entity responsibility matrix
-- Preterag OÜ integration for EU operations
+- Parametrigger OÜ integration for EU operations
 - Unified "Parametrigger" brand across all entities
 
 #### `triggerr/docs/01_vision/02_BUSINESS_STRUCTURE.md`
@@ -189,10 +189,10 @@ Successfully integrated the new business structure and regulatory arbitrage stra
 | Quote Engine | Triggerr Direct LLC | Parametrigger | ✅ 07_QUOTE_ENGINE_DESIGN.md |
 | Policy Engine | Triggerr Direct LLC | Parametrigger | Referenced in LEGAL_REFERENCE.md |
 | Payout Engine | Triggerr Direct LLC | Parametrigger | Referenced in LEGAL_REFERENCE.md |
-| Data Aggregation | Preterag Financial Solutions | Parametrigger | ✅ 06_DATA_AGGREGATION_DESIGN.md |
+| Data Aggregation | Parametrigger Financial Solutions | Parametrigger | ✅ 06_DATA_AGGREGATION_DESIGN.md |
 | Escrow Engine | Parametrigger Inc. | Parametrigger | ✅ 05_ESCROW_ARCHITECTURE_STRATEGY.md |
 | Web Platform | Parametrigger Inc. | Parametrigger | ✅ 01_TECHNICAL_OVERVIEW.md |
-| Chat Service | Preterag OÜ | Parametrigger | ✅ 03_CHAT_IMPLEMENTATION_PLAN.md |
+| Chat Service | Parametrigger OÜ | Parametrigger | ✅ 03_CHAT_IMPLEMENTATION_PLAN.md |
 | Travel Booking | FlightHub Connect LLC | FlightHub Connect | Referenced in LEGAL_REFERENCE.md |
 
 ### 5.2 Document Hierarchy
@@ -242,7 +242,7 @@ triggerr/docs/
 
 ## 7. European Strategy Integration
 
-### 7.1 Preterag OÜ Utilization
+### 7.1 Parametrigger OÜ Utilization
 - **Current Status**: Existing Estonian entity available for EU operations
 - **Strategic Approach**: Hybrid model with service agreements
 - **Documentation**: Comprehensive EU strategy in LEGAL_REFERENCE.md

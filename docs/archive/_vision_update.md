@@ -566,7 +566,7 @@ GET /api/conversation/{threadId}/messages
 - Standard marketplace fees to ensure neutrality
 - Focus on parametric flight delay insurance
 
-**Preterag Financial Solutions (B2B Provider):**
+**Parametrigger Financial Solutions (B2B Provider):**
 - Reinsurance products for platform providers
 - Risk assessment tools and data products
 - Regulatory compliance services

@@ -269,7 +269,7 @@ triggerr aims to revolutionize parametric insurance by launching `triggerr.com` 
     - **Direct Insurance Premiums (`triggerr Direct` - Phase 1+):** Majority of revenue from policies sold by the first-party insurer, after reinsurance and operational costs.
     - **Platform Commissions (Phase 2+):** Fees (e.g., 15-25%) on premiums from third-party insurers utilizing the `triggerr.com` marketplace.
     - **Flight Booking Revenue (`FlightHub Connect` - Phase 3):** Commissions/markups on flight tickets, fees for ancillary services.
-    - **B2B Financial Services (`Preterag Financial Solutions` - Phase 2+):** SaaS fees for white-label platforms, API access fees, revenue from risk analytics products, consulting.
+    - **B2B Financial Services (`Parametrigger Financial Solutions` - Phase 2+):** SaaS fees for white-label platforms, API access fees, revenue from risk analytics products, consulting.
     - **Data Licensing (Future):** Monetization of anonymized, aggregated risk data and travel trends (with strict adherence to privacy).
 
 ### Entity Roles & Operations
@@ -289,7 +289,7 @@ triggerr aims to revolutionize parametric insurance by launching `triggerr.com` 
     *   Operates as an independent Online Travel Agency, likely under its own brand (e.g., "FlightHub Connect, an triggerr partner") and domain (e.g., `flighthubconnect.com`).
     *   Manages flight search/booking (Duffel, Amadeus), airline/GDS relationships, payment processing for flights, and OTA-specific compliance (IATA, seller of travel).
     *   Integrates its services into `triggerr.com` for a unified user experience (e.g., flight search results on `triggerr.com` are powered by `FlightHub Connect`).
-4.  **`Preterag Financial Solutions` (B2B Financial Services - Phase 2+)**:
+4.  **`Parametrigger Financial Solutions` (B2B Financial Services - Phase 2+)**:
     *   Offers specialized B2B services: API-as-a-Service for parametric insurance, white-label insurance platforms, risk analytics, compliance consulting to other travel businesses.
 
 ### Regulatory Compliance & Risk Management
@@ -1043,7 +1043,7 @@ CREATE TABLE IF NOT EXISTS api_logs (
 export const providerCategoryEnum = pgEnum('provider_category', [
   'FIRST_PARTY_INSURER',        // e.g., triggerr Direct
   'THIRD_PARTY_INSURER',        // Other insurance companies on the platform
-  'B2B_FINANCIAL_SERVICES',   // e.g., Preterag
+  'B2B_FINANCIAL_SERVICES',   // e.g., Parametrigger
   'OTA_PROVIDER',               // e.g., FlightHub Connect (as an entity offering flight services)
   'FLIGHT_AGGREGATOR'           // e.g., Duffel, Amadeus (as sources of flight data/booking)
 ]);
@@ -1077,7 +1077,7 @@ export const quoteCartItemStatusEnum = pgEnum('quote_cart_item_status', ['ACTIVE
 
 ### Reference Data & Seeding Strategy
 - **Phase 1 (MVP)**:
-    - **Providers**: `triggerr Direct` (category: `FIRST_PARTY_INSURER`), `Preterag Financial Solutions` (category: `B2B_FINANCIAL_SERVICES`). Seed corresponding API keys if they have programmatic access.
+    - **Providers**: `triggerr Direct` (category: `FIRST_PARTY_INSURER`), `Parametrigger Financial Solutions` (category: `B2B_FINANCIAL_SERVICES`). Seed corresponding API keys if they have programmatic access.
     - **Products**: Parametric flight delay insurance products (e.g., "Flight Delay Shield 60+", "Flight Delay Shield 120+") offered by `triggerr Direct`.
     - **Flight Data Sources**: Records in `flightDataSource` for `AviationStack`, `FlightAware`, `OpenSky`.
     - **System Config**: Admin user for Better-Auth, default countries, currencies, system parameters.

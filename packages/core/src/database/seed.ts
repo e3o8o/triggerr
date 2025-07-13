@@ -91,13 +91,13 @@ async function fileExists(filePath: string): Promise<boolean> {
 
 // --- Provider IDs (Hardcoded for Seed Stability) ---
 const TRIGGERR_DIRECT_PROVIDER_ID = "PROV_TRDR";
-const PRETERAG_FINANCIAL_PROVIDER_ID = "PROV_PRTF";
+const PARAMETRIGGER_FINANCIAL_PROVIDER_ID = "PROV_PARA";
 const AEROASSURE_PROVIDER_ID = "PROV_AASP";
 
 // --- Product IDs (Hardcoded for Seed Stability) ---
 const TRDR_FLIGHT_DELAY_60_PRODUCT_ID = "PROD_TRDR001";
 const TRDR_FLIGHT_DELAY_120_PRODUCT_ID = "PROD_TRDR002";
-const PRETERAG_REINSURANCE_A_PRODUCT_ID = "PROD_PRTF001";
+const PARAMETRIGGER_REINSURANCE_A_PRODUCT_ID = "PROD_PARA001";
 const AEROASSURE_COMPREHENSIVE_PRODUCT_ID = "PROD_AASP001";
 
 // --- User IDs (Hardcoded for Seed Stability) ---
@@ -157,37 +157,37 @@ const providerSetupData = [
     isActive: true,
   },
   {
-    id: PRETERAG_FINANCIAL_PROVIDER_ID,
-    name: "Preterag Financial Solutions",
-    slug: "preterag-financial-solutions",
+    id: PARAMETRIGGER_FINANCIAL_PROVIDER_ID,
+    name: "Parametrigger Financial Solutions",
+    slug: "parametrigger-financial-solutions",
     category: "B2B_FINANCIAL_SERVICES" as const,
     status: "ACTIVE" as const,
     tier: "ENTERPRISE" as const,
     description:
-      "Specialized reinsurance, underwriting support, and financial services for the parametric insurance sector. Operates independently on the triggerr platform using preterag.com.",
-    logoUrl: "https://triggerr.com/assets/preterag-logo.png", // Example - update with actual logo URL
-    websiteUrl: "https://preterag.com",
-    supportEmail: "support@preterag.com",
+      "Specialized reinsurance, underwriting support, and financial services for the parametric insurance sector. Operates independently on the triggerr platform using parametrigger.com.",
+    logoUrl: "https://triggerr.com/assets/parametrigger-logo.png", // Example - update with actual logo URL
+    websiteUrl: "https://parametrigger.com",
+    supportEmail: "support@parametrigger.com",
     walletAddress:
-      process.env.PROVIDER_PRETERAG_FINANCIAL_WALLET_ADDRESS ||
-      "placeholder_preterag_financial_wallet_address",
+      process.env.PROVIDER_PARAMETRIGGER_FINANCIAL_WALLET_ADDRESS ||
+      "placeholder_parametrigger_financial_wallet_address",
     walletPrivateKey: null,
-    apiEndpoint: "https://api.preterag.com", // Example
+    apiEndpoint: "https://api.parametrigger.com", // Example
     webhookSecret: null,
     commissionRate: "0.0800", // Example: 8% platform fee for its B2B products
     escrowModel: "COLLATERALIZED_PROVIDER_POOL" as const, // Example for B2B financial products
     premiumReturnPolicy: "PROVIDER_KEEPS_PREMIUM" as const,
     collateralRequirement: "500000.00", // Example: $500k collateral for its pool
     poolAddress:
-      process.env.PROVIDER_PRETERAG_FINANCIAL_POOL_ADDRESS ||
-      "placeholder_preterag_financial_pool_address",
+      process.env.PROVIDER_PARAMETRIGGER_FINANCIAL_POOL_ADDRESS ||
+      "placeholder_parametrigger_financial_pool_address",
     poolMinimumBalance: "250000.00", // Example
     escrowConfiguration: {
       description:
-        "Operates a collateralized on-chain pool for its B2B reinsurance and financial products. This pool is funded and managed by Preterag Financial Solutions to back its obligations.",
+        "Operates a collateralized on-chain pool for its B2B reinsurance and financial products. This pool is funded and managed by Parametrigger Financial Solutions to back its obligations.",
       poolType: "Dedicated Provider Collateral Pool",
       fundingMechanism:
-        "Primarily funded by Preterag's own capital; may involve contributions from institutional participants for specific tranches.",
+        "Primarily funded by Parametrigger's own capital; may involve contributions from institutional participants for specific tranches.",
       participantRequirements:
         "Primarily for institutional clients, other insurance providers, or sophisticated entities participating in reinsurance contracts.",
       payoutLogic:
@@ -268,19 +268,19 @@ const providerProductSetupData = [
     termsUrl: "https://direct.triggerr.com/terms/flight-delay-120",
     isActive: true,
   },
-  // Products for Preterag Financial Solutions (Example B2B Reinsurance Product)
+  // Products for Parametrigger Financial Solutions (Example B2B Reinsurance Product)
   {
-    id: PRETERAG_REINSURANCE_A_PRODUCT_ID,
-    providerId: PRETERAG_FINANCIAL_PROVIDER_ID,
-    name: "Preterag: Flight Risk Reinsurance Portfolio - Tier A",
+    id: PARAMETRIGGER_REINSURANCE_A_PRODUCT_ID,
+    providerId: PARAMETRIGGER_FINANCIAL_PROVIDER_ID,
+    name: "Parametrigger: Flight Risk Reinsurance Portfolio - Tier A",
     description:
-      "Comprehensive reinsurance coverage for flight delay portfolios. Tailored for primary insurers on the triggerr network, offered by Preterag Financial Solutions.",
+      "Comprehensive reinsurance coverage for flight delay portfolios. Tailored for primary insurers on the triggerr network, offered by Parametrigger Financial Solutions.",
     productCategory: "CUSTOM_PARAMETRIC" as const, // Using existing enum, could be more specific if new enums added
     coverageType: "CUSTOM" as const, // Using existing enum
     baseRate: "0.0300", // Example: 3% of the reinsured portfolio value (interpret as needed)
     maxCoverage: "1000000.00", // Example: Max reinsurance capacity per agreement
     minCoverage: "50000.00", // Example: Min reinsurance agreement size
-    termsUrl: "https://preterag.com/terms/reinsurance-flight-A",
+    termsUrl: "https://parametrigger.com/terms/reinsurance-flight-A",
     isActive: true,
   },
   // Example Product for AeroAssure Partners
@@ -1513,7 +1513,7 @@ async function main() {
     logger.info(`  • Aircraft types and runway information`);
     logger.info(`  • Route data connecting airlines and airports`);
     logger.info(
-      `  • Core providers (triggerr Direct, Preterag Financial, AeroAssure) with products`,
+      `  • Core providers (triggerr Direct, Parametrigger Financial, AeroAssure) with products`,
     );
     logger.info(`  • Flight data source configurations`);
     logger.info(`  • Platform revenue wallet configuration`);

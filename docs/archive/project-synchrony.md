@@ -130,7 +130,7 @@ The project has reached a significant milestone with the finalization of **`trig
     *   **Phase 2:** Introduction of new insurance products, user wallet evolution towards **self-custody options** (secure private key export), and onboarding of third-party insurers.
     *   **Phase 3:** Launch of **`FlightHub Connect`** as a distinct OTA entity for flight bookings (Duffel/Amadeus APIs), integrated with `triggerr.com`.
 
-2.  **Defined Business & Entity Structures:** Roles for `triggerr` (platform), `triggerr Direct` (MVP insurer), `FlightHub Connect` (Phase 3 OTA), and `Preterag Financial Solutions` are clarified.
+2.  **Defined Business & Entity Structures:** Roles for `triggerr` (platform), `triggerr Direct` (MVP insurer), `FlightHub Connect` (Phase 3 OTA), and `Parametrigger Financial Solutions` are clarified.
 
 3.  **Confirmed Technology Stack & Architecture:**
     *   Next.js (App Router shell + React Router client-side), TailwindCSS.
@@ -202,7 +202,7 @@ The following documentation and foundational code elements **MUST BE UPDATED AND
     *   Plan anonymous-to-authenticated migration strategy for cart and conversation data
 
 **Actions & Detailed Tasks for `seed.ts`:**
-1.  **Seed `providers`:** `triggerr Direct` (category: `FIRST_PARTY_INSURER`), `Preterag Financial Solutions` (category: `B2B_FINANCIAL_SERVICES`).
+1.  **Seed `providers`:** `triggerr Direct` (category: `FIRST_PARTY_INSURER`), `Parametrigger Financial Solutions` (category: `B2B_FINANCIAL_SERVICES`).
 2.  **Seed Products (linked to `triggerr Direct`):** "Flight Delay Shield 60+", "Flight Delay Shield 120+".
 3.  **Seed `flight_data_sources`:** `AviationStack`, `FlightAware`, `OpenSky`.
 4.  **Seed Admin User** for Better-Auth.

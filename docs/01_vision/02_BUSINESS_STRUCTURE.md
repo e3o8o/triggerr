@@ -60,8 +60,8 @@ Parametrigger Inc. is being built as a decentralized insurance protocol, initial
   - Manages its direct customer relationships
   - Maintains insurance licenses and regulatory compliance
 
-### **3. Preterag Financial Solutions Inc. (Financial Services & Risk Solutions Provider)**
-- **Legal Name**: Preterag Financial Solutions Inc.
+### **3. Parametrigger Financial Solutions Inc. (Financial Services & Risk Solutions Provider)**
+- **Legal Name**: Parametrigger Financial Solutions Inc.
 - **State of Incorporation**: Nevada
 - **Entity Type**: C-Corporation
 - **Relationship**: Strategic partner with equity stake in Parametrigger Inc.
@@ -237,7 +237,7 @@ Parametrigger Inc. is being built as a decentralized insurance protocol, initial
   - [ ] State-specific insurance requirements
 
 #### **Future Subsidiaries**
-- [ ] **Preterag Financial Solutions Inc.**
+- [ ] **Parametrigger Financial Solutions Inc.**
   - [ ] Partnership structure negotiation
   - [ ] Equity stake determination
   - [ ] Separate incorporation or acquisition
@@ -359,8 +359,8 @@ Our Nevada incorporation provides significant competitive advantages:
 graph TD
     A[Parametrigger Inc.] --> B[Consumer Brand: Triggerr]
     B --> C[Triggerr Direct LLC → Triggerr]
-    B --> D[Preterag OÜ → Triggerr]
-    B --> E[Preterag Financial → Triggerr]
+    B --> D[Parametrigger OÜ → Triggerr]
+    B --> E[Parametrigger Financial → Triggerr]
     A --> F[FlightHub Connect LLC → FlightHub Connect]
 ```
 
@@ -705,7 +705,7 @@ All detailed legal requirements, compliance frameworks, and regulatory arbitrage
 **Brand Implementation:**
 - Launch as "Triggerr" globally
 - Triggerr Direct LLC operates as DBA "Triggerr"
-- Preterag OÜ operates as DBA "Triggerr" 
+- Parametrigger OÜ operates as DBA "Triggerr"
 - Single customer experience across jurisdictions
 
 **Technical Implementation:**
@@ -713,7 +713,7 @@ All detailed legal requirements, compliance frameworks, and regulatory arbitrage
 // Simple entity context
 const ENTITY_BRANDING = {
   US: { legal: 'Triggerr Direct LLC', brand: 'Triggerr' },
-  EU: { legal: 'Preterag OÜ', brand: 'Triggerr' },
+  EU: { legal: 'Parametrigger OÜ', brand: 'Triggerr' },
   PLATFORM: { legal: 'Parametrigger Inc.', brand: 'Triggerr' }
 };
 ```
@@ -778,10 +778,10 @@ const ENTITY_BRANDING = {
 **Immediate Actions (Week 1-2):**
 1. **Nevada DBA Filings** ($150 each):
    - Triggerr Direct LLC → DBA: "Triggerr"
-   - Preterag Financial Solutions → DBA: "Triggerr"
+   - Parametrigger Financial Solutions → DBA: "Triggerr"
 
 2. **Estonia DBA Filing** (€100):
-   - Preterag OÜ → DBA: "Triggerr"
+   - Parametrigger OÜ → DBA: "Triggerr"
 
 3. **Trademark Applications**:
    - "Triggerr" - US Class 36 ($350)

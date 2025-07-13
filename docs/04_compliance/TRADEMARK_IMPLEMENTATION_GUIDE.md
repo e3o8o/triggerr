@@ -37,8 +37,8 @@
 graph TD
     A[Parametrigger Inc.] --> B[Consumer Brand: Triggerr]
     B --> C[Triggerr Direct LLC → Triggerr]
-    B --> D[Preterag OÜ → Triggerr]
-    B --> E[Preterag Financial → Triggerr]
+    B --> D[Parametrigger OÜ → Triggerr]
+    B --> E[Parametrigger Financial → Triggerr]
     A --> F[FlightHub Connect LLC → FlightHub Connect]
 ```
 
@@ -47,8 +47,8 @@ graph TD
 |--------------|--------------|----------|-----------------|------------------|
 | Parametrigger Inc. | Nevada | (Corporate Parent) | Investor/Legal | Technology platform |
 | Triggerr Direct LLC | Nevada | Triggerr | US insurance | Insurance provider |
-| Preterag Financial Solutions | Nevada | Triggerr | US financial services | Risk analysis |
-| Preterag OÜ | Estonia | Triggerr | EU markets | EU operations |
+| Parametrigger Financial Solutions | Nevada | Triggerr | US financial services | Risk analysis |
+| Parametrigger OÜ | Estonia | Triggerr | EU markets | EU operations |
 | FlightHub Connect LLC | Nevada | FlightHub Connect | Travel vertical | OTA operations |
 
 ### 2.3 Brand Hierarchy
@@ -67,7 +67,7 @@ graph TD
 #### 3.1.1 Nevada DBA Filings
 **Entities Requiring DBA Registration:**
 - Triggerr Direct LLC → DBA: "Triggerr"
-- Preterag Financial Solutions Inc. → DBA: "Triggerr"
+- Parametrigger Financial Solutions Inc. → DBA: "Triggerr"
 
 **Filing Details:**
 - **Cost**: $150 per entity
@@ -78,7 +78,7 @@ graph TD
 
 #### 3.1.2 Estonia DBA Filing
 **Entity:**
-- Preterag OÜ → DBA: "Triggerr"
+- Parametrigger OÜ → DBA: "Triggerr"
 
 **Filing Details:**
 - **Cost**: €100
@@ -129,7 +129,7 @@ graph TD
 
 <!-- EU Operations -->
 <footer class="legal-disclosure">
-  Triggerr is a DBA of Preterag OÜ (Estonia)
+  Triggerr is a DBA of Parametrigger OÜ (Estonia)
 </footer>
 
 <!-- Platform Operations -->
@@ -175,11 +175,11 @@ export function getEntityBranding(jurisdiction: 'US' | 'EU' | 'GLOBAL'): EntityB
       disclosure: 'Insurance provided by Triggerr Direct LLC (Nevada)'
     },
     EU: {
-      legal: 'Preterag OÜ',
+      legal: 'Parametrigger OÜ',
       brand: 'Triggerr',
       jurisdiction: 'Estonia, EU',
-      footer: 'Triggerr is a DBA of Preterag OÜ',
-      disclosure: 'Services provided by Preterag OÜ (Estonia)'
+      footer: 'Triggerr is a DBA of Parametrigger OÜ',
+      disclosure: 'Services provided by Parametrigger OÜ (Estonia)'
     },
     GLOBAL: {
       legal: 'Parametrigger Inc.',

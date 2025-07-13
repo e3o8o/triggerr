@@ -13,7 +13,7 @@
 2. [Jurisdictional Advantages Matrix](#jurisdictional-advantages)
 3. [Regulatory Arbitrage Strategy](#regulatory-arbitrage)
 4. [Product Compliance Framework](#product-compliance)
-5. [European Strategy & Preterag OÜ](#european-strategy)
+5. [European Strategy & Parametrigger OÜ](#european-strategy)
 6. [Cross-Reference Matrix](#cross-reference-matrix)
 7. [Future-State Compliance Roadmap](#compliance-roadmap)
 8. [Risk Mitigation & Contingency Planning](#risk-mitigation)
@@ -28,9 +28,9 @@
 ```mermaid
 graph TD
     A[Parametrigger Inc.<br/>Nevada Parent Company] --> B[Triggerr Direct LLC<br/>Nevada First-Party Provider]
-    A --> C[Preterag Financial Solutions Inc.<br/>Nevada Risk Solutions]
+    A --> C[Parametrigger Financial Solutions Inc.<br/>Nevada Risk Solutions]
     A --> D[FlightHub Connect LLC<br/>Nevada OTA Entity]
-    A --> E[Preterag OÜ<br/>Estonia EU Operations]
+    A --> E[Parametrigger OÜ<br/>Estonia EU Operations]
     
     B --> B1[Insurance Risk Bearer]
     C --> C1[Financial Services Provider]
@@ -55,9 +55,9 @@ graph TD
 |--------|------------------|-----------------|---------------------|
 | **Parametrigger Inc.** | Platform infrastructure, open-source protocol | Technology platform only | Nevada corporate law |
 | **Triggerr Direct LLC** | First-party insurance provider | Insurance risk bearing | Nevada insurance + surplus lines |
-| **Preterag Financial Solutions Inc.** | Risk analysis, financial services | Financial services compliance | Nevada financial services |
+| **Parametrigger Financial Solutions Inc.** | Risk analysis, financial services | Financial services compliance | Nevada financial services |
 | **FlightHub Connect LLC** | OTA operations, flight bookings | Travel industry compliance | Nevada + interstate commerce |
-| **Preterag OÜ** | EU market operations | EU regulatory compliance | Estonia + EU directives |
+| **Parametrigger OÜ** | EU market operations | EU regulatory compliance | Estonia + EU directives |
 
 ### 1.3 Capital Structure & Risk Isolation
 
@@ -65,7 +65,7 @@ graph TD
 
 - **Insurance Risk Isolation**: Triggerr Direct LLC bears all insurance risks, protecting platform operations
 - **Technology Platform Protection**: Parametrigger Inc. holds no insurance risk or customer funds
-- **Geographic Risk Separation**: EU operations isolated through Preterag OÜ
+- **Geographic Risk Separation**: EU operations isolated through Parametrigger OÜ
 - **Operational Risk Boundaries**: Each entity operates under optimal regulatory framework
 
 ### 1.4 Unified Brand Architecture & DBA Strategy
@@ -77,8 +77,8 @@ graph TD
 |--------------|--------------|----------|-----------------|-------------------|
 | Parametrigger Inc. | Nevada | (Corporate Parent) | Investor/Legal | "Triggerr is a trademark of Parametrigger Inc." |
 | Triggerr Direct LLC | Nevada | Triggerr | US insurance | "Triggerr is a DBA of Triggerr Direct LLC" |
-| Preterag Financial Solutions | Nevada | Triggerr | US financial services | "Triggerr is a DBA of Preterag Financial Solutions Inc." |
-| Preterag OÜ | Estonia | Triggerr | EU markets | "Triggerr is a DBA of Preterag OÜ" |
+| Parametrigger Financial Solutions | Nevada | Triggerr | US financial services | "Triggerr is a DBA of Parametrigger Financial Solutions Inc." |
+| Parametrigger OÜ | Estonia | Triggerr | EU markets | "Triggerr is a DBA of Parametrigger OÜ" |
 | FlightHub Connect LLC | Nevada | FlightHub Connect | Travel vertical | "FlightHub Connect is a trademark of FlightHub Connect LLC" |
 
 **Benefits of Simple Brand Strategy:**
@@ -124,7 +124,7 @@ graph TD
 | **Minimal Reporting Requirements** | Reduced compliance burden | Administrative costs | Medium |
 | **No Franchise Tax** | Reduced operating costs | $10K-50K annually | Medium |
 
-### 2.2 Estonia/EU Advantages (Preterag OÜ)
+### 2.2 Estonia/EU Advantages (Parametrigger OÜ)
 
 | Advantage | Benefit | Strategic Value |
 |-----------|---------|-----------------|
@@ -209,7 +209,7 @@ timeline
             : Limited State Exposure
     
     2025 Q3 : Multi-State Expansion
-            : EU Market Entry via Preterag OÜ
+            : EU Market Entry via Parametrigger OÜ
             : Regulatory Relationship Building
     
     2025 Q4 : Enhanced Compliance Infrastructure
@@ -274,7 +274,7 @@ flowchart TD
 |--------------|-----------|---------------------|
 | **Nevada** | NRS 603A (Privacy Shield) | State-level protection |
 | **California** | CCPA/CPRA | Opt-out mechanisms |
-| **EU** | GDPR | Preterag OÜ compliance |
+| **EU** | GDPR | Parametrigger OÜ compliance |
 | **Federal** | Sectoral approach | Industry-specific rules |
 
 #### 4.3.2 Data Handling Standards
@@ -286,17 +286,17 @@ flowchart TD
 ---
 
 <a name="european-strategy"></a>
-## 5. European Strategy & Preterag OÜ
+## 5. European Strategy & Parametrigger OÜ
 
 ### 5.1 EU Market Entry Strategy
 
-#### 5.1.1 Preterag OÜ Utilization
-**Current Status**: Existing Estonian entity (Preterag OÜ) available for EU operations
+#### 5.1.1 Parametrigger OÜ Utilization
+**Current Status**: Existing Estonian entity (Parametrigger OÜ) available for EU operations
 
 **Strategic Options**:
-1. **Direct Utilization**: Use existing Preterag OÜ for EU operations
+1. **Direct Utilization**: Use existing Parametrigger OÜ for EU operations
 2. **Subsidiary Creation**: Create new EU entity under Parametrigger structure
-3. **Hybrid Approach**: Preterag OÜ as service provider to Nevada entities
+3. **Hybrid Approach**: Parametrigger OÜ as service provider to Nevada entities
 
 **Recommended Approach**: Hybrid model with service agreements
 
@@ -340,10 +340,10 @@ graph TD
 #### 5.3.1 Entity Coordination Framework
 | Function | Nevada Entity | Estonia Entity | Coordination Method |
 |----------|---------------|----------------|---------------------|
-| **Technology Platform** | Parametrigger Inc. | Preterag OÜ | Service agreement |
+| **Technology Platform** | Parametrigger Inc. | Parametrigger OÜ | Service agreement |
 | **Insurance Products** | Triggerr Direct LLC | None | EU distribution only |
-| **Data Processing** | Various | Preterag OÜ | Data processing agreement |
-| **Customer Support** | Various | Preterag OÜ | Service level agreement |
+| **Data Processing** | Various | Parametrigger OÜ | Data processing agreement |
+| **Customer Support** | Various | Parametrigger OÜ | Service level agreement |
 
 #### 5.3.2 Transfer Pricing & Tax Optimization
 - **Arm's Length Pricing**: Market-rate service agreements
@@ -364,13 +364,13 @@ graph TD
     A[Triggerr Brand] --> B[Legal Entities]
     B --> C[Parametrigger Inc. - Platform]
     B --> D[Triggerr Direct LLC - Insurance]
-    B --> E[Preterag OÜ - EU Operations]
-    B --> F[Preterag Financial - Risk Services]
+    B --> E[Parametrigger OÜ - EU Operations]
+    B --> F[Parametrigger Financial - Risk Services]
     A --> G[Technical Components]
     G --> H[Quote Engine → Triggerr Direct]
-    G --> I[Data Aggregation → Preterag Financial]
+    G --> I[Data Aggregation → Parametrigger Financial]
     G --> J[Web Platform → Parametrigger Inc.]
-    G --> K[EU Services → Preterag OÜ]
+    G --> K[EU Services → Parametrigger OÜ]
 ```
 
 ### 6.2 Entity-to-Technical Component Mapping
@@ -380,10 +380,10 @@ graph TD
 | **Quote Engine** | Triggerr Direct LLC | Nevada insurance law | Rate setting flexibility |
 | **Policy Engine** | Triggerr Direct LLC | Nevada insurance law | Policy form approval |
 | **Payout Engine** | Triggerr Direct LLC | Nevada insurance law | Claims handling standards |
-| **Data Aggregation** | Preterag Financial Solutions | Nevada + EU data protection | Data quality standards |
+| **Data Aggregation** | Parametrigger Financial Solutions | Nevada + EU data protection | Data quality standards |
 | **Escrow Engine** | Parametrigger Inc. | Nevada blockchain law | Smart contract audits |
 | **Wallet Service** | Parametrigger Inc. | Nevada + federal MSB | Money transmission |
-| **Chat Service** | Preterag OÜ | EU AI Act | AI system compliance |
+| **Chat Service** | Parametrigger OÜ | EU AI Act | AI system compliance |
 | **Web Platform** | Parametrigger Inc. | Nevada + consumer protection | Terms of service |
 
 ### 6.2 Regulatory Framework Mapping
@@ -411,9 +411,9 @@ graph LR
 |--------|-------------------------|---------------------------|-------------------|
 | **Parametrigger Inc.** | Platform infrastructure | Corporate governance | Chief Compliance Officer |
 | **Triggerr Direct LLC** | Insurance products | Insurance regulation | Insurance Compliance Manager |
-| **Preterag Financial Solutions** | Risk analysis | Financial services | Risk Management Officer |
+| **Parametrigger Financial Solutions** | Risk analysis | Financial services | Risk Management Officer |
 | **FlightHub Connect LLC** | OTA operations | Travel regulation | Travel Compliance Manager |
-| **Preterag OÜ** | EU operations | EU regulation | EU Compliance Officer |
+| **Parametrigger OÜ** | EU operations | EU regulation | EU Compliance Officer |
 
 ---
 
@@ -442,7 +442,7 @@ graph LR
 
 **Key Activities**:
 - [ ] Multi-state surplus lines expansion
-- [ ] EU market entry via Preterag OÜ
+- [ ] EU market entry via Parametrigger OÜ
 - [ ] Enhanced compliance infrastructure
 - [ ] Regulatory relationship building
 - [ ] International data transfer agreements

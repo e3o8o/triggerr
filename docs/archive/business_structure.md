@@ -39,7 +39,7 @@ triggerr is being built as a decentralized insurance protocol, initially launchi
   - Pays standard platform marketplace fees, ensuring platform neutrality and fair competition.
   - Manages its direct customer relationships.
 
-### **3. Preterag Financial Solutions (Financial Services & Risk Solutions Provider)**
+### **3. Parametrigger Financial Solutions (Financial Services & Risk Solutions Provider)**
 - **Role**: A specialized provider offering financial and risk management services on the triggerr platform. Operates as an independent entity on-platform.
 - **Functions**:
   - Offers B2B products such as reinsurance to other insurance providers on the platform.

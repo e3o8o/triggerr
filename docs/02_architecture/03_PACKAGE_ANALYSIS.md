@@ -152,7 +152,7 @@ interface ApiResponse<T> {
   success: boolean;
   data?: T;
   metadata: {
-    entity: 'parametrigger-inc' | 'triggerr-direct-llc' | 'preterag-financial-solutions';
+    entity: 'parametrigger-inc' | 'triggerr-direct-llc' | 'parametrigger-financial-solutions';
     jurisdiction: 'nevada' | 'estonia' | 'multi-state';
     complianceFramework: 'insurance-sandbox' | 'surplus-lines' | 'gdpr';
   };
