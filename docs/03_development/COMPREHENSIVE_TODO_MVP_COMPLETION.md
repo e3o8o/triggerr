@@ -35,12 +35,764 @@
 - **Jurisdiction-Aware APIs**: Automatic EU/US/Global routing with GDPR compliance
 - **Robust Build System**: Zero regressions, all packages compile successfully
 
-### **Ready for Phase 2**: API Testing Framework can now proceed with updated branding and enhanced architecture.
-1. **Dual Database Strategy**: Supabase (production) + Local PostgreSQL (testing)
-2. **API-First Validation**: Complete API testing before UI development
-3. **Estonia-Centric Compliance**: Preterag OÜ entity awareness throughout
-4. **Blockchain Integration**: Full PayGo testnet validation
-5. **Comprehensive Testing**: Postman collections + automated test suites
+### **Ready for Phase 1.5**: Service Abstraction Architecture must be completed before API testing to ensure modular, provider-agnostic system.
+
+---
+
+## 🏗️ **PHASE 1.5: COMPREHENSIVE SERVICE ABSTRACTION ARCHITECTURE** ⏳ **CRITICAL FOUNDATION**
+
+### **Strategic Objective**: Complete abstraction layer implementation for all external service dependencies
+**Duration**: 8-10 hours (2 working days)
+**Priority**: **CRITICAL** - Foundation for scalable, provider-agnostic platform
+**Prerequisites**: ✅ Phase 1 Complete - All branding updated, build system validated
+
+#### **Architecture Vision**: Four-Layer Service Abstraction
+
+```mermaid
+graph TD
+    subgraph Application Services
+        A[Policy Engine]
+        B[Payout Engine]
+        C[Quote Engine]
+    end
+
+    subgraph 1. Payment-as-a-Service
+        D(IPaymentProvider)
+        E[StripeProvider]
+        F[CoinbaseCommerceProvider]
+        G[AdyenProvider]
+    end
+
+    subgraph 2. Wallet-as-a-Service
+        H(IWalletProvider)
+        I[TriggerrCustodialProvider]
+        J[CrossmintProvider]
+        K[PrivyProvider]
+    end
+
+    subgraph 3. Escrow-as-a-Service
+        L(IEscrowProvider)
+        M[TriggerrEscrowProvider]
+        N[ChainlinkEscrowProvider]
+        O[SafeEscrowProvider]
+    end
+
+    subgraph 4. Blockchain-as-a-Service
+        P(IBlockchainService)
+        Q[PaygoAdapter]
+        R[EthereumAdapter]
+        S[BaseAdapter]
+    end
+
+    A --> D
+    A --> H
+    B --> L
+    B --> P
+    C --> D
+
+    D --> E
+    D --> F
+    D --> G
+
+    H --> I
+    H --> J
+    H --> K
+
+    L --> M
+    L --> N
+    L --> O
+
+    I --> P
+    M --> P
+
+    P --> Q
+    P --> R
+    P --> S
+```
+
+### **Task 1.5.1: Payment-as-a-Service Layer Implementation** ⏳ **NEW**
+**Objective**: Create generic payment interface supporting multiple providers
+**Duration**: 3 hours
+
+#### **Subtask 1.5.1.1**: Create Payment Interface Package
+- [ ] **1.5.1.1.1**: Create directory structure `packages/payment-interface/src/`
+- [ ] **1.5.1.1.2**: Define core payment models in `models.ts`:
+  ```typescript
+  export interface PaymentIntentParams {
+    amount: number; // in cents
+    currency: string;
+    metadata: Record<string, string>;
+    customerId?: string;
+    description?: string;
+    successUrl?: string;
+    cancelUrl?: string;
+  }
+
+  export interface PaymentIntentResult {
+    id: string;
+    clientSecret?: string;
+    checkoutUrl?: string;
+    status: 'pending' | 'processing' | 'succeeded' | 'failed';
+    amount: number;
+    currency: string;
+    metadata: Record<string, string>;
+  }
+
+  export interface PaymentStatus {
+    id: string;
+    status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'cancelled';
+    amount: number;
+    currency: string;
+    lastUpdated: Date;
+  }
+
+  export interface RefundResult {
+    id: string;
+    paymentId: string;
+    amount: number;
+    status: 'pending' | 'succeeded' | 'failed';
+    reason?: string;
+  }
+
+  export interface WebhookEvent {
+    id: string;
+    type: string;
+    data: any;
+    created: Date;
+  }
+
+  export interface PaymentProviderInfo {
+    name: string;
+    version: string;
+    supportedCurrencies: string[];
+    supportsRefunds: boolean;
+    supportsWebhooks: boolean;
+    minimumAmount: number; // in cents
+  }
+  ```
+
+- [ ] **1.5.1.1.3**: Define main interface in `interface.ts`:
+  ```typescript
+  export interface IPaymentProvider {
+    readonly name: string;
+    readonly capabilities: PaymentProviderInfo;
+
+    initialize(config: Record<string, any>): Promise<void>;
+    createPaymentIntent(params: PaymentIntentParams): Promise<PaymentIntentResult>;
+    getPaymentStatus(paymentId: string): Promise<PaymentStatus>;
+    createRefund(paymentId: string, amount?: number): Promise<RefundResult>;
+    validateWebhook(payload: string, signature: string): Promise<WebhookEvent>;
+    testConnection(): Promise<boolean>;
+  }
+  ```
+
+- [ ] **1.5.1.1.4**: Create `index.ts` barrel export file
+- [ ] **1.5.1.1.5**: Set up package.json and tsconfig.json
+
+#### **Subtask 1.5.1.2**: Implement Stripe Provider Adapter
+- [ ] **1.5.1.2.1**: Create `packages/integrations/stripe-adapter/src/stripe-provider.ts`:
+  ```typescript
+  export class StripeProvider implements IPaymentProvider {
+    readonly name = 'stripe';
+    readonly capabilities: PaymentProviderInfo;
+
+    constructor() {
+      this.capabilities = {
+        name: 'Stripe',
+        version: '1.0.0',
+        supportedCurrencies: ['usd', 'eur', 'gbp'],
+        supportsRefunds: true,
+        supportsWebhooks: true,
+        minimumAmount: 50 // $0.50
+      };
+    }
+
+    async initialize(config: Record<string, any>): Promise<void> {
+      // Wrap existing stripe client initialization
+    }
+
+    async createPaymentIntent(params: PaymentIntentParams): Promise<PaymentIntentResult> {
+      // Wrap existing createPolicyCheckoutSession function
+      const session = await createPolicyCheckoutSession({
+        policyId: params.metadata.policyId,
+        premiumInCents: params.amount,
+        // ... map other parameters
+      });
+
+      return {
+        id: session.data.sessionId,
+        checkoutUrl: session.data.checkoutUrl,
+        status: 'pending',
+        amount: params.amount,
+        currency: params.currency,
+        metadata: params.metadata
+      };
+    }
+
+    // ... implement other methods
+  }
+  ```
+
+- [ ] **1.5.1.2.2**: Update `packages/integrations/stripe-adapter/src/index.ts` to export provider
+- [ ] **1.5.1.2.3**: Create provider registry in `packages/payment-interface/src/registry.ts`:
+  ```typescript
+  export class PaymentProviderRegistry {
+    private providers = new Map<string, IPaymentProvider>();
+
+    register(provider: IPaymentProvider): void {
+      this.providers.set(provider.name, provider);
+    }
+
+    get(name: string): IPaymentProvider {
+      const provider = this.providers.get(name);
+      if (!provider) {
+        throw new Error(`Payment provider '${name}' not found`);
+      }
+      return provider;
+    }
+
+    getAvailable(): string[] {
+      return Array.from(this.providers.keys());
+    }
+  }
+  ```
+
+#### **Subtask 1.5.1.3**: Refactor Core Services and API Routes
+- [ ] **1.5.1.3.1**: Update `packages/services/policy-engine/src/policy-service.ts`:
+  ```typescript
+  export class PolicyService {
+    constructor(
+      private paymentProvider: IPaymentProvider,
+      // ... other dependencies
+    ) {}
+
+    async processPolicyPurchase(params: PolicyPurchaseParams): Promise<PolicyResult> {
+      // Replace direct Stripe calls with provider abstraction
+      const paymentIntent = await this.paymentProvider.createPaymentIntent({
+        amount: params.premiumCents,
+        currency: 'usd',
+        metadata: { policyId: params.policyId }
+      });
+
+      // ... rest of policy logic
+    }
+  }
+  ```
+
+- [ ] **1.5.1.3.2**: Update API routes in `apps/api/src/routes/v1/policy/purchase.ts`
+- [ ] **1.5.1.3.3**: Add environment configuration for provider selection in `packages/config/src/payment.ts`
+- [ ] **1.5.1.3.4**: Create dependency injection setup in application startup
+
+### **Task 1.5.2: Wallet-as-a-Service Layer Implementation** ⏳ **NEW**
+**Objective**: Abstract wallet management to support both custodial and non-custodial wallets (default custodial)
+**Duration**: 3 hours
+
+#### **Subtask 1.5.2.1**: Define Wallet Provider Interface
+- [ ] **1.5.2.1.1**: Create wallet models in `packages/services/wallet-service/src/wallet-models.ts`:
+  ```typescript
+  export interface WalletOptions {
+    chain?: BlockchainProviderName;
+    isPrimary?: boolean;
+    metadata?: Record<string, any>;
+  }
+
+  export interface WalletResult {
+    walletId: string;
+    address: string;
+    chain: BlockchainProviderName;
+    status: 'created' | 'pending' | 'active' | 'error';
+  }
+
+  export interface BalanceResult {
+    walletId: string;
+    balance: string; // as decimal string
+    currency: string;
+    lastUpdated: Date;
+  }
+
+  export interface TransferParams {
+    fromWalletId: string;
+    toAddress: string;
+    amount: string;
+    metadata?: Record<string, any>;
+  }
+
+  export interface TransferResult {
+    transferId: string;
+    txHash?: string;
+    status: 'pending' | 'confirmed' | 'failed';
+    gasUsed?: number;
+  }
+
+  export interface WalletInfo {
+    walletId: string;
+    address: string;
+    chain: BlockchainProviderName;
+    walletType: 'CUSTODIAL' | 'NON_CUSTODIAL';
+    isActive: boolean;
+    createdAt: Date;
+  }
+
+  export interface PreparedTransaction {
+    transactionData: any;
+    estimatedGas?: number;
+    gasPrice?: string;
+  }
+
+  export interface WalletProviderCapabilities {
+    supportedChains: BlockchainProviderName[];
+    supportsCustodialWallets: boolean;
+    supportsNonCustodialWallets: boolean;
+    supportsExternalWalletConnection: boolean;
+    supportsTransfers: boolean;
+    supportsKeyExport: boolean;
+    requiresKYC: boolean;
+    defaultWalletType: 'CUSTODIAL' | 'NON_CUSTODIAL';
+  }
+  ```
+
+- [ ] **1.5.2.1.2**: Create main interface in `packages/services/wallet-service/src/wallet-provider.ts`:
+  ```typescript
+  export interface IWalletProvider {
+    readonly name: string;
+    readonly capabilities: WalletProviderCapabilities;
+
+    initialize(config: Record<string, any>): Promise<void>;
+    createWallet(userId: string, options?: WalletOptions): Promise<WalletResult>;
+    getWalletBalance(walletId: string): Promise<BalanceResult>;
+    transferFunds(params: TransferParams): Promise<TransferResult>;
+    getWalletInfo(walletId: string): Promise<WalletInfo>;
+    prepareTransaction(params: TransactionParams): Promise<PreparedTransaction>;
+    linkExternalWallet(userId: string, walletAddress: string, walletType: string): Promise<WalletResult>;
+    requestFaucetFunds?(walletId: string, amount: string): Promise<TransferResult>;
+    testConnection(): Promise<boolean>;
+  }
+  ```
+
+#### **Subtask 1.5.2.2**: Implement Provider Adapters
+- [ ] **1.5.2.2.1**: Create Triggerr Custodial Provider in `packages/services/wallet-service/src/providers/triggerr-custodial.ts`:
+  ```typescript
+  export class TriggerrCustodialProvider implements IWalletProvider {
+    readonly name = 'triggerr-custodial';
+    readonly capabilities: WalletProviderCapabilities;
+
+    constructor(
+      private blockchainRegistry: BlockchainServiceRegistry,
+      private walletRepository: UserWalletRepository,
+      private encryptionService: EncryptionService
+    ) {
+      this.capabilities = {
+        supportedChains: ['PAYGO', 'ETHEREUM', 'BASE'],
+        supportsCustodialWallets: true,
+        supportsNonCustodialWallets: true,
+        supportsExternalWalletConnection: true,
+        supportsTransfers: true,
+        supportsKeyExport: true,
+        requiresKYC: false,
+        defaultWalletType: 'CUSTODIAL'
+      };
+    }
+
+    async createWallet(userId: string, options?: WalletOptions): Promise<WalletResult> {
+      // Wrap existing WalletService.createWallet logic
+      const result = await this.walletService.createWallet(
+        userId,
+        options?.chain || 'PAYGO'
+      );
+
+      return {
+        walletId: result.internalWalletId,
+        address: result.address,
+        chain: options?.chain || 'PAYGO',
+        status: 'active'
+      };
+    }
+
+    async linkExternalWallet(userId: string, walletAddress: string, walletType: string): Promise<WalletResult> {
+      // Wrap existing WalletService.linkExistingWallet logic
+      const result = await this.walletService.linkExistingWallet({
+        userId,
+        address: walletAddress,
+        chain: 'PAYGO', // or dynamic based on wallet detection
+      });
+
+      return {
+        walletId: result.id,
+        address: walletAddress,
+        chain: 'PAYGO',
+        status: 'active'
+      };
+    }
+
+    // ... implement other methods wrapping existing WalletService
+  }
+  ```
+
+- [ ] **1.5.2.2.2**: Create Crossmint provider stub in `packages/integrations/crossmint-adapter/src/crossmint-provider.ts`:
+  ```typescript
+  export class CrossmintProvider implements IWalletProvider {
+    readonly name = 'crossmint';
+    readonly capabilities: WalletProviderCapabilities;
+
+    constructor(private apiKey: string) {
+      this.capabilities = {
+        supportedChains: ['ETHEREUM', 'POLYGON', 'BASE'],
+        supportsCustodialWallets: true,
+        supportsNonCustodialWallets: true,
+        supportsExternalWalletConnection: true,
+        supportsTransfers: true,
+        supportsKeyExport: false,
+        requiresKYC: true,
+        defaultWalletType: 'CUSTODIAL'
+      };
+    }
+
+    async createWallet(userId: string, options?: WalletOptions): Promise<WalletResult> {
+      // TODO: Implement Crossmint API integration
+      throw new Error('Crossmint provider not yet implemented');
+    }
+
+    // ... stub other methods
+  }
+  ```
+
+- [ ] **1.5.2.2.3**: Create wallet provider registry in `packages/services/wallet-service/src/wallet-registry.ts`:
+  ```typescript
+  export class WalletProviderRegistry {
+    private providers = new Map<string, IWalletProvider>();
+
+    register(provider: IWalletProvider): void {
+      this.providers.set(provider.name, provider);
+    }
+
+    get(name: string): IWalletProvider {
+      const provider = this.providers.get(name);
+      if (!provider) {
+        throw new Error(`Wallet provider '${name}' not found`);
+      }
+      return provider;
+    }
+
+    getByCapability(capability: keyof WalletProviderCapabilities): IWalletProvider[] {
+      return Array.from(this.providers.values()).filter(p => p.capabilities[capability]);
+    }
+  }
+  ```
+
+#### **Subtask 1.5.2.3**: Service Integration
+- [ ] **1.5.2.3.1**: Refactor existing `WalletService` to use provider abstraction
+- [ ] **1.5.2.3.2**: Update API routes in `apps/api/src/routes/v1/user/wallet/` to use provider interface
+- [ ] **1.5.2.3.3**: Add wallet provider configuration in `packages/config/src/wallet.ts`
+- [ ] **1.5.2.3.4**: Update database schema to store provider information
+
+### **Task 1.5.3: Escrow Engine Dependency Injection & Architecture Cleanup** ⏳ **REFINEMENT**
+**Objective**: Refactor existing escrow engine with dependency injection, preserve 14-model architecture
+**Duration**: 2.5 hours
+
+#### **Subtask 1.5.3.1**: Refactor EscrowEngineFactory with Dependency Injection
+- [ ] **1.5.3.1.1**: Convert `EscrowEngineFactory` from static to regular class in `packages/services/escrow-engine/src/factory.ts`:
+  ```typescript
+  export class EscrowEngineFactory {
+    constructor(
+      private blockchainService: IBlockchainService,
+      private dataAggregator: IDataAggregator,
+      private logger: Logger,
+      private escrowIdGenerator: EscrowIdGenerator
+    ) {}
+
+    createEngine(modelType: EscrowModelType): IEscrowEngine {
+      switch (modelType) {
+        case 'SINGLE_SIDED':
+          return new SingleSidedEscrowEngine(
+            this.blockchainService,
+            this.dataAggregator,
+            this.logger,
+            this.escrowIdGenerator
+          );
+        case 'USER_DEPOSIT':
+          return new UserInitiatedEscrowEngine(
+            this.blockchainService,
+            this.dataAggregator,
+            this.logger,
+            this.escrowIdGenerator
+          );
+        // Future: add other models as they're implemented
+        default:
+          throw new Error(`Unsupported escrow model: ${modelType}`);
+      }
+    }
+  }
+  ```
+
+- [ ] **1.5.3.1.2**: Preserve existing 14 EscrowModelType enum - no changes needed to `escrow-models.ts`
+
+#### **Subtask 1.5.3.2**: Update Engine Constructors with Dependency Injection
+- [ ] **1.5.3.2.1**: Update `SingleSidedEscrowEngine` constructor to accept dependencies:
+  ```typescript
+  export class SingleSidedEscrowEngine extends BaseEscrowEngine {
+    constructor(
+      blockchainClient: IBlockchainService,
+      private dataAggregator: IDataAggregator,
+      private logger: Logger,
+      private escrowIdGenerator: EscrowIdGenerator
+    ) {
+      super(blockchainClient, 'SINGLE_SIDED');
+      this.logger.info('[SingleSidedEscrowEngine] Initialized with dependencies');
+    }
+
+    // ... existing implementation methods
+  }
+  ```
+
+- [ ] **1.5.3.2.2**: Update `UserInitiatedEscrowEngine` constructor similarly:
+  ```typescript
+  export class UserInitiatedEscrowEngine extends BaseEscrowEngine {
+    constructor(
+      blockchainClient: IBlockchainService,
+      private dataAggregator: IDataAggregator,
+      private logger: Logger,
+      private escrowIdGenerator: EscrowIdGenerator
+    ) {
+      super(blockchainClient, 'USER_DEPOSIT');
+      this.logger.info('[UserInitiatedEscrowEngine] Initialized with dependencies');
+    }
+
+    // ... existing implementation methods
+  }
+  ```
+
+- [ ] **1.5.3.2.3**: Update `EscrowManager` to use new factory pattern:
+  ```typescript
+  export class EscrowManager {
+    private factory: EscrowEngineFactory;
+
+    constructor(
+      blockchainService: IBlockchainService,
+      dataAggregator: IDataAggregator,
+      logger: Logger,
+      escrowIdGenerator: EscrowIdGenerator
+    ) {
+      this.factory = new EscrowEngineFactory(
+        blockchainService,
+        dataAggregator,
+        logger,
+        escrowIdGenerator
+      );
+    }
+
+    // ... rest of existing implementation
+  }
+  ```
+
+#### **Subtask 1.5.3.3**: File Restructuring and Organization
+- [ ] **1.5.3.3.1**: Break out engine classes into separate files:
+  ```typescript
+  // packages/services/escrow-engine/src/engines/single-sided.engine.ts
+  export class SingleSidedEscrowEngine extends BaseEscrowEngine {
+    // Move existing SingleSidedEscrowEngine implementation here
+  }
+
+  // packages/services/escrow-engine/src/engines/user-initiated.engine.ts
+  export class UserInitiatedEscrowEngine extends BaseEscrowEngine {
+    // Move existing UserInitiatedEscrowEngine implementation here
+  }
+  ```
+
+- [ ] **1.5.3.3.2**: Update imports in `factory.ts` and `escrow-engine.ts` to reference new file locations
+
+- [ ] **1.5.3.3.3**: Preserve product-specific escrow configuration for MVP (Single-Sided only):
+  ```typescript
+  export const PRODUCT_ESCROW_CONFIG: Record<string, EscrowConfiguration> = {
+    'PROD_TRDR001': { // Flight Delay 60+ Min
+      escrowModel: 'SINGLE_SIDED',
+      premiumReturnPolicy: 'PROVIDER_KEEPS_PREMIUM',
+      collateralRequirement: '0.00'
+    },
+    'PROD_TRDR002': { // Flight Delay 120+ Min
+      escrowModel: 'SINGLE_SIDED', // MVP: Start with single-sided
+      premiumReturnPolicy: 'PROVIDER_KEEPS_PREMIUM',
+      collateralRequirement: '0.00'
+    }
+  };
+  ```
+
+- [ ] **1.5.3.3.4**: Update `PolicyEngine` to use dependency-injected factory:
+  ```typescript
+  async createPolicyEscrow(policyId: string, productId: string): Promise<EscrowResult> {
+    const config = PRODUCT_ESCROW_CONFIG[productId];
+    const engine = this.escrowFactory.createEngine(config.escrowModel);
+
+    return await engine.createEscrow({
+      type: 'POLICY',
+      policyId,
+      configuration: config
+      // ... other params
+    });
+  }
+  ```
+
+### **Task 1.5.4: Blockchain-as-a-Service Enhancement** ⏳ **REFINEMENT**
+**Objective**: Enhance existing blockchain abstraction with multi-chain support
+**Duration**: 1.5 hours
+
+#### **Subtask 1.5.4.1**: Multi-Chain Registry Enhancement
+- [ ] **1.5.4.1.1**: Add Ethereum adapter stub in `packages/blockchain/ethereum-adapter/src/ethereum-client.ts`:
+  ```typescript
+  export class EthereumClient implements IBlockchainService {
+    async getAccountInfo(address: string): Promise<BlockchainAccountInfo> {
+      // TODO: Implement Ethereum account info retrieval using viem
+      throw new Error('Ethereum adapter not yet implemented');
+    }
+
+    async generateNewWallet(): Promise<BlockchainWallet> {
+      // TODO: Implement Ethereum wallet generation
+      throw new Error('Ethereum wallet generation not yet implemented');
+    }
+
+    // ... stub other methods
+  }
+  ```
+
+- [ ] **1.5.4.1.2**: Add Base adapter stub in `packages/blockchain/base-adapter/src/base-client.ts`:
+  ```typescript
+  export class BaseClient implements IBlockchainService {
+    // Similar structure to Ethereum but configured for Base network
+    // TODO: Implement Base network specific configurations
+  }
+  ```
+
+- [ ] **1.5.4.1.3**: Update `BlockchainServiceRegistry` to support new chains:
+  ```typescript
+  constructor() {
+    this.services = new Map<BlockchainProviderName, IBlockchainService>();
+
+    // Existing services
+    this.services.set("PAYGO", new PayGoClientService());
+
+    // New chain support (stubs for now)
+    if (process.env.ENABLE_ETHEREUM_SUPPORT === 'true') {
+      this.services.set("ETHEREUM", new EthereumClient());
+    }
+    if (process.env.ENABLE_BASE_SUPPORT === 'true') {
+      this.services.set("BASE", new BaseClient());
+    }
+  }
+  ```
+
+- [ ] **1.5.4.1.4**: Add chain selection logic based on requirements:
+  ```typescript
+  export class ChainSelector {
+    static selectOptimalChain(criteria: {
+      operationType: 'escrow' | 'transfer' | 'storage';
+      amount?: string;
+      speed?: 'fast' | 'medium' | 'slow';
+      cost?: 'low' | 'medium' | 'high';
+    }): BlockchainProviderName {
+      // PayGo for low-cost operations
+      if (criteria.cost === 'low' || criteria.operationType === 'escrow') {
+        return 'PAYGO';
+      }
+
+      // Base for medium-cost, fast operations
+      if (criteria.speed === 'fast' && criteria.cost !== 'high') {
+        return 'BASE';
+      }
+
+      // Ethereum for high-value, institutional operations
+      if (parseFloat(criteria.amount || '0') > 100000) {
+        return 'ETHEREUM';
+      }
+
+      return 'PAYGO'; // default fallback
+    }
+  }
+  ```
+
+#### **Subtask 1.5.4.2**: Service Integration Validation
+- [ ] **1.5.4.2.1**: Validate wallet service integration with multiple chains:
+  ```typescript
+  // In WalletService tests
+  describe('Multi-chain wallet creation', () => {
+    test('creates PayGo wallet by default', async () => {
+      const result = await walletService.createWallet('user123');
+      expect(result.chain).toBe('PAYGO');
+    });
+
+    test('creates Ethereum wallet when specified', async () => {
+      const result = await walletService.createWallet('user123', 'ETHEREUM');
+      expect(result.chain).toBe('ETHEREUM');
+    });
+  });
+  ```
+
+- [ ] **1.5.4.2.2**: Ensure escrow engine works with multiple blockchain services
+- [ ] **1.5.4.2.3**: Add performance optimization with connection pooling:
+  ```typescript
+  export class BlockchainConnectionPool {
+    private connections = new Map<BlockchainProviderName, IBlockchainService>();
+    private maxConnections = 10;
+
+    async getConnection(chain: BlockchainProviderName): Promise<IBlockchainService> {
+      // Implement connection pooling and reuse
+    }
+  }
+  ```
+
+#### **Subtask 1.5.4.3**: Configuration and Environment Management
+- [ ] **1.5.4.3.1**: Add multi-chain configuration in `packages/config/src/blockchain.ts`:
+  ```typescript
+  export interface BlockchainConfig {
+    defaultChain: BlockchainProviderName;
+    enabledChains: BlockchainProviderName[];
+    chainSpecificConfig: {
+      [K in BlockchainProviderName]?: {
+        rpcUrl?: string;
+        apiKey?: string;
+        networkId?: string;
+        gasLimits?: Record<string, number>;
+      };
+    };
+  }
+  ```
+
+- [ ] **1.5.4.3.2**: Environment variable setup for multi-chain support
+- [ ] **1.5.4.3.3**: Health check endpoints for all blockchain services
+
+### **Phase 1.5 Success Criteria** ⏳ **FOUNDATION FOR ALL FUTURE DEVELOPMENT**
+- [ ] **Payment-as-a-Service**: `IPaymentProvider` interface with Stripe provider implementation
+- [ ] **Wallet-as-a-Service**: `IWalletProvider` interface supporting both custodial and non-custodial wallets (default custodial)
+- [ ] **Escrow Dependency Injection**: EscrowEngineFactory refactored from static to dependency-injected class
+- [ ] **Engine Constructor Updates**: SingleSidedEscrowEngine and UserInitiatedEscrowEngine accept full dependencies
+- [ ] **File Restructuring**: Engine classes moved to separate files (single-sided.engine.ts, user-initiated.engine.ts)
+- [ ] **Blockchain Enhancement**: Multi-chain support preparation with adapter stubs
+- [ ] **Provider Registries**: Factory pattern implementation for payment and wallet services
+- [ ] **Configuration Management**: Environment-based provider selection system
+- [ ] **Core Service Refactoring**: PolicyEngine, PayoutEngine, WalletService use abstractions
+- [ ] **Build System Validation**: All packages compile with new architecture (30+ packages)
+- [ ] **External Wallet Support**: Triggerr wallet provider supports connecting external wallets
+- [ ] **MVP Focus**: Launch with SingleSidedEscrowEngine, prepare for future models
+
+### **Phase 1.5 Deliverables**
+1. **Payment Interface Package**: `@triggerr/payment-interface` with models and registry
+2. **Stripe Provider Adapter**: Wrapped existing stripe-adapter with `IPaymentProvider`
+3. **Enhanced Wallet Service**: Custodial + non-custodial wallet support with external wallet connection
+4. **Refactored EscrowEngineFactory**: Dependency injection instead of static class
+5. **Updated Engine Constructors**: SingleSidedEscrowEngine and UserInitiatedEscrowEngine with full dependencies
+6. **Restructured Engine Files**: Separate files for single-sided.engine.ts and user-initiated.engine.ts
+7. **Enhanced Blockchain Registry**: Multi-chain preparation (PayGo, Ethereum, Base stubs)
+8. **Service Configuration System**: Environment-driven provider selection
+9. **Updated Core Services**: PolicyEngine, PayoutEngine using dependency-injected factories
+
+### **Post-Phase 1.5 Strategic Benefits**
+- **🛡️ Vendor Independence**: No single-point-of-failure dependencies across payment, wallet, blockchain
+- **💰 Cost Optimization**: Dynamic provider switching based on cost, performance, geography
+- **🌍 Geographic Compliance**: EU providers for Preterag OÜ, US providers for Triggerr Direct LLC
+- **⚡ Risk Mitigation**: Provider diversity eliminates vendor lock-in across critical services
+- **👛 Wallet Flexibility**: Users can choose custodial (default) or connect external wallets
+- **🏗️ Clean Architecture**: Dependency injection enables easier testing and maintainability
+- **📈 Scalability**: New escrow models can be added without core factory changes
+- **🔧 Maintainability**: Separated engine files improve code organization and future development
+- **📋 MVP Ready**: Launch with SingleSidedEscrowEngine while preserving multi-model architecture
 
 ---
 
@@ -312,13 +1064,13 @@ All prerequisites met for API Testing Framework. Updated provider/product matrix
 
 ---
 
-## 🧪 **PHASE 2: COMPREHENSIVE API VALIDATION FRAMEWORK** ⏳ **READY TO BEGIN**
+## 🧪 **PHASE 2: COMPREHENSIVE API VALIDATION FRAMEWORK** ⏳ **PENDING PHASE 1.5**
 
 ### **Task 2.1: Core API Test Suite Development**
 **Objective**: Create comprehensive API validation using Postman + automated tests
 **Duration**: 6 hours
 **Priority**: **CRITICAL** - Foundation for all subsequent testing
-**Prerequisites**: ✅ Phase 1 Complete - All branding updated, build system validated
+**Prerequisites**: ✅ Phase 1.5 Complete - All service abstractions implemented, provider-agnostic architecture
 
 #### **Postman Collection Creation**:
 - [ ] **2.1.1**: Create Postman workspace "Triggerr MVP API"
@@ -432,15 +1184,20 @@ All prerequisites met for API Testing Framework. Updated provider/product matrix
 - [ ] **2.3.4**: Multi-provider wallet testing
 - [ ] **2.3.5**: Gas fee calculation and optimization
 
-#### **Phase 1 Lessons Learned & Phase 2 Preparation**
+**Phase 1.5 Architecture Benefits & Phase 2 Preparation**
 
-**Key Insights from Phase 1**:
-- **Payment Method Classification**: Enhanced to properly distinguish crypto (PayGo) from fiat (Stripe)
-- **Build System Robustness**: All 29 packages compile successfully with new branding
-- **Estonia-First Architecture**: Jurisdiction detection provides regulatory arbitrage benefits
-- **TypeScript Improvements**: Fixed undefined object errors for better type safety
+**Key Insights from Phase 1 + 1.5**:
+- **Service Abstraction**: All external dependencies abstracted behind provider interfaces
+- **Provider Flexibility**: Easy switching between payment, wallet, escrow, and blockchain providers
+- **Vendor Independence**: No single points of failure or vendor lock-in
+- **Configuration-Driven**: Provider selection controlled via environment configuration
+- **Future-Proof**: New providers added without core service modifications
 
-**Phase 2 Focus Areas** (Based on Phase 1 Findings):
+**Phase 2 Focus Areas** (Enhanced with Service Abstractions):
+- **Provider Integration Testing**: Validate all service provider abstractions
+- **Multi-Provider Scenarios**: Test fallback mechanisms and provider switching
+- **Configuration Validation**: Test provider selection and configuration management
+- **Service Reliability**: Test provider failure handling and recovery
 - **API Response Validation**: Test entity-aware responses with proper jurisdiction headers
 - **Payment Method Testing**: Validate crypto vs fiat payment classification in API responses
 - **Error Handling**: Test TypeScript improvements in error scenarios
@@ -451,7 +1208,7 @@ All prerequisites met for API Testing Framework. Updated provider/product matrix
 {
   "providers": {
     "PROV_TRDR": "Triggerr Direct LLC (Nevada)",
-    "PROV_PRTF": "Preterag Financial Solutions Inc. (Nevada)", 
+    "PROV_PRTF": "Preterag Financial Solutions Inc. (Nevada)",
     "PROV_AASP": "Preterag OÜ (Estonia)"
   },
   "products": {
@@ -465,13 +1222,24 @@ All prerequisites met for API Testing Framework. Updated provider/product matrix
 
 ## 🤖 **PHASE 3: LLM INTEGRATION & CHAT FUNCTIONALITY** ⏳ **FEATURE DEVELOPMENT**
 
-### **Task 3.1: Implement LLM Interface Layer**
+### **Task 3.1: Implement LLM Interface Layer** ✅ **COMPLETED**
 **Objective**: Create generic LLM interface for provider flexibility
 **Duration**: 4 hours
-**Priority**: 🟢 **LOW**
+**Priority**: 🟢 **COMPLETE** - LLM interface already implemented
 **Dependencies**: API validation framework (Phase 2)
 
-#### **LLM Interface Package**:
+**Status**: ✅ **LLM Interface Already Exists**
+- ✅ **Interface Defined**: `@triggerr/llm-interface` with `ILLMClient`
+- ✅ **DeepSeek Adapter**: `@triggerr/deepseek-adapter` implemented
+- ✅ **Provider Capabilities**: Comprehensive capability detection
+- ✅ **Insurance Context**: Specialized insurance LLM types
+- ✅ **Error Handling**: Comprehensive LLM error types
+
+**Remaining LLM Tasks**:
+
+#### **LLM Service Integration**:
+
+##### **LLM Interface Package**:
 - [ ] **3.1.1**: Create `packages/llm/llm-interface/src/interface.ts`
   ```typescript
   export interface ILLMClient {
@@ -503,9 +1271,11 @@ All prerequisites met for API Testing Framework. Updated provider/product matrix
     metadata?: Record<string, any>;
   }
   ```
-
-- [ ] **3.1.2**: Add error handling interfaces
-- [ ] **3.1.3**: Create standardized message and response types
+- [ ] **3.1.2**: Integrate existing LLM interface with Chat Service
+- [ ] **3.1.3**: Create LLM Provider Registry for multiple provider support
+- [ ] **3.1.4**: Implement Chat Service using abstracted LLM interface
+- [ ] **3.1.5**: Add error handling interfaces
+- [ ] **3.1.6**: Create standardized message and response types
 
 ### **Task 3.2: Implement DeepSeek Adapter**
 **Objective**: Build DeepSeek-specific LLM client implementation
@@ -866,8 +1636,8 @@ All prerequisites met for API Testing Framework. Updated provider/product matrix
 ## 🚀 **PHASE 5: DEPLOYMENT PREPARATION & PRODUCTION READINESS** ⏳ **LAUNCH PREPARATION**
 
 ### **Task 5.1: Containerization & Infrastructure**
-**Objective**: Prepare for scalable deployment
-**Duration**: 4 hours
+**Objective**: Production deployment with service provider management
+**Duration**: 5 hours (Extended for provider configuration management)
 
 #### **Docker Configuration**:
 - [ ] **5.1.1**: Create production Dockerfiles
@@ -982,7 +1752,7 @@ All prerequisites met for API Testing Framework. Updated provider/product matrix
 
 ```mermaid
 gantt
-    title MVP Completion Timeline
+    title MVP Completion Timeline (Updated with Service Abstractions)
     dateFormat  YYYY-MM-DD
     axisFormat %m-%d
 
@@ -990,51 +1760,69 @@ gantt
     Database Setup     :crit, 2025-01-13, 1d
     Blockchain Validation :2025-01-13, 1d
 
-    section Phase 1: Branding
-    Schema Updates     :crit, 2025-01-14, 1d
-    Code Migration     :2025-01-14, 1d
-    Estonia Integration :2025-01-15, 1d
+    section Phase 1: Branding ✅ COMPLETE
+    Schema Updates     :done, 2025-01-10, 6h
+    Code Migration     :done, 2025-01-10, 4h
+    Estonia Integration :done, 2025-01-10, 2h
 
-    section Phase 2: API Testing
-    Postman Collection :crit, 2025-01-15, 2d
-    Automated Tests    :2025-01-16, 2d
-    Blockchain Tests   :2025-01-17, 1d
+    section Phase 1.5: Service Abstractions ⏳ CRITICAL
+    Payment Interface   :crit, active, p1, 2025-01-13, 3h
+    Wallet Interface    :crit, p2, 2025-01-13, 3h
+    Escrow Enhancement  :crit, p3, 2025-01-14, 2.5h
+    Blockchain Enhancement :p4, 2025-01-14, 1.5h
+    Integration Testing :p5, 2025-01-14, 2h
+
+    section Phase 2: API Testing (Enhanced)
+    Postman Collection :crit, p6, 2025-01-15, 6h
+    Provider Testing   :p7, 2025-01-16, 4h
+    Automated Tests    :p8, 2025-01-16, 6h
+    Multi-Provider Tests :p9, 2025-01-17, 4h
 
     section Phase 3: LLM Integration
-    DeepSeek Adapter   :2025-01-18, 2d
-    Chat Service       :2025-01-19, 1d
-    API Endpoints      :2025-01-20, 1d
+    Chat Service Integration :p10, 2025-01-18, 4h
+    API Endpoint Updates :p11, 2025-01-19, 3h
+    E2E Chat Testing :p12, 2025-01-19, 3h
 
-    section Phase 4: Testing
-    E2E Integration    :2025-01-21, 2d
-    Performance Tests  :2025-01-22, 1d
-    Security Audit     :2025-01-23, 1d
+    section Phase 4: Comprehensive Testing
+    E2E Integration    :p13, 2025-01-20, 8h
+    Performance Tests  :p14, 2025-01-21, 4h
+    Security Audit     :p15, 2025-01-22, 6h
 
-    section Phase 5: Deployment
-    Containerization   :2025-01-24, 2d
-    Monitoring Setup   :2025-01-25, 1d
-    CI/CD Pipeline     :2025-01-26, 1d
+    section Phase 5: Production Deployment
+    Containerization   :p16, 2025-01-23, 5h
+    Monitoring Setup   :p17, 2025-01-24, 3h
+    CI/CD Pipeline     :p18, 2025-01-24, 3h
 ```
 
-### **Critical Path Analysis**:
-1. **Database Setup** → **All subsequent phases**
-2. **API Testing Framework** → **LLM Integration** → **E2E Testing**
-3. **Branding Migration** → **API Testing** (must complete first)
-4. **Blockchain Validation** → **Payment Testing** → **E2E Flows**
+### **Critical Path Analysis (Updated)**:
+1. **🏗️ Phase 1.5 Service Abstractions** → **BLOCKS ALL SUBSEQUENT PHASES**
+2. **Payment + Wallet + Escrow Abstractions** → **Enhanced API Testing** → **Multi-Provider Validation**
+3. **Provider Registry Implementation** → **Configuration-Driven Testing** → **Production Readiness**
+4. **Service Interface Completion** → **LLM Integration** → **End-User Features**
+5. **Multi-Provider Architecture** → **Vendor Independence** → **Operational Resilience**
 
-### **Total Duration**: **9-11 days remaining** (with Phase 1 complete)
+### **Updated Duration Estimate**: **14-16 days total** (2 days added for comprehensive service abstractions)
 
-### **Progress Update**:
-- **✅ Phase 1**: COMPLETED in 5.5 hours (ahead of 7-hour estimate) - January 10, 2025
-- **Efficiency Gain**: 21% faster than projected
-- **Quality**: 100% build success, zero regressions
-- **Current Status**: Ready to proceed with Phase 2 (API Testing Framework)
+### **Progress & Strategic Position**:
+- **✅ Phase 1**: COMPLETED in 5.5 hours (21% under estimate) - January 10, 2025
+- **⏳ Phase 1.5**: **CRITICAL FOUNDATION** - Service abstraction architecture
+- **🎯 Strategic Value**: Service abstractions eliminate vendor lock-in across payment, wallet, escrow, blockchain
+- **🛡️ Risk Mitigation**: Multi-provider support provides operational resilience
+- **🌍 Global Readiness**: Jurisdiction-aware provider selection for EU/US compliance
+- **📈 Scalability**: Future provider additions require zero core service changes
 
-### **Critical Dependencies**:
-- Local PostgreSQL + pgAdmin setup
-- PayGo testnet connectivity
-- DeepSeek API key validation
-- Postman workspace creation
+### **Phase 1.5 Blocking Dependencies**:
+1. **Payment Provider Interface**: Must complete before API testing can validate payment flows
+2. **Wallet Provider Abstraction**: Required for custodial vs third-party wallet testing
+3. **Escrow Provider Framework**: Essential for multi-model escrow testing across products
+4. **Service Registry Pattern**: Needed for configuration-driven provider selection
+5. **Core Service Refactoring**: PolicyEngine, PayoutEngine must use abstractions before testing
+
+### **Post-Phase 1.5 Advantages**:
+- **API Testing Enhancement**: Test multiple providers, not just single implementations
+- **Provider Flexibility**: Switch between Stripe/Coinbase, Triggerr/Crossmint, PayGo/Ethereum
+- **Failure Resilience**: Automatic provider fallback during testing and production
+- **Compliance Testing**: Validate jurisdiction-specific provider routing
 
 ---
 
@@ -1046,23 +1834,16 @@ gantt
 - [ ] All wallet addresses validated
 - [ ] Environment switching functional
 
-### **Phase 1 Success Criteria**:
-- [ ] Zero "InsureInnie" references in codebase
-- [ ] All policy numbers use "TRG-" prefix
-- [ ] Estonia entity integration complete
-- [ ] Clean build with `bun run build`
-
-### **Phase 2 Success Criteria**:
-- [ ] 20+ Postman API tests passing
-- [ ] Automated test suite covering all endpoints
-- [ ] PayGo blockchain transactions working
-- [ ] Anonymous and authenticated flows validated
-
-### **Phase 3 Success Criteria**:
-- [ ] Chat-to-quote functionality operational
-- [ ] DeepSeek integration working
-- [ ] Entity-aware responses for all jurisdictions
-- [ ] Conversation context management
+### **Phase 1.5 Success Criteria**: ⏳ **CRITICAL FOUNDATION**
+- [ ] **Payment-as-a-Service**: `IPaymentProvider` interface with Stripe wrapper + registry
+- [ ] **Wallet-as-a-Service**: `IWalletProvider` interface with Triggerr Custodial + Crossmint stub
+- [ ] **Escrow-as-a-Service**: Enhanced `IEscrowProvider` with multi-model + provider selection
+- [ ] **Blockchain Enhancement**: Multi-chain support (PayGo + Ethereum/Base stubs)
+- [ ] **Provider Registries**: Consistent factory pattern across all four service types
+- [ ] **Configuration System**: Environment-driven provider selection + fallback logic
+- [ ] **Core Service Refactoring**: PolicyEngine, PayoutEngine, WalletService use abstractions
+- [ ] **Integration Validation**: All packages compile + basic provider interface tests
+- [ ] **Documentation**: Provider integration guides + configuration examples
 
 ### **Phase 1 Success Criteria**: ✅ **COMPLETED**
 - [x] ✅ Database schema updated with new Triggerr branding
@@ -1158,15 +1939,7 @@ Upon completion, the following will be production-ready:
 
 ---
 
-### **## 🧹 PHASE 7: CODE QUALITY & REFACTORING (Post-MVP)**
 
-#### **Task 7.1: Refactor EscrowEngine with Dependency Injection**
-*   **Status**: ❌ **NOT IMPLEMENTED**
-*   **Priority**: Post-MVP
-*   **Action**:
-    *   [ ] Refactor the `EscrowEngineFactory` from a `static` class to a regular class that accepts dependencies (`PayGoClientService`, `FlightAggregator`, `Logger`) in its constructor.
-    *   [ ] Update the `SingleSidedEscrowEngine` constructor to accept the full set of required dependencies (`paygoAdapter`, `flightAggregator`, `logger`, `escrowIdGenerator`).
-    *   [ ] Break the `SingleSidedEscrowEngine` and `UserInitiatedEscrowEngine` classes out of `escrow-engine.ts` and into their own dedicated files (`single-sided.engine.ts`, `user-initiated.engine.ts`).
 ---
 
 ### **## 📝 PHASE 8: FINALIZATION & DOCUMENTATION (Post-Testing)**
