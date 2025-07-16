@@ -4,7 +4,17 @@ This document summarizes the key functionalities and usage patterns of the `@wit
 
 [Would be nice to have Paygo have the access to real life data and update escrow as needed]
 
-## 🔥 Critical Findings for Bun Runtime Compatibility
+## 🔥 Critical Findings for Bun Runtime Compatibility [L7-8]
+### Missing `nonce` Field in PayGo Client Transactions [L9-10]
+#### Issue Description:
+- Error: `missing field 'nonce' at line 1 column 89` when sending `FaucetRequest` or `Transfer` transactions.
+- Root Cause: The `@witnessco/paygo-ts-client` package does not handle the `nonce` field internally, causing deserialization failures.
+- Reproducible with: Bun runtime, minimal test script.
+
+#### Recommended Action:
+- Report to PayGo client team for resolution.
+- Temporary workaround: Manually add `nonce` if API allows (untested).
+
 
 ### Direct Imports vs. Wrapper Approach vs Proxy Re-Export
 
@@ -297,7 +307,7 @@ import { Transfer } from "@triggerr/paygo-adapter";
 
 ---
 
-## **Architectural Finding: The WASM Runtime Challenge & The `apps/api` Solution**
+## **Architectural Finding: The WASM Runtime Challenge & The `apps/api` Solution** [L300-301
 
 During the integration of the PayGo client, we encountered a persistent and critical runtime error related to WebAssembly (WASM) initialization within the Next.js API route environment.
 
@@ -338,20 +348,20 @@ This migration represents a significant architectural improvement and establishe
 
 To restore compatibility and reliability, the custom PayGo adapter implements a hash normalization strategy:
 
-- **Primary Method:**  
+- **Primary Method:**
   If a transaction signature is present, the adapter generates a hash using the signature:
   ```typescript
   if (signature) {
     result.hash = `0x${signature}`;
   }
   ```
-- **Fallback Method:**  
+- **Fallback Method:**
   If the signature is missing, the adapter generates a hash from the nonce and timestamp:
   ```typescript
   const hashData = `${nonce}-${timestamp}`;
   result.hash = `0x${Buffer.from(hashData).toString('hex')}`;
   ```
-- **Response Structure Normalization:**  
+- **Response Structure Normalization:**
   The adapter detects when the hash is missing, extracts unique identifiers from the response, and adds the `hash` property to maintain API compatibility. All original response data is preserved.
 
 ### Debugging & Best Practices
