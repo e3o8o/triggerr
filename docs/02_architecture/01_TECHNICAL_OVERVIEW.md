@@ -1,12 +1,12 @@
-# 01_TECHNICAL_OVERVIEW: System Architecture & Technology Stack
+# 01_TECHNICAL_OVERVIEW: Dual-Chain System Architecture & Technology Stack
 
-This document provides a high-level overview of the triggerr project's technical architecture and the technologies employed. It focuses on how the system is structured and the roles of its various components within our Nevada-based entity structure and regulatory framework.
+This document provides a high-level overview of the triggerr project's dual-chain technical architecture and the technologies employed. It focuses on how the system is structured around our Ethereum + Base foundation with complete user abstraction, and the roles of its various components within our Nevada-based entity structure and regulatory framework.
 
 > **Legal Framework**: Comprehensive regulatory compliance strategy and technical architecture legal considerations documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)
 
-## 1. System Architecture Overview
+## 1. Dual-Chain System Architecture Overview
 
-The triggerr platform follows a modular, monorepo-based architecture designed for scalability, maintainability, and clear separation of concerns.
+The triggerr platform follows a modular, monorepo-based architecture designed for dual-chain scalability, maintainability, and clear separation of concerns. Our MVP launches with owned smart contracts deployed on both Ethereum and Base, providing users with seamless blockchain abstraction while maintaining the full benefits of smart contract ownership.
 
 ### Monorepo Structure:
 
@@ -28,7 +28,7 @@ The system is broadly divided into:
 *   **Business Services (`packages/services/`)**: Encapsulate specific business domains (e.g., `escrow-engine`, `wallet-service`, `policy-engine`, `quote-engine`) with clear entity boundaries and regulatory compliance.
 *   **Data Aggregation (`packages/aggregators/`)**: Services responsible for fetching and normalizing data from external sources (e.g., flight data, weather data) supporting multi-jurisdictional operations.
 *   **External Integrations (`packages/integrations/`)**: Modules for interacting with third-party APIs (e.g., Stripe, external flight data providers) with compliance-aware implementations.
-*   **Blockchain Integration (`packages/blockchain/`)**: Modules specific to blockchain interaction and protocols (e.g., PayGo adapter) leveraging Nevada's blockchain-friendly regulations.
+*   **Blockchain Integration (`packages/blockchain/`)**: Dual-chain modules for Ethereum and Base interaction with our owned smart contracts, including chain abstraction layer leveraging Nevada's blockchain-friendly regulations.
 *   **API Layer (`packages/api/`)**: Defines API contracts (DTOs, validators) and may contain API client SDKs with entity-aware response structures.
 *   **Shared Packages (`packages/shared/`)**: General utilities and types shared across the monorepo, including compliance utilities.
 *   **Configuration (`packages/config/`)**: Centralized configuration management with entity-specific settings and regulatory parameters.
@@ -37,17 +37,37 @@ The system is broadly divided into:
 
 The `apps/web` application uses a hybrid Next.js App Router and React Router navigation model, allowing for rich client-side routing within a server-rendered application.
 
-## 2. Technology Stack
+## 2. Dual-Chain Technology Stack
 
-The triggerr platform leverages a modern TypeScript-first technology stack:
+The triggerr platform leverages a modern TypeScript-first technology stack with dual-chain blockchain foundation:
 
 *   **Frontend**: Next.js (React), Tailwind CSS, shadcn/ui.
 *   **Backend (API Routes)**: Next.js API Routes (Edge Runtime where applicable).
 *   **Database**: PostgreSQL with Drizzle ORM.
 *   **Authentication**: Better-Auth (with Google OAuth).
-*   **Blockchain Interaction**: PayGo Protocol (`@witnessco/paygo-ts-client`).
-*   **Language**: TypeScript across the entire monorepo.
+*   **Blockchain Infrastructure**: Dual-chain owned smart contracts on Ethereum + Base with user abstraction layer.
+*   **Smart Contract Development**: Solidity with Hardhat/Foundry, deployed on Ethereum Mainnet and Base Mainnet.
+*   **Chain Abstraction**: Intelligent routing between Ethereum and Base based on cost optimization and network conditions.
+*   **Language**: TypeScript across the entire monorepo, Solidity for smart contracts.
 *   **Package Manager**: Bun.
+
+### Entity-Aware API Design
+```mermaid
+graph TD
+    A[API Layer] --> B[Parametrigger Inc.<br/>Platform APIs]
+    A --> C[Triggerr Direct LLC<br/>Insurance APIs]
+    A --> D[Parametrigger Financial Solutions<br/>Risk Analysis APIs]
+
+    B --> B1[Technology Platform]
+    B --> B2[Escrow Infrastructure]
+
+    C --> C1[Quote Engine]
+    C --> C2[Policy Engine]
+    C --> C3[Payout Engine]
+
+    D --> D1[Data Aggregation]
+    D --> D2[Risk Assessment]
+```
 
 ## 3. Core Packages & Infrastructure
 
@@ -79,30 +99,35 @@ graph TD
     A[API Layer] --> B[Parametrigger Inc.<br/>Platform APIs]
     A --> C[Triggerr Direct LLC<br/>Insurance APIs]
     A --> D[Parametrigger Financial Solutions<br/>Risk Analysis APIs]
-    
+
     B --> B1[Technology Platform]
     B --> B2[Escrow Infrastructure]
-    
+
     C --> C1[Quote Engine]
     C --> C2[Policy Engine]
     C --> C3[Payout Engine]
-    
+
     D --> D1[Data Aggregation]
     D --> D2[Risk Assessment]
 ```
 
-### Regulatory Compliance Integration
-- **Nevada Entity Benefits**: APIs leverage Nevada's business-friendly regulations and blockchain laws
-- **Multi-Jurisdictional Support**: API responses include entity context and compliance metadata
-- **Regulatory Arbitrage**: Entity separation optimizes regulatory burden across different API functions
+### Dual-Chain Regulatory Compliance Integration
+- **Nevada Entity Benefits**: APIs leverage Nevada's business-friendly regulations and blockchain laws across dual-chain operations
+- **Smart Contract Ownership**: Parametrigger Inc. maintains full ownership and control of contracts on both Ethereum and Base
+- **Multi-Jurisdictional Support**: API responses include entity context and compliance metadata with dual-chain considerations
+- **Regulatory Arbitrage**: Entity separation optimizes regulatory burden across different API functions and blockchain networks
+- **Cross-Chain Compliance**: Unified legal framework governing dual-chain smart contract operations
 
-## 6. Security Model & Compliance Framework
+## 6. Dual-Chain Security Model & Compliance Framework
 
-Security is built-in with entity-aware compliance:
-*   **Better-Auth**: For user authentication with entity context tracking.
-*   **Row Level Security (RLS)**: Enforced at the database layer for data isolation and regulatory compliance.
-*   **Environment Variable Management**: Secure handling of sensitive credentials with entity-specific configurations.
-*   **Regulatory Compliance**: Built-in compliance monitoring and audit trails for multi-jurisdictional operations.
-*   **Entity Isolation**: Security boundaries aligned with corporate entity structure for liability protection.
+Security is built-in with dual-chain entity-aware compliance:
+*   **Better-Auth**: For user authentication with entity context tracking across dual-chain operations.
+*   **Row Level Security (RLS)**: Enforced at the database layer for data isolation and regulatory compliance across both blockchains.
+*   **Smart Contract Security**: Owned contracts on Ethereum and Base with professional security audits and upgradeability through proxy patterns.
+*   **Chain Abstraction Security**: Secure routing between Ethereum and Base with automatic failover and consistency checks.
+*   **Environment Variable Management**: Secure handling of sensitive credentials with dual-chain configurations and private key management.
+*   **Cross-Chain Monitoring**: Real-time security monitoring across both Ethereum and Base networks.
+*   **Regulatory Compliance**: Built-in compliance monitoring and audit trails for dual-chain multi-jurisdictional operations.
+*   **Entity Isolation**: Security boundaries aligned with corporate entity structure for liability protection across both blockchain networks.
 
 > **Legal Framework**: Detailed security requirements, compliance standards, and entity-specific security policies documented in [Legal Reference](../04_compliance/LEGAL_REFERENCE.md)

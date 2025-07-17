@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Triggerr platform uses an enterprise-grade build system based on **TypeScript Project References** with strict type safety enforcement. This document provides comprehensive guidance for understanding, maintaining, and extending the build system.
+The Triggerr platform uses an enterprise-grade build system based on **TypeScript Project References** with strict type safety enforcement, enhanced with **dual-chain Solidity smart contract compilation and deployment**. This document provides comprehensive guidance for understanding, maintaining, and extending the build system across both TypeScript and Solidity codebases.
 
 ## Table of Contents
 
@@ -42,6 +42,10 @@ triggerr/
 │   ├── ui/                         # UI components
 │   ├── api/                        # API contracts and SDK
 │   ├── blockchain/                 # Blockchain interfaces and adapters
+│   ├── smart-contracts/            # Solidity smart contracts (Ethereum + Base)
+│   ├── ethereum-adapter/           # Ethereum blockchain adapter
+│   ├── base-adapter/               # Base (L2) blockchain adapter
+│   ├── chain-router/               # Dual-chain routing and abstraction
 │   ├── integrations/               # External API integrations
 │   ├── aggregators/                # Data aggregation services
 │   ├── services/                   # Business logic services
@@ -89,6 +93,55 @@ The build system follows a strict dependency hierarchy:
 9. Application Layer:
    - apps/api
    - apps/web
+```
+
+## Dual-Chain Smart Contract Build System
+
+### Solidity Build Pipeline
+
+The platform integrates Solidity smart contract development with the TypeScript monorepo through:
+
+- **Hardhat Framework**: Primary development environment for Ethereum and Base smart contracts
+- **Foundry Support**: Alternative tooling for advanced testing and gas optimization
+- **TypeChain Integration**: Automatic TypeScript interface generation from ABIs
+- **Dual-Chain Deployment**: Coordinated deployment scripts for Ethereum and Base networks
+
+### Smart Contract Package Structure
+
+```
+packages/smart-contracts/
+├── contracts/                      # Solidity source files
+│   ├── TriggerrEscrowFactory.sol  # Main escrow factory contract
+│   ├── PolicyRegistry.sol         # Policy management contract
+│   └── PolicyFund.sol             # Fund management contract
+├── scripts/                       # Deployment and utility scripts
+├── test/                          # Solidity and TypeScript tests
+├── artifacts/                     # Compiled contract artifacts (gitignored)
+├── typechain-types/               # Generated TypeScript interfaces
+├── hardhat.config.ts             # Hardhat configuration
+├── foundry.toml                  # Foundry configuration
+└── package.json                  # Package configuration
+```
+
+### ABI Generation and TypeChain Integration
+
+The build system automatically:
+
+1. **Compiles Solidity contracts** using Hardhat
+2. **Generates ABIs** from compiled contracts
+3. **Creates TypeScript interfaces** using TypeChain
+4. **Exports contract artifacts** to dependent packages
+5. **Updates package references** for seamless integration
+
+### Build Process Integration
+
+```typescript
+// Generated TypeScript interfaces are available immediately
+import { TriggerrEscrowFactory__factory } from '@triggerr/smart-contracts';
+import type { TriggerrEscrowFactory } from '@triggerr/smart-contracts';
+
+// Seamless integration with existing TypeScript packages
+const factory = TriggerrEscrowFactory__factory.connect(address, signer);
 ```
 
 ## Package Templates System
@@ -161,6 +214,42 @@ Located in `templates/package-templates/`, this system provides standardized con
 
 ### Primary Build Commands
 
+#### Dual-Chain Smart Contract Build
+```bash
+# Compile all smart contracts for both Ethereum and Base
+bun run build:contracts
+
+# Generate TypeScript interfaces from ABIs
+bun run generate:typechain
+
+# Deploy to local development networks
+bun run deploy:local
+
+# Deploy to testnets (Sepolia + Base Sepolia)
+bun run deploy:testnet
+
+# Deploy to production networks (Ethereum + Base Mainnet)
+bun run deploy:mainnet
+```
+
+#### Smart Contract Development Commands
+```bash
+# Start local Hardhat node with Ethereum fork
+bun run hardhat:node
+
+# Start local Base node (via Docker)
+bun run base:node
+
+# Run smart contract tests
+bun run test:contracts
+
+# Run gas optimization analysis
+bun run analyze:gas
+
+# Verify contracts on Etherscan/Basescan
+bun run verify:contracts
+```
+
 #### Full Project Type Check
 ```bash
 # Check all TypeScript files for errors (no compilation)
@@ -215,6 +304,72 @@ The `scripts/validate-build.ts` script provides comprehensive build testing:
 - Validates type definition generation
 - Reports success/failure statistics
 - Identifies packages with missing declarations
+
+## Smart Contract Integration Configuration
+
+### Hardhat Configuration
+
+The smart contracts package uses Hardhat with dual-network support:
+
+```typescript
+// packages/smart-contracts/hardhat.config.ts
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
+import "@typechain/hardhat";
+
+const config: HardhatUserConfig = {
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200,
+      },
+    },
+  },
+  networks: {
+    ethereum: {
+      url: process.env.ETHEREUM_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+    },
+    base: {
+      url: process.env.BASE_RPC_URL,
+      accounts: [process.env.DEPLOYER_PRIVATE_KEY!],
+    },
+  },
+  typechain: {
+    outDir: "typechain-types",
+    target: "ethers-v6",
+  },
+};
+```
+
+### TypeScript Integration
+
+Smart contracts are integrated into the TypeScript build system through:
+
+```json
+// packages/smart-contracts/package.json
+{
+  "scripts": {
+    "build": "hardhat compile && npm run typechain",
+    "typechain": "hardhat typechain",
+    "clean": "hardhat clean && rimraf typechain-types",
+    "deploy:ethereum": "hardhat run scripts/deploy.ts --network ethereum",
+    "deploy:base": "hardhat run scripts/deploy.ts --network base"
+  },
+  "exports": {
+    ".": {
+      "import": "./typechain-types/index.js",
+      "types": "./typechain-types/index.d.ts"
+    },
+    "./contracts/*": {
+      "import": "./typechain-types/contracts/*.js",
+      "types": "./typechain-types/contracts/*.d.ts"
+    }
+  }
+}
+```
 
 ## Type Safety Configuration
 
@@ -718,6 +873,49 @@ if (result) {
 - Track build times and optimize slow packages
 - Monitor type error frequency and patterns
 - Keep documentation updated with architecture changes
+
+## Smart Contract Deployment Pipeline
+
+### Deployment Strategy
+
+The build system supports coordinated deployment across both Ethereum and Base:
+
+```typescript
+// scripts/deploy-dual-chain.ts
+export async function deployDualChain() {
+  // Deploy to Ethereum first (primary chain)
+  const ethereumContracts = await deployToEthereum();
+  
+  // Deploy to Base with same configuration
+  const baseContracts = await deployToBase(ethereumContracts.config);
+  
+  // Verify deployment consistency
+  await verifyConsistency(ethereumContracts, baseContracts);
+  
+  // Update environment configurations
+  await updateEnvironmentConfig({
+    ethereum: ethereumContracts.addresses,
+    base: baseContracts.addresses
+  });
+}
+```
+
+### Environment Configuration
+
+Post-deployment, the build system automatically updates environment configurations:
+
+```bash
+# Auto-generated environment variables
+ETHEREUM_FACTORY_ADDRESS=0x...
+BASE_FACTORY_ADDRESS=0x...
+ETHEREUM_REGISTRY_ADDRESS=0x...
+BASE_REGISTRY_ADDRESS=0x...
+
+# Chain router configuration
+CHAIN_ROUTER_PRIMARY=ethereum
+CHAIN_ROUTER_FALLBACK=base
+CHAIN_ROUTER_COST_THRESHOLD=50
+```
 
 ### Future Considerations
 

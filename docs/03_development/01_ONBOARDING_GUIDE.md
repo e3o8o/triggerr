@@ -162,14 +162,235 @@ graph TD
 - **Backend**: Next.js API Routes (Edge Runtime)
 - **Database**: PostgreSQL with Drizzle ORM
 - **Authentication**: Better-Auth with Google OAuth
-- **Blockchain**: PayGo Protocol (`@witnessco/paygo-ts-client`)
+- **Blockchain**: Dual-Chain (Ethereum + Base) with PayGo Protocol
+- **Smart Contracts**: Solidity 0.8.20+ with Hardhat/Foundry
+- **Chain Abstraction**: Intelligent routing with user transparency
 - **Language**: TypeScript (100% type-safe)
 - **Package Manager**: Bun
-- **Build System**: TypeScript Project References
+- **Build System**: TypeScript Project References + Solidity Compilation
 
 ---
 
-## IV. 📈 **CURRENT IMPLEMENTATION STATUS** {#implementation-status}
+## IV. 🔗 **DUAL-CHAIN DEVELOPMENT ENVIRONMENT SETUP** {#dual-chain-setup}
+
+### **Prerequisites & Installation**
+
+#### **Required Software**
+```bash
+# 1. Install Node.js 18+ and Bun
+curl -fsSL https://bun.sh/install | bash
+
+# 2. Install Docker (for local blockchain nodes)
+# Visit: https://docs.docker.com/get-docker/
+
+# 3. Install Foundry (for advanced Solidity development)
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+#### **Environment Variables Setup**
+```bash
+# Copy the environment template
+cp .env.example .env.local
+
+# Configure dual-chain RPC endpoints
+ETHEREUM_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY"
+BASE_RPC_URL="https://base-sepolia.g.alchemy.com/v2/YOUR_KEY"
+
+# Set up deployer wallet (for contract deployment)
+DEPLOYER_PRIVATE_KEY="your_private_key_here"
+
+# Configure chain router settings
+CHAIN_ROUTER_PRIMARY="ethereum"
+CHAIN_ROUTER_FALLBACK="base"
+CHAIN_ROUTER_COST_THRESHOLD="50"
+```
+
+### **Local Development Networks**
+
+#### **Start Local Ethereum Node**
+```bash
+# Terminal 1: Start Hardhat node with Ethereum mainnet fork
+cd packages/smart-contracts
+bun run hardhat:node
+
+# This starts a local Ethereum node on http://localhost:8545
+# Pre-funded accounts will be displayed in the terminal
+```
+
+#### **Start Local Base Node**
+```bash
+# Terminal 2: Start Base node (using Docker)
+bun run base:node
+
+# This starts a local Base node on http://localhost:8546
+# Compatible with Base mainnet state
+```
+
+### **Smart Contract Development Workflow**
+
+#### **Initial Setup**
+```bash
+# 1. Install all dependencies
+bun install
+
+# 2. Compile smart contracts
+cd packages/smart-contracts
+bun run build
+
+# 3. Generate TypeScript interfaces
+bun run generate:typechain
+
+# 4. Deploy to local networks
+bun run deploy:local
+```
+
+#### **Development Commands**
+```bash
+# Compile contracts and generate types
+bun run build:contracts
+
+# Run comprehensive contract tests
+bun run test:contracts
+
+# Deploy to testnets (Sepolia + Base Sepolia)
+bun run deploy:testnet
+
+# Verify contracts on block explorers
+bun run verify:contracts
+
+# Analyze gas optimization opportunities
+bun run analyze:gas
+```
+
+### **Chain Abstraction Development**
+
+#### **Testing Chain Router Logic**
+```typescript
+// Example: Testing optimal chain selection
+import { ChainRouter } from '@triggerr/chain-router';
+
+const router = new ChainRouter({
+  ethereum: ethereumAdapter,
+  base: baseAdapter,
+  costThreshold: 50 // USD
+});
+
+// Test automatic chain selection based on transaction cost
+const result = await router.executeWithOptimalChain(
+  async (adapter) => adapter.createEscrow(params),
+  { preferredChain: 'base' }
+);
+
+console.log(`Executed on: ${result.chainUsed}`);
+console.log(`Cost saved: $${result.costSavings}`);
+```
+
+#### **User Abstraction Testing**
+```typescript
+// Example: Testing seamless user experience
+import { UserAbstractionLayer } from '@triggerr/chain-router';
+
+const ual = new UserAbstractionLayer();
+
+// User never knows which chain is used
+const policy = await ual.purchasePolicy({
+  flightNumber: 'AA1234',
+  premium: 50,
+  coverage: 1000
+  // Chain selection is automatic and transparent
+});
+```
+
+### **Development Best Practices**
+
+#### **Dual-Chain Contract Development**
+1. **Identical Interface**: Ensure contracts have identical interfaces on both chains
+2. **State Synchronization**: Use events for cross-chain state awareness
+3. **Gas Optimization**: Design for Base's lower costs while maintaining Ethereum compatibility
+4. **Fallback Mechanisms**: Always implement chain failover logic
+
+#### **TypeScript Integration**
+```typescript
+// Auto-generated types are immediately available
+import { 
+  TriggerrEscrowFactory__factory,
+  type TriggerrEscrowFactory 
+} from '@triggerr/smart-contracts';
+
+// Seamless integration with chain adapters
+const ethereumFactory = TriggerrEscrowFactory__factory.connect(
+  ethereumAddress, 
+  ethereumSigner
+);
+
+const baseFactory = TriggerrEscrowFactory__factory.connect(
+  baseAddress, 
+  baseSigner
+);
+```
+
+### **Testing & Deployment Strategy**
+
+#### **Local Testing**
+```bash
+# 1. Test individual contracts
+bun run test:contracts:unit
+
+# 2. Test cross-chain integration
+bun run test:contracts:integration
+
+# 3. Test chain abstraction layer
+bun run test:chain-router
+
+# 4. End-to-end testing with local nodes
+bun run test:e2e:local
+```
+
+#### **Testnet Deployment Pipeline**
+```bash
+# 1. Deploy to Sepolia (Ethereum testnet)
+bun run deploy:sepolia
+
+# 2. Deploy to Base Sepolia
+bun run deploy:base-sepolia
+
+# 3. Verify deployment consistency
+bun run verify:consistency
+
+# 4. Update environment configuration
+bun run update:testnet-config
+```
+
+### **Troubleshooting Common Issues**
+
+#### **RPC Connection Issues**
+```bash
+# Check RPC connectivity
+curl -X POST -H "Content-Type: application/json" \
+  --data '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}' \
+  $ETHEREUM_RPC_URL
+```
+
+#### **Gas Estimation Failures**
+```bash
+# Run gas analysis to identify issues
+bun run analyze:gas --detailed
+
+# Check for contract size limits
+bun run check:contract-size
+```
+
+#### **TypeChain Generation Issues**
+```bash
+# Clean and regenerate all types
+bun run clean:typechain
+bun run generate:typechain --force
+```
+
+---
+
+## V. 📈 **CURRENT IMPLEMENTATION STATUS** {#implementation-status}
 
 ### **Phase F Completion Status (Foundation)**
 **Overall Progress**: 95% Complete - Moving to Service Implementation

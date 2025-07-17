@@ -1,4 +1,4 @@
-# triggerr: Decentralized Parametric Insurance Experts - Vision & Architecture v1.0
+# triggerr: Dual-Chain Parametric Insurance Platform - Vision & Architecture v2.0
 
 **Document Version**: 1.0
 **Last Updated**: June 16, 2025
@@ -244,7 +244,17 @@ triggerr aims to revolutionize parametric insurance by launching `triggerr.com` 
 - **Technology**: Duffel (primary) and Amadeus Self-Service (secondary) for flight search, offers, and booking.
 - **Product Focus**: Flight search, booking, bundled flight + `triggerr` insurance packages.
 
-### Brand Positioning & Key Differentiators (MVP Focus for `triggerr`)
+### Brand Positioning & Key Differentiators (Dual-Chain MVP Focus for `triggerr`)
+
+#### **Core Technical Differentiator: Dual-Chain Smart Contract Ownership**
+- **Complete Infrastructure Control**: Owned smart contracts deployed on both Ethereum and Base networks
+- **TriggerrEscrowFactory.sol**: Proprietary escrow factory supporting all 14 escrow models across both chains
+- **PolicyRegistry.sol**: Immutable on-chain policy verification system for maximum transparency
+- **PolicyFund.sol**: DeFi-integrated treasury management with yield generation capabilities
+- **User Abstraction**: Seamless blockchain experience - users never need to choose between Ethereum and Base
+- **Investment Appeal**: True Web3-native company with valuable smart contract IP and infrastructure ownership
+
+#### **Strategic Market Advantages**
 - **Digital Dominance**: Strategic ownership of key social media channels
 - **Information Control**: Direct access to millions through acquired platforms
 - **Algorithm Advantage**: Leveraging existing platform favorability
@@ -400,7 +410,7 @@ Our three-phase approach to market leadership:
 2. **Expansion Phase (Q3-Q4 2025)**: Achieve market leadership and establish de facto industry standards
 3. **Domination Phase (Q1-Q2 2026)**: Secure 60%+ market share through ecosystem lock-in
 
-### Competitive Advantages
+### Dual-Chain Competitive Advantages
 - **Network Effects**: Developer ecosystem creates self-reinforcing growth
 - **Standard Ownership**: Canonical models become industry requirement
 - **Switching Costs**: Deep platform integration makes migration expensive
@@ -865,9 +875,25 @@ Our go-to-market strategy is **API-First**, which provides the best balance of s
 
 ---
 
-## 6. Technical Architecture
+## 6. Dual-Chain Technical Architecture
 
-### Technology Stack & Project Structure
+### **Smart Contract Foundation**
+Our technical architecture is built on owned smart contract infrastructure deployed across Ethereum and Base networks:
+
+**Core Smart Contract Suite:**
+- **TriggerrEscrowFactory.sol**: Central factory contract for deploying all escrow types
+- **SingleSidedEscrowLogic.sol**: Primary escrow implementation for user premiums
+- **PolicyRegistry.sol**: Immutable policy term verification and transparency
+- **PolicyFund.sol**: DeFi-integrated treasury with automated yield generation
+- **TriggerrDelegation.sol**: Secure backend automation for parametric payouts
+
+**Chain Abstraction Architecture:**
+- **Intelligent Routing**: Automatic chain selection based on cost optimization and network conditions
+- **User Transparency**: Complete blockchain abstraction - users interact with Triggerr, not specific chains
+- **Cross-Chain Consistency**: Policy terms and escrow states synchronized across both networks
+- **Failover Capability**: Automatic fallback between Ethereum and Base for maximum reliability
+
+### Dual-Chain Technology Stack & Project Structure
 - **Frontend**: Next.js (App Router, with `apps/web/src/app/shell/page.tsx` bootstrapping client-side React Router in `apps/web/src/frontend/app.tsx`), TailwindCSS, Shadcn/UI (or similar component library).
     *   **Proposed Frontend Directory Structure (`apps/web/src/frontend/`)**:
         ```
